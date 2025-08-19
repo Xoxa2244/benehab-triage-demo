@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Logo from '../components/Logo'
 
-const TIME_SLOTS = ["13:00","15:00","17:00"]
+const TIME_SLOTS = ['13:00','15:00','17:00']
+
+// demo-followup delay: 30 секунд (потом поставишь 2 часа = 2*60*60*1000)
+const FOLLOWUP_DELAY_MS = 30 * 1000
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -11,19 +14,38 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [showSlots, setShowSlots] = useState(false)
   const listRef = useRef(null)
+  const followupTimer = useRef(null)
 
+  // Быстрые чипы с интентами
   const quickChips = useMemo(() => [
-    { label: "Трудно дышать", text: "Мне трудно дышать" },
-    { label: "Грипп, 3-й день", text: "У меня грипп, третий день температура 37.3, слабость" },
-    { label: "Сыпь 6 дней", text: "У меня уже 6 дней сыпь на ногах, не чешется, не проходит" },
-    { label: "Субфебрилитет?", text: "Что такое субфебрильная температура?" },
+    { label: 'Очень переживаю', intent: 'anxious' },
+    { label: 'Расскажи про препарат', intent: 'drug_info' },
+    { label: 'Куда обратиться', intent: 'where_to_go' },
+    { label: 'Запиши к врачу', intent: 'book' },
+    { label: 'Напомнить через 2 часа', intent: 'followup' },
   ], [])
 
-  useEffect(() => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
-  }, [messages, showSlots])
+  const scrollDown = () => {
+    requestAnimationFrame(() => {
+      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+    })
+  }
 
-  const send = async (text) => {
+  useEffect(() => { scrollDown() }, [messages, showSlots])
+
+  // Follow‑up: простая имитация напоминания (через 30 сек для демо)
+  const scheduleFollowup = () => {
+    // очищаем старый
+    if (followupTimer.current) {
+      clearTimeout(followupTimer.current)
+      followupTimer.current = null
+    }
+    followupTimer.current = setTimeout(() => {
+      setMessages(m => [...m, { role: 'assistant', content: 'Проверка самочувствия. Как ты сейчас? Изменилась ли температура/боль/дыхание?' }])
+    }, FOLLOWUP_DELAY_MS)
+  }
+
+  const send = async (text, meta = {}) => {
     if (!text.trim()) return
     const withUser = [...messages, { role: 'user', content: text }]
     setMessages(withUser)
@@ -33,11 +55,15 @@ export default function Home() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: withUser })
+        body: JSON.stringify({ messages: withUser, meta })
       })
       const data = await res.json()
-      setMessages(m => [...m, { role: 'assistant', content: data.content }])
-      setShowSlots(/Выбери удобное время:/i.test(data.content))
+      const reply = data.content || 'Готово.'
+      setMessages(m => [...m, { role: 'assistant', content: reply }])
+      setShowSlots(/Выбери удобное время:/i.test(reply))
+
+      // если ассистент предложил follow‑up, покажем кнопку «Напомнить сейчас»
+      // (на практике можно парсить ответ и автоматически планировать).
     } catch (e) {
       setMessages(m => [...m, { role: 'assistant', content: 'Упс, что-то пошло не так. Попробуй ещё раз.' }])
     } finally {
@@ -45,8 +71,18 @@ export default function Home() {
     }
   }
 
+  const onChipClick = (chip) => {
+    if (chip.intent === 'followup') {
+      scheduleFollowup()
+      setMessages(m => [...m, { role: 'assistant', content: 'Ок, напомню через ~2 часа (в демо через 30 секунд).' }])
+      return
+    }
+    send(chip.label, { intent: chip.intent })
+  }
+
   const onChooseTime = (t) => {
-    // Для простоты: локально подтверждаем запись (сервер тоже умеет это делать через tool)
+    // Для простоты: локально подтверждаем запись;
+    // сервер тоже сможет подтвердить через tool book_appointment.
     setMessages(m => [...m, { role: 'assistant', content: 'Спасибо, вы записаны.' }])
     setShowSlots(false)
   }
@@ -61,7 +97,7 @@ export default function Home() {
             <div className="text-xs text-gray-500">Triage · Запись к врачу · Базовые вопросы</div>
           </div>
           <div className="ml-auto flex gap-2">
-            <button className="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 text-sm" onClick={() => send('SOS')}>
+            <button className="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 text-sm" onClick={() => send('SOS')} title="Экстренная помощь">
               SOS
             </button>
           </div>
@@ -71,7 +107,9 @@ export default function Home() {
       <div className="max-w-3xl mx-auto p-4 grid gap-3">
         <div className="flex flex-wrap gap-2">
           {quickChips.map(c => (
-            <button key={c.label} className="px-3 py-1.5 rounded-full bg-white shadow text-sm hover:bg-slate-50" onClick={() => send(c.text)}>
+            <button key={c.label}
+              className="px-3 py-1.5 rounded-full bg-white shadow text-sm hover:bg-slate-50"
+              onClick={() => onChipClick(c)}>
               {c.label}
             </button>
           ))}
@@ -80,6 +118,7 @@ export default function Home() {
             onClick={() => {
               setMessages([{ role: 'assistant', content: 'Привет! Я — медицинский ассистент Benehab. Расскажи, что беспокоит. Если станет совсем плохо — нажми SOS.' }])
               setShowSlots(false)
+              if (followupTimer.current) { clearTimeout(followupTimer.current); followupTimer.current = null }
             }}
           >
             Сбросить сессию
@@ -124,7 +163,7 @@ export default function Home() {
         </div>
 
         <div className="text-xs text-gray-500 leading-relaxed">
-          <p>⚠️ Демонстрация. Ассистент не ставит диагнозы, не назначает лечение и не интерпретирует анализы. При признаках опасного состояния — вызывайте скорую.</p>
+          <p>⚠️ Демонстрация. Ассистент не ставит диагнозы, не назначает дозировки и не интерпретирует анализы. При признаках опасного состояния — вызывайте скорую.</p>
         </div>
       </div>
     </div>
