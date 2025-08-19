@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Logo from '@/components/Logo'
+import Logo from '../components/Logo'
 
 const TIME_SLOTS = ["13:00","15:00","17:00"]
 
