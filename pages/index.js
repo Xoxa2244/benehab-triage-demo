@@ -2,9 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Logo from '../components/Logo'
 
 const TIME_SLOTS = ['13:00','15:00','17:00']
-
-// demo-followup delay: 30 секунд (потом поставишь 2 часа = 2*60*60*1000)
-const FOLLOWUP_DELAY_MS = 30 * 1000
+const FOLLOWUP_DELAY_MS = 30 * 1000  // demo 30s
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -16,7 +14,6 @@ export default function Home() {
   const listRef = useRef(null)
   const followupTimer = useRef(null)
 
-  // Быстрые чипы с интентами
   const quickChips = useMemo(() => [
     { label: 'Очень переживаю', intent: 'anxious' },
     { label: 'Расскажи про препарат', intent: 'drug_info' },
@@ -25,21 +22,12 @@ export default function Home() {
     { label: 'Напомнить через 2 часа', intent: 'followup' },
   ], [])
 
-  const scrollDown = () => {
-    requestAnimationFrame(() => {
-      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
-    })
-  }
+  const scrollDown = () => requestAnimationFrame(() => { if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight })
 
   useEffect(() => { scrollDown() }, [messages, showSlots])
 
-  // Follow‑up: простая имитация напоминания (через 30 сек для демо)
   const scheduleFollowup = () => {
-    // очищаем старый
-    if (followupTimer.current) {
-      clearTimeout(followupTimer.current)
-      followupTimer.current = null
-    }
+    if (followupTimer.current) clearTimeout(followupTimer.current)
     followupTimer.current = setTimeout(() => {
       setMessages(m => [...m, { role: 'assistant', content: 'Проверка самочувствия. Как ты сейчас? Изменилась ли температура/боль/дыхание?' }])
     }, FOLLOWUP_DELAY_MS)
@@ -60,10 +48,8 @@ export default function Home() {
       const data = await res.json()
       const reply = data.content || 'Готово.'
       setMessages(m => [...m, { role: 'assistant', content: reply }])
+      // Слоты показываем только если ассистент явно попросил выбрать время
       setShowSlots(/Выбери удобное время:/i.test(reply))
-
-      // если ассистент предложил follow‑up, покажем кнопку «Напомнить сейчас»
-      // (на практике можно парсить ответ и автоматически планировать).
     } catch (e) {
       setMessages(m => [...m, { role: 'assistant', content: 'Упс, что-то пошло не так. Попробуй ещё раз.' }])
     } finally {
@@ -81,8 +67,6 @@ export default function Home() {
   }
 
   const onChooseTime = (t) => {
-    // Для простоты: локально подтверждаем запись;
-    // сервер тоже сможет подтвердить через tool book_appointment.
     setMessages(m => [...m, { role: 'assistant', content: 'Спасибо, вы записаны.' }])
     setShowSlots(false)
   }
@@ -97,9 +81,7 @@ export default function Home() {
             <div className="text-xs text-gray-500">Triage · Запись к врачу · Базовые вопросы</div>
           </div>
           <div className="ml-auto flex gap-2">
-            <button className="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 text-sm" onClick={() => send('SOS')} title="Экстренная помощь">
-              SOS
-            </button>
+            <button className="px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 text-sm" onClick={() => send('SOS')}>SOS</button>
           </div>
         </div>
       </div>
@@ -107,9 +89,7 @@ export default function Home() {
       <div className="max-w-3xl mx-auto p-4 grid gap-3">
         <div className="flex flex-wrap gap-2">
           {quickChips.map(c => (
-            <button key={c.label}
-              className="px-3 py-1.5 rounded-full bg-white shadow text-sm hover:bg-slate-50"
-              onClick={() => onChipClick(c)}>
+            <button key={c.label} className="px-3 py-1.5 rounded-full bg-white shadow text-sm hover:bg-slate-50" onClick={() => onChipClick(c)}>
               {c.label}
             </button>
           ))}
@@ -118,7 +98,7 @@ export default function Home() {
             onClick={() => {
               setMessages([{ role: 'assistant', content: 'Привет! Я — медицинский ассистент Benehab. Расскажи, что беспокоит. Если станет совсем плохо — нажми SOS.' }])
               setShowSlots(false)
-              if (followupTimer.current) { clearTimeout(followupTimer.current); followupTimer.current = null }
+              if (followupTimer.current) clearTimeout(followupTimer.current)
             }}
           >
             Сбросить сессию
@@ -150,20 +130,12 @@ export default function Home() {
         </div>
 
         <div className="bg-white rounded-2xl border shadow-sm p-2 flex items-center gap-2">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
-            placeholder="Опиши симптомы или задай медицинский вопрос…"
-            className="flex-1 px-3 py-2 outline-none"
-          />
-          <button onClick={() => send(input)} disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50">
-            Отправить
-          </button>
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }} placeholder="Опиши симптомы или задай медицинский вопрос…" className="flex-1 px-3 py-2 outline-none" />
+          <button onClick={() => send(input)} disabled={loading} className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50">Отправить</button>
         </div>
 
         <div className="text-xs text-gray-500 leading-relaxed">
-          <p>⚠️ Демонстрация. Ассистент не ставит диагнозы, не назначает дозировки и не интерпретирует анализы. При признаках опасного состояния — вызывайте скорую.</p>
+          <p>⚠️ Демонстрация. Ассистент даёт фактическую справочную информацию о препаратах без дозировок и не назначает лечение. При признаках опасного состояния — вызывайте скорую.</p>
         </div>
       </div>
     </div>
