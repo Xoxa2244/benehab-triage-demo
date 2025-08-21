@@ -100,9 +100,17 @@ export default function ProfilingProgress() {
 
       {totalProgress === totalSurveys && (
         <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-          <p className="text-sm text-emerald-800 text-center">
+          <p className="text-sm text-emerald-800 text-center mb-3">
             🎉 Все опросы завершены! Теперь Татьяна будет общаться с вами в полностью персонализированном режиме.
           </p>
+          <div className="text-center">
+            <Link 
+              href="/communication-instructions" 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm"
+            >
+              📋 Посмотреть инструкции по общению
+            </Link>
+          </div>
         </div>
       )}
 

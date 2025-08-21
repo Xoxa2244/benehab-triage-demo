@@ -273,6 +273,12 @@ export default function Home() {
               >
                 ⏰ Напомнить через 2 часа
               </button>
+              <Link
+                href="/communication-instructions"
+                className="px-3 py-2 bg-indigo-50 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors text-sm"
+              >
+                📋 Инструкции по общению
+              </Link>
             </div>
           </div>
         )}

@@ -169,6 +169,9 @@ export default function AttitudeResults() {
           <Link href="/profiling/attitude" className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:border-emerald-400 hover:text-emerald-600 transition-colors">
             Пройти опрос заново
           </Link>
+          <Link href="/communication-instructions" className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">
+            📋 Инструкции по общению
+          </Link>
           <Link href="/" className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
             Продолжить профилирование
           </Link>
