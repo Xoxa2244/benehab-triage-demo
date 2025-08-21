@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { getCommunicationInstructions } from '../../../lib/communication-instructions';
 
 export default function AttitudeResult() {
   const router = useRouter();
@@ -63,6 +64,17 @@ export default function AttitudeResult() {
     };
 
     return profile.comm_flags.map(flag => tipMap[flag] || flag);
+  };
+
+  const getCommunicationInstructions = () => {
+    if (!profile) return null;
+    
+    // Получаем инструкции по коммуникации на основе профиля
+    const instructions = getCommunicationInstructions(profile, null);
+    
+    if (!instructions || !instructions.attitude) return null;
+    
+    return instructions.attitude;
   };
 
   const continueToTypology = () => {
@@ -141,6 +153,67 @@ export default function AttitudeResult() {
             ))}
           </div>
         </div>
+
+        {/* Инструкции по коммуникации на основе профиля */}
+        {getCommunicationInstructions() && (
+          <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Персональные рекомендации по общению
+            </h2>
+            
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                Профиль: {getCommunicationInstructions().name}
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                {getCommunicationInstructions().description}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Положительный сценарий */}
+              <div>
+                <h4 className="text-md font-medium text-emerald-700 mb-3">✅ Что делать:</h4>
+                <div className="space-y-2">
+                  {getCommunicationInstructions().positive_scenario.map((item, index) => (
+                    <div key={index} className="flex items-start">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                      <p className="text-gray-700 text-sm">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Отрицательный сценарий */}
+              <div>
+                <h4 className="text-md font-medium text-red-700 mb-3">❌ Чего избегать:</h4>
+                <div className="space-y-2">
+                  {getCommunicationInstructions().negative_scenario.map((item, index) => (
+                    <div key={index} className="flex items-start">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                      <p className="text-gray-700 text-sm">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Экстремальные значения */}
+            {getCommunicationInstructions().extreme_actions && (
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="text-md font-medium text-blue-800 mb-3">⚠️ Особое внимание:</h4>
+                <div className="space-y-2 text-sm text-blue-700">
+                  {getCommunicationInstructions().extreme_actions.low && (
+                    <p><strong>Низкие значения:</strong> {getCommunicationInstructions().extreme_actions.low}</p>
+                  )}
+                  {getCommunicationInstructions().extreme_actions.high && (
+                    <p><strong>Высокие значения:</strong> {getCommunicationInstructions().extreme_actions.high}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Детальные результаты */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">

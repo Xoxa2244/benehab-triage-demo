@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/AWMv5TTCqIVQrw4oq-IqO/_buildManifest.js",
-    "static/AWMv5TTCqIVQrw4oq-IqO/_ssgManifest.js"
+    "static/qqQ4WHQCt-aQFWr8Aa3SV/_buildManifest.js",
+    "static/qqQ4WHQCt-aQFWr8Aa3SV/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
@@ -21,7 +21,7 @@
       "static/chunks/webpack-69bfa6990bb9e155.js",
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
-      "static/css/c15a7b924dbc4ca9.css",
+      "static/css/705ca153da9df1ec.css",
       "static/chunks/pages/_app-2c81db487fff70a6.js"
     ],
     "/_error": [
@@ -42,7 +42,7 @@
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/profiling/attitude/result-eb5a13367b90acf9.js"
+      "static/chunks/pages/profiling/attitude/result-25973591792bf0ae.js"
     ],
     "/profiling/typology": [
       "static/chunks/webpack-69bfa6990bb9e155.js",
