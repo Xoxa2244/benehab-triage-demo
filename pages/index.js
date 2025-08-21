@@ -28,6 +28,8 @@ export default function Home() {
     const haveT = !!localStorage.getItem('benehab_typology_profile');
     const pibData = localStorage.getItem('benehab.pib');
     
+    console.log('🔍 Debug localStorage:', { demo, haveA, haveT, needProfiling: !(haveA && haveT) });
+    
     setDemoDone(demo);
     setNeedProfiling(!(haveA && haveT));
     
@@ -39,6 +41,29 @@ export default function Home() {
       }
     }
   }, []);
+
+  // Дополнительный useEffect для отслеживания изменений в localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const checkProfiles = () => {
+      const haveA = !!localStorage.getItem('benehab_attitude_profile');
+      const haveT = !!localStorage.getItem('benehab_typology_profile');
+      const newNeedProfiling = !(haveA && haveT);
+      
+      console.log('🔄 Проверка профилей:', { haveA, haveT, newNeedProfiling, current: needProfiling });
+      
+      if (newNeedProfiling !== needProfiling) {
+        setNeedProfiling(newNeedProfiling);
+        console.log('✅ needProfiling обновлен:', newNeedProfiling);
+      }
+    };
+
+    // Проверяем каждые 2 секунды
+    const interval = setInterval(checkProfiles, 2000);
+    
+    return () => clearInterval(interval);
+  }, [needProfiling]);
 
   const listRef = useRef(null);
   useEffect(() => {
@@ -160,7 +185,40 @@ export default function Home() {
           )}
         </div>
 
-        {!demoDone && <OnboardingCard onDone={() => setDemoDone(true)} />}
+        {!demoDone && <OnboardingCard onDone={(demo) => {
+          setDemoDone(true);
+          // Принудительно обновляем needProfiling после завершения демо
+          setTimeout(() => {
+            const haveA = !!localStorage.getItem('benehab_attitude_profile');
+            const haveT = !!localStorage.getItem('benehab_typology_profile');
+            setNeedProfiling(!(haveA && haveT));
+            console.log('🔄 Обновление needProfiling:', { haveA, haveT, needProfiling: !(haveA && haveT) });
+          }, 100);
+        }} />}
+
+        {/* Отладочная информация */}
+        {demoDone && (
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 text-xs text-gray-600">
+            <div className="font-medium mb-1">🔍 Отладка:</div>
+            <div>demoDone: {demoDone.toString()}</div>
+            <div>needProfiling: {needProfiling.toString()}</div>
+            <div>Есть attitude: {!!localStorage.getItem('benehab_attitude_profile') ? '✅' : '❌'}</div>
+            <div>Есть typology: {!!localStorage.getItem('benehab_typology_profile') ? '✅' : '❌'}</div>
+            <div className="mt-2">
+              <button
+                onClick={() => {
+                  const haveA = !!localStorage.getItem('benehab_attitude_profile');
+                  const haveT = !!localStorage.getItem('benehab_typology_profile');
+                  setNeedProfiling(!(haveA && haveT));
+                  console.log('🔄 Принудительное обновление needProfiling:', { haveA, haveT, needProfiling: !(haveA && haveT) });
+                }}
+                className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+              >
+                🔄 Обновить состояние
+              </button>
+            </div>
+          </div>
+        )}
 
         {demoDone && needProfiling && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm">
