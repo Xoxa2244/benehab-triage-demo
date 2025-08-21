@@ -2,7 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/profiling/typology": "pages/profiling/typology.js",
-  "/": "pages/index.js",
-  "/api/profiling/values/items": "pages/api/profiling/values/items.js"
+  "/": "pages/index.js"
 }

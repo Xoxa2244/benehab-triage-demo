@@ -103,7 +103,9 @@ function analyzeColorRankings(colorRankings, colorAssociations) {
     top_colors: colorRankings.slice(0, 5), // Топ-5 приятных цветов
     bottom_colors: colorRankings.slice(-5), // Топ-5 неприятных цветов
     concept_distribution: {},
-    color_emotion_map: {}
+    color_emotion_map: {},
+    top_priorities: [],
+    bottom_priorities: []
   };
 
   // Анализируем распределение понятий по цветам
@@ -124,6 +126,13 @@ function analyzeColorRankings(colorRankings, colorAssociations) {
       emotion: index < colorRankings.length / 2 ? 'positive' : 'negative',
       intensity: Math.abs((colorRankings.length / 2) - index)
     };
+
+    // Добавляем понятия в приоритеты
+    if (index < 3) {
+      analysis.top_priorities.push(...conceptsWithThisColor);
+    } else if (index >= colorRankings.length - 3) {
+      analysis.bottom_priorities.push(...conceptsWithThisColor);
+    }
   });
 
   return analysis;
@@ -139,7 +148,11 @@ function calculateValueIndices(colorAssociations, colorRankings) {
     treatment_attitude: calculateTreatmentAttitudeIndex(colorAssociations, colorRankings),
     family_importance: calculateFamilyImportanceIndex(colorAssociations, colorRankings),
     health_priority: calculateHealthPriorityIndex(colorAssociations, colorRankings),
-    social_orientation: calculateSocialOrientationIndex(colorAssociations, colorRankings)
+    social_orientation: calculateSocialOrientationIndex(colorAssociations, colorRankings),
+    self_attitude: calculateSelfAttitudeIndex(colorAssociations, colorRankings),
+    death_attitude: calculateDeathAttitudeIndex(colorAssociations, colorRankings),
+    addiction_attitude: calculateAddictionAttitudeIndex(colorAssociations, colorRankings),
+    needs_satisfaction: calculateNeedsSatisfactionIndex(colorAssociations, colorRankings)
   };
 }
 
@@ -158,48 +171,34 @@ function generateCommunicationGuidelines(colorAnalysis, rankingAnalysis) {
   return guidelines;
 }
 
-// Вспомогательные функции
-function getConceptCategory(concept) {
-  // Здесь должна быть логика определения категории понятия
-  // Пока возвращаем заглушку
-  return 'general';
-}
-
-function calculateLifeAttitude(rankings) {
-  const positiveConcepts = ['Счастье', 'Радость', 'Надежда', 'Любовь', 'Семья'];
-  const negativeConcepts = ['Страх', 'Тревога', 'Страдание', 'Одиночество', 'Смерть'];
-  
-  let positiveScore = 0;
-  let negativeScore = 0;
-  
-  rankings.forEach((concept, index) => {
-    if (positiveConcepts.includes(concept)) {
-      positiveScore += (rankings.length - index);
-    } else if (negativeConcepts.includes(concept)) {
-      negativeScore += (index + 1);
-    }
-  });
-  
-  return positiveScore > negativeScore ? 'positive' : 'negative';
-}
-
+/**
+ * Рассчитывает индекс удовлетворенности жизнью
+ */
 function calculateLifeSatisfactionIndex(colorAssociations, colorRankings) {
-  // Расчет индекса удовлетворенности жизнью на основе ранжирования цветов
-  const positiveColors = colorRankings.slice(0, Math.ceil(colorRankings.length / 2));
-  let positiveScore = 0;
+  const lifeConcepts = ['жизнь', 'счастье', 'радость', 'надежда', 'любовь'];
+  let totalScore = 0;
+  let count = 0;
   
-  Object.values(colorAssociations).forEach(color => {
-    if (positiveColors.includes(color)) {
+  lifeConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
       const rank = colorRankings.indexOf(color);
-      positiveScore += (colorRankings.length - rank);
+      if (rank !== -1) {
+        // Чем выше ранг (ближе к началу), тем лучше
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
     }
   });
   
-  return Math.round((positiveScore / (Object.keys(colorAssociations).length * colorRankings.length)) * 100);
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
+/**
+ * Рассчитывает индекс ориентации на будущее
+ */
 function calculateFutureOrientationIndex(colorAssociations, colorRankings) {
-  const futureConcepts = ['Будущее', 'Надежда', 'Перемены', 'Успех'];
+  const futureConcepts = ['будущее', 'надежда', 'перемены', 'успех', 'цель'];
   let totalScore = 0;
   let count = 0;
   
@@ -217,71 +216,189 @@ function calculateFutureOrientationIndex(colorAssociations, colorRankings) {
   return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
-function calculateTreatmentAttitudeIndex(colorAssociations, rankings) {
-  const treatmentConcepts = ['Лечение', 'Врач', 'Медработники', 'Здоровье'];
-  let positiveCount = 0;
-  let totalCount = 0;
+/**
+ * Рассчитывает индекс отношения к лечению
+ */
+function calculateTreatmentAttitudeIndex(colorAssociations, colorRankings) {
+  const treatmentConcepts = ['лечение', 'врач', 'медицина', 'здоровье', 'больница'];
+  let totalScore = 0;
+  let count = 0;
   
   treatmentConcepts.forEach(concept => {
     if (colorAssociations[concept]) {
-      totalCount++;
-      if (['green', 'blue', 'yellow'].includes(colorAssociations[concept])) {
-        positiveCount++;
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
       }
     }
   });
   
-  return totalCount > 0 ? Math.round((positiveCount / totalCount) * 100) : 50;
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
-function calculateFamilyImportanceIndex(rankings) {
-  const familyConcepts = ['Семья', 'Любовь', 'Дружба'];
-  let totalRank = 0;
+/**
+ * Рассчитывает индекс важности семьи
+ */
+function calculateFamilyImportanceIndex(colorAssociations, colorRankings) {
+  const familyConcepts = ['семья', 'любовь', 'дружба', 'близкие', 'дом'];
+  let totalScore = 0;
   let count = 0;
   
   familyConcepts.forEach(concept => {
-    const index = rankings.indexOf(concept);
-    if (index !== -1) {
-      totalRank += (rankings.length - index);
-      count++;
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
     }
   });
   
-  return count > 0 ? Math.round((totalRank / count) / rankings.length * 100) : 50;
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
-function calculateHealthPriorityIndex(rankings) {
-  const healthConcepts = ['Здоровье', 'Болезнь', 'Лечение'];
-  let totalRank = 0;
+/**
+ * Рассчитывает индекс приоритета здоровья
+ */
+function calculateHealthPriorityIndex(colorAssociations, colorRankings) {
+  const healthConcepts = ['здоровье', 'болезнь', 'лечение', 'профилактика'];
+  let totalScore = 0;
   let count = 0;
   
   healthConcepts.forEach(concept => {
-    const index = rankings.indexOf(concept);
-    if (index !== -1) {
-      totalRank += (rankings.length - index);
-      count++;
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
     }
   });
   
-  return count > 0 ? Math.round((totalRank / count) / rankings.length * 100) : 50;
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
-function calculateSocialOrientationIndex(rankings) {
-  const socialConcepts = ['Друзья', 'Коллеги', 'Соседи', 'Общение'];
-  let totalRank = 0;
+/**
+ * Рассчитывает индекс социальной ориентации
+ */
+function calculateSocialOrientationIndex(colorAssociations, colorRankings) {
+  const socialConcepts = ['друзья', 'коллеги', 'соседи', 'общение', 'общество'];
+  let totalScore = 0;
   let count = 0;
   
   socialConcepts.forEach(concept => {
-    const index = rankings.indexOf(concept);
-    if (index !== -1) {
-      totalRank += (rankings.length - index);
-      count++;
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
     }
   });
   
-  return count > 0 ? Math.round((totalRank / count) / rankings.length * 100) : 50;
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
+/**
+ * Рассчитывает индекс отношения к себе
+ */
+function calculateSelfAttitudeIndex(colorAssociations, colorRankings) {
+  const selfConcepts = ['я', 'личность', 'тело', 'внешность', 'характер'];
+  let totalScore = 0;
+  let count = 0;
+  
+  selfConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
+    }
+  });
+  
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+}
+
+/**
+ * Рассчитывает индекс отношения к смерти
+ */
+function calculateDeathAttitudeIndex(colorAssociations, colorRankings) {
+  const deathConcepts = ['смерть', 'конец', 'бессмысленность', 'тревога', 'страх'];
+  let totalScore = 0;
+  let count = 0;
+  
+  deathConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
+    }
+  });
+  
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+}
+
+/**
+ * Рассчитывает индекс отношения к аддикциям
+ */
+function calculateAddictionAttitudeIndex(colorAssociations, colorRankings) {
+  const addictionConcepts = ['алкоголь', 'курение', 'наркотики', 'азартные игры'];
+  let totalScore = 0;
+  let count = 0;
+  
+  addictionConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
+    }
+  });
+  
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+}
+
+/**
+ * Рассчитывает индекс удовлетворенности потребностей
+ */
+function calculateNeedsSatisfactionIndex(colorAssociations, colorRankings) {
+  const needsConcepts = [
+    'материальные', 'безопасность', 'общение', 'превосходство', 
+    'автономия', 'познание', 'эстетика', 'творчество', 'труд', 
+    'семья', 'сексуальные', 'спорт', 'религия'
+  ];
+  let totalScore = 0;
+  let count = 0;
+  
+  needsConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
+    }
+  });
+  
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+}
+
+/**
+ * Определяет стиль коммуникации на основе анализа цветов
+ */
 function determineCommunicationStyle(colorAnalysis) {
   const positiveCount = Object.keys(colorAnalysis.positive_colors).length;
   const negativeCount = Object.keys(colorAnalysis.negative_colors).length;
