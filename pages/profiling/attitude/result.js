@@ -29,7 +29,7 @@ export default function AttitudeResult() {
   };
 
   const getRiskBadges = () => {
-    if (!profile || !profile.risk_tags) return [];
+    if (!profile || !profile.risk_tags || !Array.isArray(profile.risk_tags)) return [];
     
     const badgeMap = {
       'suicide_risk': { text: 'Кризисная ситуация', color: 'bg-red-100 text-red-800' },
@@ -47,7 +47,7 @@ export default function AttitudeResult() {
   };
 
   const getCommunicationTips = () => {
-    if (!profile || !profile.comm_flags) return [];
+    if (!profile || !profile.comm_flags || !Array.isArray(profile.comm_flags)) return [];
     
     const tipMap = {
       'crisis_intervention': 'Буду особенно бережно и внимательно',
@@ -66,15 +66,20 @@ export default function AttitudeResult() {
     return profile.comm_flags.map(flag => tipMap[flag] || flag);
   };
 
-  const getCommunicationInstructions = () => {
+  const getCommunicationInstructionsData = () => {
     if (!profile) return null;
     
-    // Получаем инструкции по коммуникации на основе профиля
-    const instructions = getCommunicationInstructions(profile, null);
-    
-    if (!instructions || !instructions.attitude) return null;
-    
-    return instructions.attitude;
+    try {
+      // Получаем инструкции по коммуникации на основе профиля
+      const instructions = getCommunicationInstructions(profile, null);
+      
+      if (!instructions || !instructions.attitude) return null;
+      
+      return instructions.attitude;
+    } catch (error) {
+      console.error('Ошибка получения инструкций по коммуникации:', error);
+      return null;
+    }
   };
 
   const continueToTypology = () => {
@@ -155,7 +160,7 @@ export default function AttitudeResult() {
         </div>
 
         {/* Инструкции по коммуникации на основе профиля */}
-        {getCommunicationInstructions() && (
+        {getCommunicationInstructionsData() && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Персональные рекомендации по общению
@@ -163,10 +168,10 @@ export default function AttitudeResult() {
             
             <div className="mb-6">
               <h3 className="text-lg font-medium text-gray-800 mb-3">
-                Профиль: {getCommunicationInstructions().name}
+                Профиль: {getCommunicationInstructionsData().name}
               </h3>
               <p className="text-gray-700 leading-relaxed">
-                {getCommunicationInstructions().description}
+                {getCommunicationInstructionsData().description}
               </p>
             </div>
 
@@ -175,7 +180,7 @@ export default function AttitudeResult() {
               <div>
                 <h4 className="text-md font-medium text-emerald-700 mb-3">✅ Что делать:</h4>
                 <div className="space-y-2">
-                  {getCommunicationInstructions().positive_scenario.map((item, index) => (
+                  {getCommunicationInstructionsData().positive_scenario.map((item, index) => (
                     <div key={index} className="flex items-start">
                       <div className="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                       <p className="text-gray-700 text-sm">{item}</p>
@@ -188,7 +193,7 @@ export default function AttitudeResult() {
               <div>
                 <h4 className="text-md font-medium text-red-700 mb-3">❌ Чего избегать:</h4>
                 <div className="space-y-2">
-                  {getCommunicationInstructions().negative_scenario.map((item, index) => (
+                  {getCommunicationInstructionsData().negative_scenario.map((item, index) => (
                     <div key={index} className="flex items-start">
                       <div className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                       <p className="text-gray-700 text-sm">{item}</p>
@@ -199,15 +204,15 @@ export default function AttitudeResult() {
             </div>
 
             {/* Экстремальные значения */}
-            {getCommunicationInstructions().extreme_actions && (
+            {getCommunicationInstructionsData().extreme_actions && (
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <h4 className="text-md font-medium text-blue-800 mb-3">⚠️ Особое внимание:</h4>
                 <div className="space-y-2 text-sm text-blue-700">
-                  {getCommunicationInstructions().extreme_actions.low && (
-                    <p><strong>Низкие значения:</strong> {getCommunicationInstructions().extreme_actions.low}</p>
+                  {getCommunicationInstructionsData().extreme_actions.low && (
+                    <p><strong>Низкие значения:</strong> {getCommunicationInstructionsData().extreme_actions.low}</p>
                   )}
-                  {getCommunicationInstructions().extreme_actions.high && (
-                    <p><strong>Высокие значения:</strong> {getCommunicationInstructions().extreme_actions.high}</p>
+                  {getCommunicationInstructionsData().extreme_actions.high && (
+                    <p><strong>Высокие значения:</strong> {getCommunicationInstructionsData().extreme_actions.high}</p>
                   )}
                 </div>
               </div>
@@ -216,43 +221,45 @@ export default function AttitudeResult() {
         )}
 
         {/* Детальные результаты */}
-        <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Детальные результаты</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(profile.raw).map(([scale, score]) => {
-              const level = profile.levels[scale];
-              const scaleLabels = {
-                severity: 'Оценка тяжести болезни',
-                secondary_gain: 'Вторичная выгода',
-                hide_resist: 'Сокрытие и сопротивление',
-                work_escape: 'Уход в работу/спорт',
-                low_selfesteem: 'Самооценка',
-                alt_med: 'Альтернативная медицина',
-                addictions: 'Зависимости',
-                ignore: 'Игнорирование болезни',
-                anxiety: 'Тревожность'
-              };
+        {profile.raw && profile.levels && (
+          <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Детальные результаты</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(profile.raw).map(([scale, score]) => {
+                const level = profile.levels[scale];
+                const scaleLabels = {
+                  severity: 'Оценка тяжести болезни',
+                  secondary_gain: 'Вторичная выгода',
+                  hide_resist: 'Сокрытие и сопротивление',
+                  work_escape: 'Уход в работу/спорт',
+                  low_selfesteem: 'Самооценка',
+                  alt_med: 'Альтернативная медицина',
+                  addictions: 'Зависимости',
+                  ignore: 'Игнорирование болезни',
+                  anxiety: 'Тревожность'
+                };
 
-              const levelColors = {
-                low: 'bg-green-100 text-green-800',
-                medium: 'bg-yellow-100 text-yellow-800',
-                high: 'bg-red-100 text-red-800'
-              };
+                const levelColors = {
+                  low: 'bg-green-100 text-green-800',
+                  medium: 'bg-yellow-100 text-yellow-800',
+                  high: 'bg-red-100 text-red-800'
+                };
 
-              return (
-                <div key={scale} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-medium text-gray-900">{scaleLabels[scale]}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${levelColors[level]}`}>
-                      {level === 'low' ? 'Низкий' : level === 'medium' ? 'Средний' : 'Высокий'}
-                    </span>
+                return (
+                  <div key={scale} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-medium text-gray-900">{scaleLabels[scale] || scale}</h3>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${levelColors[level] || 'bg-gray-100 text-gray-800'}`}>
+                        {level === 'low' ? 'Низкий' : level === 'medium' ? 'Средний' : level === 'high' ? 'Высокий' : 'Неизвестно'}
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-700">{score}</p>
                   </div>
-                  <p className="text-2xl font-bold text-gray-700">{score}</p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Навигация */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
