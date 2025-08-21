@@ -1,0 +1,1 @@
+(()=>{var r={id:888,ids:[888]};r.modules={9597:(r,e,s)=>{"use strict";s.r(e),s.d(e,{default:()=>u});var t=s(997);s(6764);function u({Component:r,pageProps:e}){return t.jsx(r,{...e})}},6764:()=>{},997:r=>{"use strict";r.exports=require("react/jsx-runtime")}};var e=require("../webpack-runtime.js");e.C(r);var s,t=(s=9597,e(e.s=s));module.exports=t})();

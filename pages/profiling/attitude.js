@@ -98,8 +98,8 @@ export default function AttitudeSurvey() {
           localStorage.setItem('benehab_attitude_profile', JSON.stringify(result.profile));
         }
 
-        // Переходим к следующему опросу
-        router.push('/profiling/typology');
+        // Переходим к странице результата
+        router.push('/profiling/attitude/result');
       } else {
         throw new Error('Ошибка отправки');
       }

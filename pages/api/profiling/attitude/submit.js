@@ -74,37 +74,58 @@ function generateSummary(profile) {
     .filter(([_, level]) => level === 'medium')
     .map(([scale, _]) => scale);
 
+  // Обрабатываем высокие уровни
   if (highScales.includes('severity')) {
-    summary += 'Я вижу, что ты серьезно относишься к своему здоровью и часто беспокоишься. ';
+    summary += 'Я вижу, что ты серьезно относишься к своему состоянию. ';
+  }
+  
+  if (highScales.includes('secondary_gain')) {
+    summary += 'Болезнь может давать тебе возможность получать поддержку и внимание. ';
+  }
+  
+  if (highScales.includes('hide_resist')) {
+    summary += 'Тебе может быть некомфортно обсуждать проблемы со здоровьем. ';
+  }
+  
+  if (highScales.includes('work_escape')) {
+    summary += 'Работа и активность помогают тебе отвлекаться от проблем со здоровьем. ';
+  }
+  
+  if (highScales.includes('low_selfesteem')) {
+    summary += 'Ты можешь быть склонен к самокритике. ';
   }
   
   if (highScales.includes('alt_med')) {
     summary += 'Ты открыт к альтернативным подходам к здоровью. ';
   }
   
-  if (highScales.includes('avoidance')) {
-    summary += 'Тебе комфортнее избегать давления и спешки. ';
+  if (highScales.includes('addictions')) {
+    summary += 'У тебя есть опыт борьбы с зависимостями. ';
   }
   
-  if (highScales.includes('info_seeking')) {
-    summary += 'Ты ценишь подробную информацию и понимание. ';
+  if (highScales.includes('ignore')) {
+    summary += 'Ты склонен надеяться, что проблемы решатся сами. ';
   }
   
-  if (highScales.includes('family_support')) {
-    summary += 'Поддержка близких важна для тебя. ';
+  if (highScales.includes('anxiety')) {
+    summary += 'Ты часто беспокоишься о своем здоровье. ';
   }
 
   // Добавляем рекомендации по коммуникации
-  if (comm_flags.includes('avoid_pressure')) {
-    summary += 'Я буду объяснять спокойно и без давления. ';
+  if (comm_flags.includes('crisis_intervention')) {
+    summary += 'Я буду особенно внимателен и бережен в общении. ';
   }
   
-  if (comm_flags.includes('normalize_fears')) {
-    summary += 'Твои переживания нормальны, и я здесь, чтобы помочь. ';
+  if (comm_flags.includes('gentle_approach')) {
+    summary += 'Я буду избегать давления и спешки. ';
   }
   
-  if (comm_flags.includes('explain_benefits')) {
-    summary += 'Я буду объяснять пользу и риски понятно. ';
+  if (comm_flags.includes('build_trust')) {
+    summary += 'Я постараюсь завоевать твое доверие. ';
+  }
+  
+  if (comm_flags.includes('avoid_stigma')) {
+    summary += 'Я буду избегать любых форм стигматизации. ';
   }
 
   summary += 'Если где-то станет тревожно — скажи, мы замедлимся.';
