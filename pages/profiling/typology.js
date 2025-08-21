@@ -6,12 +6,14 @@ import Link from 'next/link';
 
 export default function TypologySurvey() {
   const router = useRouter();
-  const [answers, setAnswers] = useState(Array(63).fill(0));
+  const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState({});
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    console.log('🚀 Компонент TypologySurvey загружен');
+    console.log('📊 Начальное состояние items:', items);
     loadItems();
     loadProgress();
   }, []);
@@ -22,11 +24,24 @@ export default function TypologySurvey() {
 
   const loadItems = async () => {
     try {
+      console.log('🔄 Загружаем вопросы типологии...');
       const response = await fetch('/api/profiling/typology/items');
       const data = await response.json();
-      setItems(data.items || []);
+      console.log('📊 Полученные данные:', data);
+      
+      if (data.success) {
+        setItems(data);
+        // Инициализируем массив ответов на основе количества вопросов
+        const totalQuestions = data.total || 0;
+        setAnswers(Array(totalQuestions).fill(0));
+        console.log('✅ Вопросы загружены успешно, инициализировано ответов:', totalQuestions);
+      } else {
+        console.error('❌ API вернул ошибку:', data.error);
+        setItems({});
+      }
     } catch (error) {
-      console.error('Ошибка загрузки вопросов:', error);
+      console.error('❌ Ошибка загрузки вопросов:', error);
+      setItems([]);
     }
   };
 
@@ -36,7 +51,10 @@ export default function TypologySurvey() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setAnswers(parsed);
+          // Проверяем, что сохраненные ответы соответствуют текущему количеству вопросов
+          if (items.total && parsed.length === items.total) {
+            setAnswers(parsed);
+          }
         } catch (error) {
           console.error('Ошибка загрузки прогресса:', error);
         }
@@ -51,8 +69,9 @@ export default function TypologySurvey() {
   };
 
   const updateProgress = () => {
+    const totalQuestions = items.total || 0;
     const answered = answers.filter(a => a !== 0).length;
-    setProgress((answered / 63) * 100);
+    setProgress(totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0);
   };
 
   const handleAnswer = (questionIndex, value) => {
@@ -143,7 +162,7 @@ export default function TypologySurvey() {
 
 
 
-  if (items.length === 0) {
+  if (!items.total || items.total === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -166,10 +185,18 @@ export default function TypologySurvey() {
             </Link>
           </div>
           
+          {/* Временная отладка в заголовке */}
+          <div className="bg-red-100 border border-red-300 rounded-lg p-3 mb-4 text-sm">
+            <div className="font-bold text-red-800">🚨 ОТЛАДКА:</div>
+            <div>items: {JSON.stringify(items)}</div>
+            <div>items.columns: {items.columns ? `✅ ${items.columns.length} колонок` : '❌ НЕТ'}</div>
+            <div>items.total: {items.total || 'НЕТ'}</div>
+          </div>
+          
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>Прогресс: {Math.round(progress)}%</span>
-              <span>{answers.filter(a => a !== 0).length} из 63</span>
+              <span>{answers.filter(a => a !== 0).length} из {items.total || 0}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -185,36 +212,63 @@ export default function TypologySurvey() {
           </p>
         </div>
 
-        {/* Вопросы по столбцам */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {items.columns?.map((column) => (
-            <div key={column.column} className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {getColumnLabel(column.column)} ({column.count} вопросов)
-              </h3>
-              
-              <div className="space-y-3">
-                {column.questions.map((item) => {
-                  const questionIndex = item.id - 1; // id начинается с 1
-                  
-                  return (
-                    <label key={item.id} className="flex items-start cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={answers[questionIndex] === 1}
-                        onChange={(e) => handleAnswer(questionIndex, e.target.checked ? 1 : 0)}
-                        className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                        {item.question_text}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        {/* Отладочная информация */}
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6 text-xs text-gray-600">
+          <div className="font-medium mb-2">🔍 Отладка типологического опроса:</div>
+          <div>items.total: {items.total || 'НЕТ'}</div>
+          <div>items.columns: {items.columns ? `✅ ${items.columns.length} колонок` : '❌ НЕТ'}</div>
+          <div>Количество колонок: {items.columns?.length || 0}</div>
+          <div>Общее количество вопросов: {items.total || 0}</div>
+          <pre className="mt-2 text-xs overflow-auto max-h-32">
+            {JSON.stringify(items, null, 2)}
+          </pre>
         </div>
+
+        {/* Вопросы по столбцам */}
+        {items.columns && items.columns.length > 0 ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {items.columns.map((column) => (
+              <div key={column.column} className="bg-white rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  {getColumnLabel(column.column)} ({column.count} вопросов)
+                </h3>
+                
+                <div className="space-y-3">
+                  {column.questions.map((item) => {
+                    const questionIndex = item.id - 1; // id начинается с 1
+                    
+                    return (
+                      <label key={item.id} className="flex items-start cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={answers[questionIndex] === 1}
+                          onChange={(e) => handleAnswer(questionIndex, e.target.checked ? 1 : 0)}
+                          className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                        />
+                        <span className="ml-3 text-sm text-gray-700 leading-relaxed">
+                          {item.question_text}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
+            <div className="text-yellow-800 mb-2">⚠️ Вопросы не загружены</div>
+            <div className="text-sm text-yellow-700">
+              {!items.total ? 'Данные не получены' : 'Структура данных некорректна'}
+            </div>
+            <button 
+              onClick={loadItems} 
+              className="mt-3 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200"
+            >
+              🔄 Попробовать снова
+            </button>
+          </div>
+        )}
 
         {/* Навигация */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">

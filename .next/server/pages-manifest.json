@@ -1,1 +1,7 @@
-{"/_app":"pages/_app.js","/_error":"pages/_error.js","/api/clinics":"pages/api/clinics.js","/api/chat":"pages/api/chat.js","/api/drugs":"pages/api/drugs.js","/api/profiling/attitude/items":"pages/api/profiling/attitude/items.js","/api/profiling/attitude/submit":"pages/api/profiling/attitude/submit.js","/api/profiling/pib":"pages/api/profiling/pib.js","/api/profiling/typology/items":"pages/api/profiling/typology/items.js","/api/profiling/typology/submit":"pages/api/profiling/typology/submit.js","/":"pages/index.html","/profiling/attitude":"pages/profiling/attitude.html","/profiling/attitude/result":"pages/profiling/attitude/result.html","/profiling/typology":"pages/profiling/typology.html","/_document":"pages/_document.js","/404":"pages/404.html"}
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/profiling/typology": "pages/profiling/typology.js",
+  "/api/profiling/typology/items": "pages/api/profiling/typology/items.js"
+}
