@@ -12,9 +12,9 @@ export default async function handler(req, res) {
   try {
     const { answers } = req.body;
 
-    if (!answers || !Array.isArray(answers) || answers.length !== 56) {
+    if (!answers || !Array.isArray(answers) || answers.length !== 63) {
       return res.status(400).json({ 
-        error: 'Необходимо 56 ответов для расчета профиля' 
+        error: 'Необходимо 63 ответа для расчета профиля' 
       });
     }
 
@@ -61,55 +61,29 @@ export default async function handler(req, res) {
  * @returns {string} резюме на русском языке
  */
 function generateSummary(profile) {
-  const { scores, dominant, tone_mods } = profile;
+  const { scores, dominant, interpretation } = profile;
   
-  let summary = 'Понятно, что тебе ближе ';
+  let summary = '';
   
-  // Описываем доминирующие типы
-  if (dominant.length > 0) {
-    const dominantLabels = {
-      'sensitive': 'спокойный темп и бережное отношение',
-      'dysthymic': 'постепенность и поддержка',
-      'demonstrative': 'внимание и признание',
-      'unstable': 'стабильность и простота',
-      'anxious': 'ясность и уверенность',
-      'pedantic': 'детальность и структура',
-      'exalted': 'вдохновение и позитив',
-      'emotive': 'эмоциональная поддержка'
-    };
+  // Обрабатываем разные типы интерпретации
+  if (interpretation.type === 'unaccentuated') {
+    summary = 'У вас сбалансированный психологический профиль. Это означает хорошую адаптивность и стабильность. ';
+    summary += 'Я буду общаться с вами в стандартном режиме, учитывая ваши индивидуальные особенности.';
+  } else if (interpretation.type === 'mixed') {
+    summary = 'У вас умеренно выраженные черты нескольких типов личности. ';
+    summary += 'Я буду использовать гибкий подход, адаптируясь под ваши текущие потребности.';
+  } else if (interpretation.type === 'accentuated') {
+    summary = `У вас выражены черты ${interpretation.dominant_types.map(t => t.label.toLowerCase()).join(' и ')} типов личности. `;
     
-    const labels = dominant.map(type => dominantLabels[type] || type);
-    summary += labels.join(' и ') + '. ';
-  } else {
-    summary += 'сбалансированный подход. ';
-  }
-
-  // Добавляем рекомендации по коммуникации
-  if (tone_mods.avoid && tone_mods.avoid.length > 0) {
-    const avoidLabels = {
-      'pressure': 'давления',
-      'rush': 'спешки',
-      'uncertainty': 'неопределенности',
-      'overwhelming_info': 'перегрузки информацией'
-    };
+    // Добавляем описание ведущего типа
+    if (interpretation.dominant_types.length > 0) {
+      const mainType = interpretation.dominant_types[0];
+      summary += `${mainType.description} `;
+      summary += `${mainType.promise} `;
+    }
     
-    const avoids = tone_mods.avoid.map(item => avoidLabels[item] || item);
-    summary += `Я постараюсь избегать ${avoids.join(' и ')}. `;
+    summary += 'Я буду учитывать ваши особенности в общении и предоставлять информацию в наиболее подходящем для вас формате.';
   }
-  
-  if (tone_mods.seek && tone_mods.seek.length > 0) {
-    const seekLabels = {
-      'slow_pacing': 'медленного темпа',
-      'clarity': 'ясности',
-      'structure': 'структуры',
-      'reassurance': 'поддержки'
-    };
-    
-    const seeks = tone_mods.seek.map(item => seekLabels[item] || item);
-    summary += `Буду стремиться к ${seeks.join(' и ')}. `;
-  }
-
-  summary += 'Если что — поправляй меня.';
   
   return summary;
 }

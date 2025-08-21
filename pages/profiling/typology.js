@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function TypologySurvey() {
   const router = useRouter();
-  const [answers, setAnswers] = useState(Array(56).fill(0));
+  const [answers, setAnswers] = useState(Array(63).fill(0));
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -52,7 +52,7 @@ export default function TypologySurvey() {
 
   const updateProgress = () => {
     const answered = answers.filter(a => a !== 0).length;
-    setProgress((answered / 56) * 100);
+    setProgress((answered / 63) * 100);
   };
 
   const handleAnswer = (questionIndex, value) => {
@@ -63,6 +63,21 @@ export default function TypologySurvey() {
   };
 
   const canSubmit = answers.filter(a => a !== 0).length > 0;
+
+  const getColumnLabel = (columnNumber) => {
+    const labels = {
+      1: 'Сензитивный',
+      2: 'Дистимический', 
+      3: 'Демонстративный',
+      4: 'Возбудимый',
+      5: 'Тревожный',
+      6: 'Педантичный',
+      7: 'Экзальтированный',
+      8: 'Эмотивный',
+      9: 'Застревающий'
+    };
+    return labels[columnNumber] || `Колонка ${columnNumber}`;
+  };
 
   const submitSurvey = async () => {
     if (!canSubmit) return;
@@ -126,14 +141,7 @@ export default function TypologySurvey() {
     }
   };
 
-  // Группируем вопросы по столбцам
-  const groupedItems = items.reduce((acc, item) => {
-    if (!acc[item.column_id]) {
-      acc[item.column_id] = [];
-    }
-    acc[item.column_id].push(item);
-    return acc;
-  }, {});
+
 
   if (items.length === 0) {
     return (
@@ -161,7 +169,7 @@ export default function TypologySurvey() {
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>Прогресс: {Math.round(progress)}%</span>
-              <span>{answers.filter(a => a !== 0).length} из 56</span>
+              <span>{answers.filter(a => a !== 0).length} из 63</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -178,19 +186,19 @@ export default function TypologySurvey() {
         </div>
 
         {/* Вопросы по столбцам */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {Object.entries(groupedItems).map(([columnId, columnItems]) => (
-            <div key={columnId} className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 capitalize">
-                {columnItems[0]?.column_label || columnId}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {items.columns?.map((column) => (
+            <div key={column.column} className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                {getColumnLabel(column.column)} ({column.count} вопросов)
               </h3>
               
               <div className="space-y-3">
-                {columnItems.map((item) => {
-                  const questionIndex = item.item_id - 1; // item_id начинается с 1
+                {column.questions.map((item) => {
+                  const questionIndex = item.id - 1; // id начинается с 1
                   
                   return (
-                    <label key={item.item_id} className="flex items-start cursor-pointer">
+                    <label key={item.id} className="flex items-start cursor-pointer">
                       <input
                         type="checkbox"
                         checked={answers[questionIndex] === 1}
@@ -198,7 +206,7 @@ export default function TypologySurvey() {
                         className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                       />
                       <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                        {item.item_text}
+                        {item.question_text}
                       </span>
                     </label>
                   );

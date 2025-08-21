@@ -20,21 +20,33 @@ export default async function handler(req, res) {
     
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',');
-      if (values.length >= 4) {
+      if (values.length >= 3) {
         items.push({
-          column_id: values[0],
-          column_label: values[1],
-          item_id: parseInt(values[2]),
-          item_text: values[3]
+          id: parseInt(values[0]),
+          question_text: values[1].replace(/"/g, ''),
+          column: parseInt(values[2])
         });
       }
     }
+
+    // Группируем вопросы по колонкам
+    const columns = {};
+    items.forEach(item => {
+      if (!columns[item.column]) {
+        columns[item.column] = [];
+      }
+      columns[item.column].push(item);
+    });
 
     res.status(200).json({
       success: true,
       items,
       total: items.length,
-      columns: [...new Set(items.map(item => item.column_id))]
+      columns: Object.keys(columns).map(col => ({
+        column: parseInt(col),
+        count: columns[col].length,
+        questions: columns[col]
+      }))
     });
   } catch (error) {
     console.error('Ошибка загрузки вопросов:', error);
