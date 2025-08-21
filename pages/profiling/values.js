@@ -6,10 +6,10 @@ import Link from 'next/link';
 
 export default function ValuesSurvey() {
   const router = useRouter();
-  const [currentStage, setCurrentStage] = useState(1); // 1 - цвета, 2 - ранжирование
+  const [currentStage, setCurrentStage] = useState(1); // 1 - цвета, 2 - ранжирование цветов
   const [items, setItems] = useState([]);
   const [colorAssociations, setColorAssociations] = useState({});
-  const [rankings, setRankings] = useState([]);
+  const [colorRankings, setColorRankings] = useState([]); // Ранжирование цветов
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -34,7 +34,7 @@ export default function ValuesSurvey() {
 
   useEffect(() => {
     updateProgress();
-  }, [currentStage, colorAssociations, rankings]);
+  }, [currentStage, colorAssociations, colorRankings]);
 
   const loadItems = async () => {
     try {
@@ -57,7 +57,7 @@ export default function ValuesSurvey() {
   const loadProgress = () => {
     if (typeof window !== 'undefined') {
       const savedColors = localStorage.getItem('benehab_values_colors');
-      const savedRankings = localStorage.getItem('benehab_values_rankings');
+      const savedColorRankings = localStorage.getItem('benehab_values_color_rankings');
       
       if (savedColors) {
         try {
@@ -67,11 +67,11 @@ export default function ValuesSurvey() {
         }
       }
       
-      if (savedRankings) {
+      if (savedColorRankings) {
         try {
-          setRankings(JSON.parse(savedRankings));
+          setColorRankings(JSON.parse(savedColorRankings));
         } catch (error) {
-          console.error('Ошибка загрузки ранжирования:', error);
+          console.error('Ошибка загрузки ранжирования цветов:', error);
         }
       }
     }
@@ -80,7 +80,7 @@ export default function ValuesSurvey() {
   const saveProgress = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('benehab_values_colors', JSON.stringify(colorAssociations));
-      localStorage.setItem('benehab_values_rankings', JSON.stringify(rankings));
+      localStorage.setItem('benehab_values_color_rankings', JSON.stringify(colorRankings));
     }
   };
 
@@ -92,7 +92,7 @@ export default function ValuesSurvey() {
       const coloredCount = Object.keys(colorAssociations).length;
       stageProgress = (coloredCount / items.length) * 50;
     } else if (currentStage === 2) {
-      stageProgress = 50 + (rankings.length / items.length) * 50;
+      stageProgress = 50 + (colorRankings.length / colors.length) * 50;
     }
     
     setProgress(Math.min(stageProgress, 100));
@@ -106,19 +106,19 @@ export default function ValuesSurvey() {
     saveProgress();
   };
 
-  const handleRankingChange = (concept, newIndex) => {
-    let newRankings = [...rankings];
+  const handleColorRankingChange = (color, newIndex) => {
+    let newColorRankings = [...colorRankings];
     
-    // Убираем понятие из текущей позиции
-    const currentIndex = newRankings.indexOf(concept);
+    // Убираем цвет из текущей позиции
+    const currentIndex = newColorRankings.indexOf(color);
     if (currentIndex !== -1) {
-      newRankings.splice(currentIndex, 1);
+      newColorRankings.splice(currentIndex, 1);
     }
     
     // Вставляем на новую позицию
-    newRankings.splice(newIndex, 0, concept);
+    newColorRankings.splice(newIndex, 0, color);
     
-    setRankings(newRankings);
+    setColorRankings(newColorRankings);
     saveProgress();
   };
 
@@ -127,7 +127,7 @@ export default function ValuesSurvey() {
   };
 
   const canSubmit = () => {
-    return rankings.length === items.length;
+    return colorRankings.length === colors.length;
   };
 
   const goToStage2 = () => {
@@ -150,7 +150,7 @@ export default function ValuesSurvey() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ colorAssociations, rankings }),
+        body: JSON.stringify({ colorAssociations, colorRankings }),
       });
 
       if (response.ok) {
@@ -238,7 +238,7 @@ export default function ValuesSurvey() {
           <p className="text-gray-700">
             {currentStage === 1 
               ? 'Выберите цвет для каждого понятия, который лучше всего ассоциируется с вашими чувствами.'
-              : 'Расставьте понятия по порядку от самого приятного до самого неприятного.'
+              : 'Расставьте цвета по порядку от самого приятного до самого неприятного.'
             }
           </p>
         </div>
@@ -304,47 +304,51 @@ export default function ValuesSurvey() {
           </div>
         )}
 
-        {/* Этап 2: Ранжирование */}
+        {/* Этап 2: Ранжирование цветов */}
         {currentStage === 2 && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Этап 2: Ранжирование по привлекательности
+              Этап 2: Ранжирование цветов по привлекательности
             </h2>
             
             <div className="mb-6">
               <h3 className="font-medium text-gray-900 mb-3">От самого приятного к самому неприятному:</h3>
               
               <div className="space-y-2">
-                {rankings.map((concept, index) => (
-                  <div key={concept} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                {colorRankings.map((color, index) => (
+                  <div key={color} className="flex items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-lg font-bold text-emerald-600 w-8">{index + 1}</span>
-                    <span className="flex-1 text-gray-900">{concept}</span>
-                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: colorAssociations[concept] || '#ccc' }}></div>
+                    <div className="w-8 h-8 rounded-full mr-3" style={{ backgroundColor: color }}></div>
+                    <span className="flex-1 text-gray-900">{colors.find(c => c.name === color)?.label || color}</span>
+                    <span className="text-sm text-gray-500">
+                      {Object.keys(colorAssociations).filter(concept => colorAssociations[concept] === color).length} понятий
+                    </span>
                   </div>
                 ))}
               </div>
               
-              {rankings.length < items.length && (
+              {colorRankings.length < colors.length && (
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800 text-sm">
-                    Перетащите понятия из списка ниже, чтобы завершить ранжирование
+                    Выберите цвета из списка ниже, чтобы завершить ранжирование
                   </p>
                 </div>
               )}
             </div>
             
             <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-3">Доступные понятия:</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {items
-                  .filter(item => !rankings.includes(item.concept))
-                  .map((item) => (
+              <h3 className="font-medium text-gray-900 mb-3">Доступные цвета:</h3>
+              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+                {colors
+                  .filter(color => !colorRankings.includes(color.name))
+                  .map((color) => (
                     <button
-                      key={item.id}
-                      onClick={() => handleRankingChange(item.concept, rankings.length)}
-                      className="p-2 text-sm border border-gray-200 rounded hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
+                      key={color.name}
+                      onClick={() => handleColorRankingChange(color.name, colorRankings.length)}
+                      className="flex flex-col items-center p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
                     >
-                      {item.concept}
+                      <div className={`w-8 h-8 rounded-full mb-2 ${color.class}`}></div>
+                      <span className="text-xs text-gray-700 text-center">{color.label}</span>
                     </button>
                   ))}
               </div>

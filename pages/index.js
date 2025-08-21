@@ -158,7 +158,7 @@ export default function Home() {
       localStorage.removeItem('benehab_attitude_answers');
       localStorage.removeItem('benehab_typology_answers');
       localStorage.removeItem('benehab_values_colors');
-      localStorage.removeItem('benehab_values_rankings');
+      localStorage.removeItem('benehab_values_color_rankings');
     }
     
     // Сбрасываем состояние

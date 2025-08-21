@@ -6,16 +6,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { colorAssociations, rankings } = req.body;
+    const { colorAssociations, colorRankings } = req.body;
 
-    if (!colorAssociations || !rankings) {
+    if (!colorAssociations || !colorRankings) {
       return res.status(400).json({ 
-        error: 'Необходимы данные о цветовых ассоциациях и ранжировании' 
+        error: 'Необходимы данные о цветовых ассоциациях и ранжировании цветов' 
       });
     }
 
     // Рассчитываем ценностную модель
-    const profile = calculateValuesProfile(colorAssociations, rankings);
+    const profile = calculateValuesProfile(colorAssociations, colorRankings);
 
     res.status(200).json({
       success: true,
@@ -32,24 +32,24 @@ export default async function handler(req, res) {
 }
 
 /**
- * Рассчитывает ценностную модель на основе цветовых ассоциаций и ранжирования
+ * Рассчитывает ценностную модель на основе цветовых ассоциаций и ранжирования цветов
  * @param {Object} colorAssociations - цветовые ассоциации для каждого понятия
- * @param {Array} rankings - ранжирование понятий по привлекательности
+ * @param {Array} colorRankings - ранжирование цветов по привлекательности
  * @returns {Object} профиль с индексами и рекомендациями
  */
-function calculateValuesProfile(colorAssociations, rankings) {
+function calculateValuesProfile(colorAssociations, colorRankings) {
   // Анализируем цветовые ассоциации
   const colorAnalysis = analyzeColorAssociations(colorAssociations);
   
-  // Анализируем ранжирование
-  const rankingAnalysis = analyzeRankings(rankings);
+  // Анализируем ранжирование цветов
+  const rankingAnalysis = analyzeColorRankings(colorRankings, colorAssociations);
   
   // Формируем общий профиль
   const profile = {
     version: 'V/1.0',
     color_associations: colorAnalysis,
-    ranking_analysis: rankingAnalysis,
-    value_indices: calculateValueIndices(colorAssociations, rankings),
+    color_rankings: rankingAnalysis,
+    value_indices: calculateValueIndices(colorAssociations, colorRankings),
     communication_guidelines: generateCommunicationGuidelines(colorAnalysis, rankingAnalysis)
   };
 
@@ -96,42 +96,50 @@ function analyzeColorAssociations(colorAssociations) {
 }
 
 /**
- * Анализирует ранжирование понятий
+ * Анализирует ранжирование цветов
  */
-function analyzeRankings(rankings) {
+function analyzeColorRankings(colorRankings, colorAssociations) {
   const analysis = {
-    top_priorities: rankings.slice(0, 10), // Топ-10 приоритетов
-    bottom_priorities: rankings.slice(-10), // Последние 10 приоритетов
-    category_distribution: {},
-    life_attitude: calculateLifeAttitude(rankings)
+    top_colors: colorRankings.slice(0, 5), // Топ-5 приятных цветов
+    bottom_colors: colorRankings.slice(-5), // Топ-5 неприятных цветов
+    concept_distribution: {},
+    color_emotion_map: {}
   };
 
-  // Анализируем распределение по категориям
-  rankings.forEach((concept, index) => {
-    const category = getConceptCategory(concept);
-    if (!analysis.category_distribution[category]) {
-      analysis.category_distribution[category] = [];
-    }
-    analysis.category_distribution[category].push({
-      concept,
-      rank: index + 1
-    });
+  // Анализируем распределение понятий по цветам
+  colorRankings.forEach((color, index) => {
+    const conceptsWithThisColor = Object.keys(colorAssociations).filter(
+      concept => colorAssociations[concept] === color
+    );
+    
+    analysis.concept_distribution[color] = {
+      rank: index + 1,
+      concepts: conceptsWithThisColor,
+      count: conceptsWithThisColor.length
+    };
+    
+    // Маппинг эмоций по цветам
+    analysis.color_emotion_map[color] = {
+      rank: index + 1,
+      emotion: index < colorRankings.length / 2 ? 'positive' : 'negative',
+      intensity: Math.abs((colorRankings.length / 2) - index)
+    };
   });
 
   return analysis;
 }
 
 /**
- * Рассчитывает индексы ценностей
+ * Рассчитывает индексы ценностей на основе цветовых ассоциаций и ранжирования
  */
-function calculateValueIndices(colorAssociations, rankings) {
+function calculateValueIndices(colorAssociations, colorRankings) {
   return {
-    life_satisfaction: calculateLifeSatisfactionIndex(colorAssociations, rankings),
-    future_orientation: calculateFutureOrientationIndex(rankings),
-    treatment_attitude: calculateTreatmentAttitudeIndex(colorAssociations, rankings),
-    family_importance: calculateFamilyImportanceIndex(rankings),
-    health_priority: calculateHealthPriorityIndex(rankings),
-    social_orientation: calculateSocialOrientationIndex(rankings)
+    life_satisfaction: calculateLifeSatisfactionIndex(colorAssociations, colorRankings),
+    future_orientation: calculateFutureOrientationIndex(colorAssociations, colorRankings),
+    treatment_attitude: calculateTreatmentAttitudeIndex(colorAssociations, colorRankings),
+    family_importance: calculateFamilyImportanceIndex(colorAssociations, colorRankings),
+    health_priority: calculateHealthPriorityIndex(colorAssociations, colorRankings),
+    social_orientation: calculateSocialOrientationIndex(colorAssociations, colorRankings)
   };
 }
 
@@ -175,32 +183,38 @@ function calculateLifeAttitude(rankings) {
   return positiveScore > negativeScore ? 'positive' : 'negative';
 }
 
-function calculateLifeSatisfactionIndex(colorAssociations, rankings) {
-  // Упрощенный расчет индекса удовлетворенности жизнью
-  const positiveColors = ['green', 'blue', 'yellow'];
-  let positiveCount = 0;
+function calculateLifeSatisfactionIndex(colorAssociations, colorRankings) {
+  // Расчет индекса удовлетворенности жизнью на основе ранжирования цветов
+  const positiveColors = colorRankings.slice(0, Math.ceil(colorRankings.length / 2));
+  let positiveScore = 0;
   
   Object.values(colorAssociations).forEach(color => {
-    if (positiveColors.includes(color)) positiveCount++;
-  });
-  
-  return Math.round((positiveCount / Object.keys(colorAssociations).length) * 100);
-}
-
-function calculateFutureOrientationIndex(rankings) {
-  const futureConcepts = ['Будущее', 'Надежда', 'Перемены', 'Успех'];
-  let totalRank = 0;
-  let count = 0;
-  
-  futureConcepts.forEach(concept => {
-    const index = rankings.indexOf(concept);
-    if (index !== -1) {
-      totalRank += (rankings.length - index);
-      count++;
+    if (positiveColors.includes(color)) {
+      const rank = colorRankings.indexOf(color);
+      positiveScore += (colorRankings.length - rank);
     }
   });
   
-  return count > 0 ? Math.round((totalRank / count) / rankings.length * 100) : 50;
+  return Math.round((positiveScore / (Object.keys(colorAssociations).length * colorRankings.length)) * 100);
+}
+
+function calculateFutureOrientationIndex(colorAssociations, colorRankings) {
+  const futureConcepts = ['Будущее', 'Надежда', 'Перемены', 'Успех'];
+  let totalScore = 0;
+  let count = 0;
+  
+  futureConcepts.forEach(concept => {
+    if (colorAssociations[concept]) {
+      const color = colorAssociations[concept];
+      const rank = colorRankings.indexOf(color);
+      if (rank !== -1) {
+        totalScore += (colorRankings.length - rank);
+        count++;
+      }
+    }
+  });
+  
+  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
 }
 
 function calculateTreatmentAttitudeIndex(colorAssociations, rankings) {
