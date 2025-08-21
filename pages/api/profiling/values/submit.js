@@ -38,18 +38,26 @@ export default async function handler(req, res) {
  * @returns {Object} профиль с индексами и рекомендациями
  */
 function calculateValuesProfile(colorAssociations, colorRankings) {
+  console.log('🔍 Отладка calculateValuesProfile:');
+  console.log('colorAssociations:', colorAssociations);
+  console.log('colorRankings:', colorRankings);
+  
   // Анализируем цветовые ассоциации
   const colorAnalysis = analyzeColorAssociations(colorAssociations);
   
   // Анализируем ранжирование цветов
   const rankingAnalysis = analyzeColorRankings(colorRankings, colorAssociations);
   
+  // Рассчитываем индексы ценностей
+  const valueIndices = calculateValueIndices(colorAssociations, colorRankings);
+  console.log('📊 Рассчитанные индексы ценностей:', valueIndices);
+  
   // Формируем общий профиль
   const profile = {
     version: 'V/1.0',
     color_associations: colorAnalysis,
     color_rankings: rankingAnalysis,
-    value_indices: calculateValueIndices(colorAssociations, colorRankings),
+    value_indices: valueIndices,
     communication_guidelines: generateCommunicationGuidelines(colorAnalysis, rankingAnalysis)
   };
 
@@ -175,30 +183,39 @@ function generateCommunicationGuidelines(colorAnalysis, rankingAnalysis) {
  * Рассчитывает индекс удовлетворенности жизнью
  */
 function calculateLifeSatisfactionIndex(colorAssociations, colorRankings) {
-  const lifeConcepts = ['жизнь', 'счастье', 'радость', 'надежда', 'любовь'];
+  const lifeConcepts = ['Счастье', 'Радость', 'Надежда', 'Любовь', 'Семья', 'Спокойствие'];
   let totalScore = 0;
   let count = 0;
+  
+  console.log('🔍 Отладка calculateLifeSatisfactionIndex:');
+  console.log('lifeConcepts:', lifeConcepts);
   
   lifeConcepts.forEach(concept => {
     if (colorAssociations[concept]) {
       const color = colorAssociations[concept];
       const rank = colorRankings.indexOf(color);
+      console.log(`✅ ${concept} -> ${color} -> rank ${rank}`);
       if (rank !== -1) {
         // Чем выше ранг (ближе к началу), тем лучше
         totalScore += (colorRankings.length - rank);
         count++;
       }
+    } else {
+      console.log(`❌ ${concept} не найден в colorAssociations`);
     }
   });
   
-  return count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+  const result = count > 0 ? Math.round((totalScore / count) / colorRankings.length * 100) : 50;
+  console.log(`📊 Результат: totalScore=${totalScore}, count=${count}, result=${result}`);
+  
+  return result;
 }
 
 /**
  * Рассчитывает индекс ориентации на будущее
  */
 function calculateFutureOrientationIndex(colorAssociations, colorRankings) {
-  const futureConcepts = ['будущее', 'надежда', 'перемены', 'успех', 'цель'];
+  const futureConcepts = ['Будущее', 'Надежда', 'Перемены', 'Успех', 'Вдохновение'];
   let totalScore = 0;
   let count = 0;
   
@@ -220,7 +237,7 @@ function calculateFutureOrientationIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс отношения к лечению
  */
 function calculateTreatmentAttitudeIndex(colorAssociations, colorRankings) {
-  const treatmentConcepts = ['лечение', 'врач', 'медицина', 'здоровье', 'больница'];
+  const treatmentConcepts = ['Лечение', 'Врач', 'Медработники', 'Здоровье', 'Болезнь'];
   let totalScore = 0;
   let count = 0;
   
@@ -242,7 +259,7 @@ function calculateTreatmentAttitudeIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс важности семьи
  */
 function calculateFamilyImportanceIndex(colorAssociations, colorRankings) {
-  const familyConcepts = ['семья', 'любовь', 'дружба', 'близкие', 'дом'];
+  const familyConcepts = ['Семья', 'Любовь', 'Дружба', 'Свадьба', 'Дом'];
   let totalScore = 0;
   let count = 0;
   
@@ -264,7 +281,7 @@ function calculateFamilyImportanceIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс приоритета здоровья
  */
 function calculateHealthPriorityIndex(colorAssociations, colorRankings) {
-  const healthConcepts = ['здоровье', 'болезнь', 'лечение', 'профилактика'];
+  const healthConcepts = ['Здоровье', 'Болезнь', 'Лечение', 'Спорт', 'Отдых'];
   let totalScore = 0;
   let count = 0;
   
@@ -286,7 +303,7 @@ function calculateHealthPriorityIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс социальной ориентации
  */
 function calculateSocialOrientationIndex(colorAssociations, colorRankings) {
-  const socialConcepts = ['друзья', 'коллеги', 'соседи', 'общение', 'общество'];
+  const socialConcepts = ['Друзья', 'Коллеги', 'Соседи', 'Общение', 'Волонтерство'];
   let totalScore = 0;
   let count = 0;
   
@@ -308,7 +325,7 @@ function calculateSocialOrientationIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс отношения к себе
  */
 function calculateSelfAttitudeIndex(colorAssociations, colorRankings) {
-  const selfConcepts = ['я', 'личность', 'тело', 'внешность', 'характер'];
+  const selfConcepts = ['Я сам', 'Гордость', 'Признание', 'Мудрость', 'Верность'];
   let totalScore = 0;
   let count = 0;
   
@@ -330,7 +347,7 @@ function calculateSelfAttitudeIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс отношения к смерти
  */
 function calculateDeathAttitudeIndex(colorAssociations, colorRankings) {
-  const deathConcepts = ['смерть', 'конец', 'бессмысленность', 'тревога', 'страх'];
+  const deathConcepts = ['Смерть', 'Страх', 'Тревога', 'Страдание', 'Одиночество'];
   let totalScore = 0;
   let count = 0;
   
@@ -352,7 +369,8 @@ function calculateDeathAttitudeIndex(colorAssociations, colorRankings) {
  * Рассчитывает индекс отношения к аддикциям
  */
 function calculateAddictionAttitudeIndex(colorAssociations, colorRankings) {
-  const addictionConcepts = ['алкоголь', 'курение', 'наркотики', 'азартные игры'];
+  // В CSV нет прямых понятий об аддикциях, используем косвенные
+  const addictionConcepts = ['Страх', 'Тревога', 'Усталость', 'Страдание', 'Стыд'];
   let totalScore = 0;
   let count = 0;
   
@@ -375,9 +393,8 @@ function calculateAddictionAttitudeIndex(colorAssociations, colorRankings) {
  */
 function calculateNeedsSatisfactionIndex(colorAssociations, colorRankings) {
   const needsConcepts = [
-    'материальные', 'безопасность', 'общение', 'превосходство', 
-    'автономия', 'познание', 'эстетика', 'творчество', 'труд', 
-    'семья', 'сексуальные', 'спорт', 'религия'
+    'Богатство', 'Безопасность', 'Дружба', 'Признание', 'Власть',
+    'Знания', 'Красота', 'Творчество', 'Работа', 'Семья', 'Спорт', 'Религия'
   ];
   let totalScore = 0;
   let count = 0;
