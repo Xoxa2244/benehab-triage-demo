@@ -19,14 +19,25 @@ export default function Home() {
   // Весь доступ к localStorage — только на клиенте и внутри эффектов
   const [demoDone, setDemoDone] = useState(false);
   const [needProfiling, setNeedProfiling] = useState(false);
+  const [pib, setPib] = useState(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const demo = !!localStorage.getItem('benehab_demographics');
     const haveA = !!localStorage.getItem('benehab_attitude_profile');
     const haveT = !!localStorage.getItem('benehab_typology_profile');
+    const pibData = localStorage.getItem('benehab.pib');
+    
     setDemoDone(demo);
     setNeedProfiling(!(haveA && haveT));
+    
+    if (pibData) {
+      try {
+        setPib(JSON.parse(pibData));
+      } catch (error) {
+        console.error('Ошибка парсинга PIB:', error);
+      }
+    }
   }, []);
 
   const listRef = useRef(null);
@@ -35,17 +46,29 @@ export default function Home() {
   }, [messages]);
 
   const getPIB = async () => {
+    if (pib) return pib;
+    
     if (typeof window === 'undefined') return null;
     const A = JSON.parse(localStorage.getItem('benehab_attitude_profile') || 'null');
     const B = JSON.parse(localStorage.getItem('benehab_typology_profile') || 'null');
     if (!A && !B) return null;
-    const r = await fetch('/api/profiling/pib', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attitude_profile: A, typology_profile: B }),
-    });
-    const d = await r.json();
-    return d.pib || null;
+    
+    try {
+      const r = await fetch('/api/profiling/pib', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attitude_profile: A, typology_profile: B }),
+      });
+      const d = await r.json();
+      if (d.pib) {
+        localStorage.setItem('benehab.pib', JSON.stringify(d.pib));
+        setPib(d.pib);
+        return d.pib;
+      }
+    } catch (error) {
+      console.error('Ошибка получения PIB:', error);
+    }
+    return null;
   };
 
   const send = async (text) => {
@@ -55,11 +78,11 @@ export default function Home() {
     setInput('');
     setLoading(true);
     try {
-      const pib = await getPIB();
+      const currentPib = await getPIB();
       const r = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: next, meta: { pib } }),
+        body: JSON.stringify({ messages: next, meta: { pib: currentPib } }),
       });
       const d = await r.json();
       setMessages((m) => [...m, { role: 'assistant', content: d.content || 'Готово.' }]);
@@ -70,9 +93,35 @@ export default function Home() {
     }
   };
 
+  const handleChipClick = async (intent) => {
+    let message = '';
+    
+    switch (intent) {
+      case 'anxious':
+        message = 'Я очень переживаю о своем здоровье. Мне нужна поддержка и понимание.';
+        break;
+      case 'drug_info':
+        message = 'Расскажи, пожалуйста, про препарат. Мне нужна информация о показаниях, противопоказаниях и возможных побочных эффектах.';
+        break;
+      case 'where_to_go':
+        message = 'Куда мне обратиться за помощью? Мне нужен совет по выбору специалиста или клиники.';
+        break;
+      case 'book':
+        message = 'Хочу записаться к врачу. Помоги мне с этим, пожалуйста.';
+        break;
+      case 'reminder':
+        message = 'Напомни мне через 2 часа принять лекарство.';
+        break;
+      default:
+        message = 'Мне нужна помощь.';
+    }
+    
+    await send(message);
+  };
+
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto p-4 space-y-3">
+      <div className="max-w-4xl mx-auto p-4 space-y-3">
         {!demoDone && <OnboardingCard onDone={() => setDemoDone(true)} />}
 
         {demoDone && needProfiling && (
@@ -81,9 +130,62 @@ export default function Home() {
               Можно я задам несколько коротких вопросов? Это займёт 5–10 минут и поможет мне говорить с тобой максимально
               комфортно.
             </div>
-            <Link href="/profiling" className="inline-block px-3 py-1.5 rounded-xl bg-emerald-600 text-white">
+            <Link href="/profiling/attitude" className="inline-block px-3 py-1.5 rounded-xl bg-emerald-600 text-white">
               Да, пройти опрос →
             </Link>
+          </div>
+        )}
+
+        {/* Чипы-интенты */}
+        {demoDone && !needProfiling && (
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            <div className="text-sm text-gray-600 mb-3">Быстрые действия:</div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => handleChipClick('anxious')}
+                className="px-3 py-2 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors text-sm"
+              >
+                😰 Очень переживаю
+              </button>
+              <button
+                onClick={() => handleChipClick('drug_info')}
+                className="px-3 py-2 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors text-sm"
+              >
+                💊 Рассказать про препарат
+              </button>
+              <button
+                onClick={() => handleChipClick('where_to_go')}
+                className="px-3 py-2 bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-colors text-sm"
+              >
+                🏥 Куда обратиться
+              </button>
+              <button
+                onClick={() => handleChipClick('book')}
+                className="px-3 py-2 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors text-sm"
+              >
+                📅 Записать к врачу
+              </button>
+              <button
+                onClick={() => handleChipClick('reminder')}
+                className="px-3 py-2 bg-orange-50 text-orange-700 rounded-xl hover:bg-orange-100 transition-colors text-sm"
+              >
+                ⏰ Напомнить через 2 часа
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Профиль пользователя */}
+        {pib && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm">
+            <div className="font-medium mb-2 text-blue-900">Ваш профиль:</div>
+            <div className="text-blue-800">
+              <div>Тон: <span className="font-medium">{pib.communication_plan?.tone || 'calm_supportive'}</span></div>
+              <div>Длительность сессии: <span className="font-medium">{pib.communication_plan?.session_length || 'medium'}</span></div>
+              {pib.communication_plan?.avoid?.length > 0 && (
+                <div>Избегаем: <span className="font-medium">{pib.communication_plan.avoid.join(', ')}</span></div>
+              )}
+            </div>
           </div>
         )}
 

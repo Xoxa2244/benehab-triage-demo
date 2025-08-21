@@ -1,1 +1,57 @@
-id,text,scale
+column_id,column_label,item_id,item_text
+sensitive,sensitive,1,Я легко расстраиваюсь из-за мелочей
+sensitive,sensitive,2,Я часто чувствую себя уязвимым
+sensitive,sensitive,3,Мне важно, чтобы меня понимали
+sensitive,sensitive,4,Я остро реагирую на критику
+sensitive,sensitive,5,Мне нужно время, чтобы привыкнуть к новому
+sensitive,sensitive,6,Я чувствую эмоции других людей
+sensitive,sensitive,7,Мне важно чувствовать поддержку
+dysthymic,dysthymic,8,Я часто чувствую усталость
+dysthymic,dysthymic,9,Мне трудно радоваться
+dysthymic,dysthymic,10,Я склонен к пессимизму
+dysthymic,dysthymic,11,Мне нужно больше времени для восстановления
+dysthymic,dysthymic,12,Я часто чувствую себя подавленным
+dysthymic,dysthymic,13,Мне трудно сосредоточиться
+dysthymic,dysthymic,14,Я часто чувствую тревогу
+demonstrative,demonstrative,15,Мне важно быть в центре внимания
+demonstrative,demonstrative,16,Я люблю рассказывать истории
+demonstrative,demonstrative,17,Мне нравится быть на виду
+demonstrative,demonstrative,18,Я легко завожу знакомства
+demonstrative,demonstrative,19,Мне важно производить впечатление
+demonstrative,demonstrative,20,Я люблю быть лидером
+demonstrative,demonstrative,21,Мне нравится выступать публично
+unstable,unstable,22,Мое настроение часто меняется
+unstable,unstable,23,Я легко возбуждаюсь
+unstable,unstable,24,Мне трудно контролировать эмоции
+unstable,unstable,25,Я часто действую импульсивно
+unstable,unstable,26,Мне трудно планировать
+unstable,unstable,27,Я часто меняю планы
+unstable,unstable,28,Мне трудно доводить дела до конца
+anxious,anxious,29,Я часто беспокоюсь
+anxious,anxious,30,Мне трудно расслабиться
+anxious,anxious,31,Я часто чувствую напряжение
+anxious,anxious,32,Мне трудно принимать решения
+anxious,anxious,33,Я часто переживаю о будущем
+anxious,anxious,34,Мне трудно справляться со стрессом
+anxious,anxious,35,Я часто чувствую себя небезопасно
+pedantic,pedantic,36,Мне важно, чтобы все было по порядку
+pedantic,pedantic,37,Я внимателен к деталям
+pedantic,pedantic,38,Мне нужно все планировать
+pedantic,pedantic,39,Я люблю структуру и порядок
+pedantic,pedantic,40,Мне важно следовать правилам
+pedantic,pedantic,41,Я часто проверяю, все ли сделано правильно
+pedantic,pedantic,42,Мне трудно принимать неопределенность
+exalted,exalted,43,Я часто чувствую восторг
+exalted,exalted,44,Мне легко вдохновляться
+exalted,exalted,45,Я часто чувствую энтузиазм
+exalted,exalted,46,Мне нравится мечтать
+exalted,exalted,47,Я часто чувствую вдохновение
+exalted,exalted,48,Мне легко увлекаться новым
+exalted,exalted,49,Я часто чувствую радость
+emotive,emotive,50,Я легко плачу
+emotive,emotive,51,Я остро реагирую на искусство
+emotive,emotive,52,Мне легко сопереживать
+emotive,emotive,53,Я часто чувствую глубокие эмоции
+emotive,emotive,54,Мне важно чувствовать красоту
+emotive,emotive,55,Я легко трогаюсь до слез
+emotive,emotive,56,Мне важно эмоциональное общение

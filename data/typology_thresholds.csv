@@ -1,3 +1,2 @@
-key,value
-minScore,0
-margin,1
+minScoreDominant,margin
+5,1
