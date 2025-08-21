@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
     // Читаем CSV файл с вопросами
-    const csvPath = path.join(process.cwd(), 'data', 'typology_items.csv');
+    const csvPath = path.join(process.cwd(), 'data', 'questions_personality.csv');
     const csvContent = fs.readFileSync(csvPath, 'utf-8');
     
     // Парсим CSV с учетом запятых в тексте
@@ -40,44 +40,50 @@ export default async function handler(req, res) {
       }
       values.push(current.trim()); // Добавляем последнее значение
       
-      if (values.length >= 3) {
+      if (values.length >= 5) {
         const id = parseInt(values[0]);
         const question_text = values[1].replace(/"/g, '');
-        const column = parseInt(values[2]);
+        const option_id = parseInt(values[2]);
+        const option_text = values[3].replace(/"/g, '');
+        const ptype = values[4];
         
-        if (!isNaN(id) && !isNaN(column) && question_text) {
+        if (!isNaN(id) && !isNaN(option_id) && question_text && option_text && ptype) {
           items.push({
             id,
             question_text,
-            column
+            option_id,
+            option_text,
+            ptype
           });
         }
       }
     }
 
-    // Группируем вопросы по колонкам (исключаем null)
-    const columns = {};
+    // Группируем вопросы по номерам вопросов
+    const questions = {};
     items.forEach(item => {
-      if (item.column && !isNaN(item.column)) {
-        if (!columns[item.column]) {
-          columns[item.column] = [];
-        }
-        columns[item.column].push(item);
+      if (!questions[item.id]) {
+        questions[item.id] = {
+          id: item.id,
+          question_text: item.question_text,
+          options: []
+        };
       }
+      questions[item.id].options.push({
+        option_id: item.option_id,
+        option_text: item.option_text,
+        ptype: item.ptype
+      });
     });
+
+    // Преобразуем в массив и сортируем по ID вопроса
+    const questionsArray = Object.values(questions).sort((a, b) => a.id - b.id);
 
     res.status(200).json({
       success: true,
-      items,
-      total: items.length,
-      columns: Object.keys(columns)
-        .filter(col => col !== 'null' && !isNaN(parseInt(col)))
-        .map(col => ({
-          column: parseInt(col),
-          count: columns[col].length,
-          questions: columns[col]
-        }))
-        .sort((a, b) => a.column - b.column) // Сортируем по номеру колонки
+      items: questionsArray,
+      total: questionsArray.length,
+      questions: questionsArray
     });
   } catch (error) {
     console.error('Ошибка загрузки вопросов:', error);

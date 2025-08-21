@@ -6,38 +6,32 @@ import Link from 'next/link';
 
 export default function TypologySurvey() {
   const router = useRouter();
-  const [answers, setAnswers] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState({});
+  const [items, setItems] = useState([]);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    console.log('🚀 Компонент TypologySurvey загружен');
-    console.log('📊 Начальное состояние items:', items);
     loadItems();
     loadProgress();
   }, []);
 
   useEffect(() => {
     updateProgress();
-  }, [answers]);
+  }, [answers, currentQuestion]);
 
   const loadItems = async () => {
     try {
-      console.log('🔄 Загружаем вопросы типологии...');
       const response = await fetch('/api/profiling/typology/items');
       const data = await response.json();
-      console.log('📊 Полученные данные:', data);
       
       if (data.success) {
-        setItems(data);
-        // Инициализируем массив ответов на основе количества вопросов
-        const totalQuestions = data.total || 0;
-        setAnswers(Array(totalQuestions).fill(0));
-        console.log('✅ Вопросы загружены успешно, инициализировано ответов:', totalQuestions);
+        setItems(data.questions || []);
+        console.log('✅ Вопросы загружены успешно:', data.questions?.length);
       } else {
         console.error('❌ API вернул ошибку:', data.error);
-        setItems({});
+        setItems([]);
       }
     } catch (error) {
       console.error('❌ Ошибка загрузки вопросов:', error);
@@ -51,10 +45,7 @@ export default function TypologySurvey() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // Проверяем, что сохраненные ответы соответствуют текущему количеству вопросов
-          if (items.total && parsed.length === items.total) {
-            setAnswers(parsed);
-          }
+          setAnswers(parsed);
         } catch (error) {
           console.error('Ошибка загрузки прогресса:', error);
         }
@@ -69,65 +60,102 @@ export default function TypologySurvey() {
   };
 
   const updateProgress = () => {
-    const totalQuestions = items.total || 0;
-    const answered = answers.filter(a => a !== 0).length;
-    setProgress(totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0);
+    const totalQuestions = items.length;
+    if (totalQuestions > 0) {
+      const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+      setProgress(progress);
+    }
   };
 
-  const handleAnswer = (questionIndex, value) => {
-    const newAnswers = [...answers];
-    newAnswers[questionIndex] = value;
-    setAnswers(newAnswers);
+  const handleOptionSelect = (questionId, optionId, ptype) => {
+    const currentAnswers = answers[questionId] || [];
+    
+    // Если опция уже выбрана, убираем её
+    if (currentAnswers.some(ans => ans.optionId === optionId)) {
+      const newAnswers = currentAnswers.filter(ans => ans.optionId !== optionId);
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: newAnswers
+      }));
+    } else {
+      // Если выбрано уже 3 опции, не добавляем
+      if (currentAnswers.length >= 3) {
+        return;
+      }
+      
+      // Добавляем новую опцию
+      const newAnswers = [...currentAnswers, { optionId, ptype }];
+      setAnswers(prev => ({
+        ...prev,
+        [questionId]: newAnswers
+      }));
+    }
+    
     saveProgress();
   };
 
-  const canSubmit = answers.filter(a => a !== 0).length > 0;
+  const canGoNext = () => {
+    const currentAnswers = answers[items[currentQuestion]?.id] || [];
+    return currentAnswers.length >= 1;
+  };
 
-  const getColumnLabel = (columnNumber) => {
-    const labels = {
-      1: 'Сензитивный',
-      2: 'Дистимический', 
-      3: 'Демонстративный',
-      4: 'Возбудимый',
-      5: 'Тревожный',
-      6: 'Педантичный',
-      7: 'Экзальтированный',
-      8: 'Эмотивный',
-      9: 'Застревающий'
-    };
-    return labels[columnNumber] || `Колонка ${columnNumber}`;
+  const canGoBack = () => {
+    return currentQuestion > 0;
+  };
+
+  const goToNext = () => {
+    if (canGoNext() && currentQuestion < items.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    }
+  };
+
+  const goToBack = () => {
+    if (canGoBack()) {
+      setCurrentQuestion(prev => prev - 1);
+    }
+  };
+
+  const getSelectedCount = (questionId) => {
+    return (answers[questionId] || []).length;
+  };
+
+  const isOptionSelected = (questionId, optionId) => {
+    return (answers[questionId] || []).some(ans => ans.optionId === optionId);
+  };
+
+  const isOptionDisabled = (questionId, optionId) => {
+    const selectedCount = getSelectedCount(questionId);
+    const isSelected = isOptionSelected(questionId, optionId);
+    return selectedCount >= 3 && !isSelected;
   };
 
   const submitSurvey = async () => {
-    if (!canSubmit) return;
+    if (!canGoNext()) return;
 
     setLoading(true);
     try {
       const response = await fetch('/api/profiling/typology/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ answers }),
       });
 
       if (response.ok) {
         const result = await response.json();
+        localStorage.setItem('benehab_typology_profile', JSON.stringify(result.profile));
         
-        // Сохраняем профиль
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('benehab_typology_profile', JSON.stringify(result.profile));
-        }
-
         // Генерируем PIB
         await generatePIB();
         
-        // Переходим к чату
+        // Перенаправляем на главную страницу
         router.push('/');
       } else {
-        throw new Error('Ошибка отправки');
+        console.error('Ошибка отправки ответов');
       }
     } catch (error) {
-      console.error('Ошибка отправки опроса:', error);
-      alert('Произошла ошибка. Попробуйте еще раз.');
+      console.error('Ошибка отправки ответов:', error);
     } finally {
       setLoading(false);
     }
@@ -135,34 +163,28 @@ export default function TypologySurvey() {
 
   const generatePIB = async () => {
     try {
-      const attitudeProfile = localStorage.getItem('benehab_attitude_profile');
-      const typologyProfile = localStorage.getItem('benehab_typology_profile');
-      const demographics = localStorage.getItem('benehab_demographics');
+      const response = await fetch('/api/profiling/pib', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          demographics: JSON.parse(localStorage.getItem('benehab_demographics') || '{}'),
+          attitude_profile: JSON.parse(localStorage.getItem('benehab_attitude_profile') || '{}'),
+          typology_profile: JSON.parse(localStorage.getItem('benehab_typology_profile') || '{}')
+        }),
+      });
 
-      if (attitudeProfile && typologyProfile) {
-        const response = await fetch('/api/profiling/pib', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            attitude_profile: JSON.parse(attitudeProfile),
-            typology_profile: JSON.parse(typologyProfile),
-            patient_meta: demographics ? JSON.parse(demographics) : {}
-          })
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
-        }
+      if (response.ok) {
+        const result = await response.json();
+        localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
       }
     } catch (error) {
       console.error('Ошибка генерации PIB:', error);
     }
   };
 
-
-
-  if (!items.total || items.total === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -173,9 +195,11 @@ export default function TypologySurvey() {
     );
   }
 
+  const currentItem = items[currentQuestion];
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4">
         {/* Заголовок */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
@@ -185,18 +209,10 @@ export default function TypologySurvey() {
             </Link>
           </div>
           
-          {/* Временная отладка в заголовке */}
-          <div className="bg-red-100 border border-red-300 rounded-lg p-3 mb-4 text-sm">
-            <div className="font-bold text-red-800">🚨 ОТЛАДКА:</div>
-            <div>items: {JSON.stringify(items)}</div>
-            <div>items.columns: {items.columns ? `✅ ${items.columns.length} колонок` : '❌ НЕТ'}</div>
-            <div>items.total: {items.total || 'НЕТ'}</div>
-          </div>
-          
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
               <span>Прогресс: {Math.round(progress)}%</span>
-              <span>{answers.filter(a => a !== 0).length} из {items.total || 0}</span>
+              <span>Вопрос {currentQuestion + 1} из {items.length}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -207,92 +223,100 @@ export default function TypologySurvey() {
           </div>
 
           <p className="text-gray-700">
-            Отметьте утверждения, которые относятся к вам. Нет "правильных" или "неправильных" ответов — 
+            Отметьте от 1 до 3 утверждений, которые относятся к вам. Нет "правильных" или "неправильных" ответов — 
             это просто про ваш стиль общения и восприятия информации.
           </p>
         </div>
 
-        {/* Отладочная информация */}
-        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6 text-xs text-gray-600">
-          <div className="font-medium mb-2">🔍 Отладка типологического опроса:</div>
-          <div>items.total: {items.total || 'НЕТ'}</div>
-          <div>items.columns: {items.columns ? `✅ ${items.columns.length} колонок` : '❌ НЕТ'}</div>
-          <div>Количество колонок: {items.columns?.length || 0}</div>
-          <div>Общее количество вопросов: {items.total || 0}</div>
-          <pre className="mt-2 text-xs overflow-auto max-h-32">
-            {JSON.stringify(items, null, 2)}
-          </pre>
-        </div>
-
-        {/* Вопросы по столбцам */}
-        {items.columns && items.columns.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {items.columns.map((column) => (
-              <div key={column.column} className="bg-white rounded-2xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  {getColumnLabel(column.column)} ({column.count} вопросов)
-                </h3>
-                
-                <div className="space-y-3">
-                  {column.questions.map((item) => {
-                    const questionIndex = item.id - 1; // id начинается с 1
-                    
-                    return (
-                      <label key={item.id} className="flex items-start cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={answers[questionIndex] === 1}
-                          onChange={(e) => handleAnswer(questionIndex, e.target.checked ? 1 : 0)}
-                          className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                        />
-                        <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                          {item.question_text}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
-            <div className="text-yellow-800 mb-2">⚠️ Вопросы не загружены</div>
-            <div className="text-sm text-yellow-700">
-              {!items.total ? 'Данные не получены' : 'Структура данных некорректна'}
+        {/* Текущий вопрос */}
+        {currentItem && (
+          <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              {currentItem.question_text}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {currentItem.options.map((option) => (
+                <label 
+                  key={option.option_id} 
+                  className={`
+                    flex items-start cursor-pointer p-4 rounded-lg border-2 transition-all
+                    ${isOptionSelected(currentItem.id, option.option_id)
+                      ? 'border-emerald-500 bg-emerald-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                    }
+                    ${isOptionDisabled(currentItem.id, option.option_id)
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                    }
+                  `}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isOptionSelected(currentItem.id, option.option_id)}
+                    onChange={() => handleOptionSelect(currentItem.id, option.option_id, option.ptype)}
+                    disabled={isOptionDisabled(currentItem.id, option.option_id)}
+                    className="mt-1 h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <span className="ml-3 text-sm text-gray-700 leading-relaxed">
+                    {option.option_text}
+                  </span>
+                </label>
+              ))}
             </div>
-            <button 
-              onClick={loadItems} 
-              className="mt-3 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200"
-            >
-              🔄 Попробовать снова
-            </button>
+            
+            <div className="mt-4 text-sm text-gray-500 text-center">
+              Выбрано: {getSelectedCount(currentItem.id)} из 3
+            </div>
           </div>
         )}
 
         {/* Навигация */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center">
-            <Link
-              href="/profiling/attitude"
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:border-emerald-400 hover:text-emerald-600 transition-colors"
-            >
-              ← К предыдущему опросу
-            </Link>
-
             <button
-              onClick={submitSurvey}
-              disabled={!canSubmit || loading}
+              onClick={goToBack}
+              disabled={!canGoBack()}
               className={`
                 px-6 py-2 rounded-xl transition-colors
-                ${canSubmit && !loading
-                  ? 'bg-emerald-600 text-white hover:bg-emerald-700' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ${canGoBack()
+                  ? 'border border-gray-300 text-gray-700 hover:border-emerald-400 hover:text-emerald-600'
+                  : 'border border-gray-200 text-gray-400 cursor-not-allowed'
                 }
               `}
             >
-              {loading ? 'Завершаем...' : 'Завершить все опросы'}
+              ← Назад
             </button>
+
+            {currentQuestion < items.length - 1 ? (
+              <button
+                onClick={goToNext}
+                disabled={!canGoNext()}
+                className={`
+                  px-6 py-2 rounded-xl transition-colors
+                  ${canGoNext()
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }
+                `}
+              >
+                Далее →
+              </button>
+            ) : (
+              <button
+                onClick={submitSurvey}
+                disabled={!canGoNext() || loading}
+                className={`
+                  px-6 py-2 rounded-xl transition-colors
+                  ${canGoNext() && !loading
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }
+                `}
+              >
+                {loading ? 'Завершаем...' : 'Завершить опрос'}
+              </button>
+            )}
           </div>
         </div>
 
