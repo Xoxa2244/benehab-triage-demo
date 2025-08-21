@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import OnboardingCard from '../components/OnboardingCard';
+import ProfilingProgress from '../components/ProfilingProgress';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -26,12 +27,13 @@ export default function Home() {
     const demo = !!localStorage.getItem('benehab_demographics');
     const haveA = !!localStorage.getItem('benehab_attitude_profile');
     const haveT = !!localStorage.getItem('benehab_typology_profile');
+    const haveV = !!localStorage.getItem('benehab_values_profile');
     const pibData = localStorage.getItem('benehab.pib');
     
-    console.log('🔍 Debug localStorage:', { demo, haveA, haveT, needProfiling: !(haveA && haveT) });
+    console.log('🔍 Debug localStorage:', { demo, haveA, haveT, haveV, needProfiling: !(haveA && haveT && haveV) });
     
     setDemoDone(demo);
-    setNeedProfiling(!(haveA && haveT));
+    setNeedProfiling(!(haveA && haveT && haveV));
     
     if (pibData) {
       try {
@@ -49,9 +51,10 @@ export default function Home() {
     const checkProfiles = () => {
       const haveA = !!localStorage.getItem('benehab_attitude_profile');
       const haveT = !!localStorage.getItem('benehab_typology_profile');
-      const newNeedProfiling = !(haveA && haveT);
+      const haveV = !!localStorage.getItem('benehab_values_profile');
+      const newNeedProfiling = !(haveA && haveT && haveV);
       
-      console.log('🔄 Проверка профилей:', { haveA, haveT, newNeedProfiling, current: needProfiling });
+      console.log('🔄 Проверка профилей:', { haveA, haveT, haveV, newNeedProfiling, current: needProfiling });
       
       if (newNeedProfiling !== needProfiling) {
         setNeedProfiling(newNeedProfiling);
@@ -150,9 +153,12 @@ export default function Home() {
       localStorage.removeItem('benehab_demographics');
       localStorage.removeItem('benehab_attitude_profile');
       localStorage.removeItem('benehab_typology_profile');
+      localStorage.removeItem('benehab_values_profile');
       localStorage.removeItem('benehab.pib');
       localStorage.removeItem('benehab_attitude_answers');
       localStorage.removeItem('benehab_typology_answers');
+      localStorage.removeItem('benehab_values_colors');
+      localStorage.removeItem('benehab_values_rankings');
     }
     
     // Сбрасываем состояние
@@ -204,13 +210,15 @@ export default function Home() {
             <div>needProfiling: {needProfiling.toString()}</div>
             <div>Есть attitude: {!!localStorage.getItem('benehab_attitude_profile') ? '✅' : '❌'}</div>
             <div>Есть typology: {!!localStorage.getItem('benehab_typology_profile') ? '✅' : '❌'}</div>
+            <div>Есть values: {!!localStorage.getItem('benehab_values_profile') ? '✅' : '❌'}</div>
             <div className="mt-2">
               <button
                 onClick={() => {
                   const haveA = !!localStorage.getItem('benehab_attitude_profile');
                   const haveT = !!localStorage.getItem('benehab_typology_profile');
-                  setNeedProfiling(!(haveA && haveT));
-                  console.log('🔄 Принудительное обновление needProfiling:', { haveA, haveT, needProfiling: !(haveA && haveT) });
+                  const haveV = !!localStorage.getItem('benehab_values_profile');
+                  setNeedProfiling(!(haveA && haveT && haveV));
+                  console.log('🔄 Принудительное обновление needProfiling:', { haveA, haveT, haveV, needProfiling: !(haveA && haveT && haveV) });
                 }}
                 className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
               >
@@ -222,13 +230,11 @@ export default function Home() {
 
         {demoDone && needProfiling && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm">
-            <div className="font-medium mb-1">
+            <div className="font-medium mb-3">
               Можно я задам несколько коротких вопросов? Это займёт 5–10 минут и поможет мне говорить с тобой максимально
               комфортно.
             </div>
-            <Link href="/profiling/attitude" className="inline-block px-3 py-1.5 rounded-xl bg-emerald-600 text-white">
-              Да, пройти опрос →
-            </Link>
+            <ProfilingProgress />
           </div>
         )}
 

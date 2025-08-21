@@ -8,16 +8,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { attitude_profile, typology_profile, patient_meta = {} } = req.body;
+    const { attitude_profile, typology_profile, values_profile, demographics, patient_meta = {} } = req.body;
 
-    if (!attitude_profile || !typology_profile) {
+    // Проверяем наличие хотя бы одного профиля
+    if (!attitude_profile && !typology_profile && !values_profile) {
       return res.status(400).json({ 
-        error: 'Необходимы оба профиля для генерации PIB' 
+        error: 'Необходим хотя бы один профиль для генерации PIB' 
       });
     }
 
     // Генерируем PIB
-    const pib = generatePIB(attitude_profile, typology_profile, patient_meta);
+    const pib = generatePIB(attitude_profile, typology_profile, values_profile, demographics, patient_meta);
 
     res.status(200).json({
       success: true,

@@ -99,7 +99,7 @@ export default function AttitudeSurvey() {
         }
 
         // Переходим к странице результата
-        router.push('/profiling/attitude/result');
+        router.push('/profiling/attitude-results');
       } else {
         throw new Error('Ошибка отправки');
       }

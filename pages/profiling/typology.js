@@ -132,7 +132,9 @@ export default function TypologySurvey() {
   const submitSurvey = async () => {
     if (!canGoNext()) return;
 
+    console.log('🚀 Отправляем опрос...', { answers });
     setLoading(true);
+    
     try {
       const response = await fetch('/api/profiling/typology/submit', {
         method: 'POST',
@@ -142,20 +144,29 @@ export default function TypologySurvey() {
         body: JSON.stringify({ answers }),
       });
 
+      console.log('📡 Ответ API:', { status: response.status, ok: response.ok });
+
       if (response.ok) {
         const result = await response.json();
+        console.log('✅ Результат API:', result);
+        
         localStorage.setItem('benehab_typology_profile', JSON.stringify(result.profile));
         
         // Генерируем PIB
+        console.log('🔄 Генерируем PIB...');
         await generatePIB();
         
-        // Перенаправляем на главную страницу
-        router.push('/');
+        // Перенаправляем на страницу результатов
+        console.log('🔄 Перенаправляем на результаты...');
+        router.push('/profiling/typology-results');
       } else {
-        console.error('Ошибка отправки ответов');
+        const errorText = await response.text();
+        console.error('❌ Ошибка отправки ответов:', response.status, errorText);
+        alert(`Ошибка отправки: ${response.status}`);
       }
     } catch (error) {
-      console.error('Ошибка отправки ответов:', error);
+      console.error('❌ Ошибка отправки ответов:', error);
+      alert(`Ошибка: ${error.message}`);
     } finally {
       setLoading(false);
     }
