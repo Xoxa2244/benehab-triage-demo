@@ -119,9 +119,47 @@ export default function Home() {
     await send(message);
   };
 
+  const resetSession = () => {
+    // Сбрасываем все данные сессии
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('benehab_demographics');
+      localStorage.removeItem('benehab_attitude_profile');
+      localStorage.removeItem('benehab_typology_profile');
+      localStorage.removeItem('benehab.pib');
+      localStorage.removeItem('benehab_attitude_answers');
+      localStorage.removeItem('benehab_typology_answers');
+    }
+    
+    // Сбрасываем состояние
+    setDemoDone(false);
+    setNeedProfiling(false);
+    setPib(null);
+    setMessages([
+      {
+        role: 'assistant',
+        content:
+          'Привет! Я — Татьяна, твой ассистент по здоровью. Расскажи, что беспокоит. Если станет совсем плохо — нажми SOS.',
+      },
+    ]);
+  };
+
   return (
     <div className="min-h-screen">
       <div className="max-w-4xl mx-auto p-4 space-y-3">
+        {/* Заголовок с кнопкой сброса */}
+        <div className="flex items-center justify-between bg-white rounded-2xl p-4 shadow-sm">
+          <h1 className="text-xl font-semibold text-gray-900">Benehab - Татьяна</h1>
+          {demoDone && (
+            <button
+              onClick={resetSession}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm"
+              title="Сбросить сессию и начать заново"
+            >
+              🔄 Сбросить сессию
+            </button>
+          )}
+        </div>
+
         {!demoDone && <OnboardingCard onDone={() => setDemoDone(true)} />}
 
         {demoDone && needProfiling && (
