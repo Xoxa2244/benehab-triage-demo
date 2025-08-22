@@ -21,6 +21,9 @@ export default function Home() {
     typology: false,
     values: false
   });
+  const [chatMessages, setChatMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     // Проверяем, что мы в браузере
@@ -67,6 +70,88 @@ export default function Home() {
       surveyResults: results
     });
     setShowTatianaMessage(true);
+  };
+
+  const handleQuickAction = (action) => {
+    let message = '';
+    let response = '';
+    
+    switch (action) {
+      case 'doctor':
+        message = 'Хочу записаться к врачу';
+        response = 'Конечно! Я помогу вам записаться к врачу. Скажите, к какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы, и я порекомендую подходящего врача?';
+        break;
+      case 'medicine':
+        message = 'Хочу узнать про препарат';
+        response = 'Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем, и вы хотите узнать, какие лекарства могут помочь?';
+        break;
+      case 'symptoms':
+        message = 'У меня есть симптомы';
+        response = 'Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию и дать более точные рекомендации.';
+        break;
+      case 'general':
+        message = 'Просто хочу поговорить';
+        response = 'Конечно! Я всегда рада пообщаться с вами. Расскажите, как ваши дела? Что вас беспокоит или радует сегодня? Я здесь, чтобы выслушать и поддержать вас.';
+        break;
+      default:
+        return;
+    }
+
+    // Добавляем сообщение пользователя
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: message,
+      timestamp: new Date()
+    };
+
+    // Добавляем ответ Татьяны
+    const tatianaResponse = {
+      id: Date.now() + 1,
+      type: 'tatiana',
+      text: response,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage, tatianaResponse]);
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: inputMessage,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsTyping(true);
+
+    // Имитируем ответ Татьяны
+    setTimeout(() => {
+      let response = '';
+      
+      if (completedSurveys.attitude && completedSurveys.typology && completedSurveys.values) {
+        // Если профиль заполнен, даем персонализированный ответ
+        response = `Спасибо за ваше сообщение, ${demographics?.name}! Учитывая ваш профиль, я понимаю вашу ситуацию лучше. Давайте разберем это подробнее. Что именно вас интересует?`;
+      } else {
+        // Если профиль не заполнен, даем общий ответ
+        response = 'Спасибо за ваше сообщение! Я готова помочь вам. Расскажите подробнее, что вас интересует, и я постараюсь дать полезный совет.';
+      }
+
+      const tatianaResponse = {
+        id: Date.now() + 1,
+        type: 'tatiana',
+        text: response,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, tatianaResponse]);
+      setIsTyping(false);
+    }, 1000);
   };
 
 
@@ -130,19 +215,18 @@ export default function Home() {
 
           {/* Быстрые действия */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Быстрые действия</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Общение с Татьяной</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link
-                href="/profiling/attitude"
+              <button
+                onClick={() => handleQuickAction('doctor')}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('attitude', null)}
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                  <span className="text-blue-600 text-xl">🏥</span>
+                  <span className="text-blue-600 text-xl">👨‍⚕️</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
-                <p className="text-sm text-gray-600">Первый опрос</p>
-              </Link>
+                <h3 className="font-medium text-gray-900 mb-1">Записаться к врачу</h3>
+                <p className="text-sm text-gray-600">Помощь с записью</p>
+              </button>
 
               <Link
                 href="/profiling/typology"
@@ -250,6 +334,79 @@ export default function Home() {
             )}
           </div>
 
+          {/* Чат с Татьяной */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Чат с Татьяной</h2>
+            
+            {/* История сообщений */}
+            <div className="mb-4 max-h-96 overflow-y-auto space-y-3">
+              {chatMessages.length === 0 ? (
+                <div className="text-center text-gray-500 py-8">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-white text-2xl">💬</span>
+                  </div>
+                  <p>Начните общение с Татьяной!</p>
+                  <p className="text-sm">Используйте кнопки выше или напишите сообщение</p>
+                </div>
+              ) : (
+                chatMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        msg.type === 'user'
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.text}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {msg.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+              
+              {/* Индикатор печатания */}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                      <span className="text-sm">Татьяна печатает...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Поле ввода */}
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Напишите сообщение..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim()}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
+
           {/* Сообщение от Татьяны */}
           {showTatianaMessage && (
             <TatianaMessage
@@ -259,6 +416,51 @@ export default function Home() {
               isVisible={showTatianaMessage}
             />
           )}
+
+          {/* Опросы для профилирования */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Профилирование</h2>
+            <p className="text-gray-600 mb-4">
+              Пройдите опросы, чтобы Татьяна могла лучше понять вас и адаптировать стиль общения
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link
+                href="/profiling/attitude"
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
+                onClick={() => showSurveyMessage('attitude', null)}
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
+                  <span className="text-blue-600 text-xl">🏥</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
+                <p className="text-sm text-gray-600">Первый опрос</p>
+              </Link>
+
+              <Link
+                href="/profiling/typology"
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-center"
+                onClick={() => showSurveyMessage('typology', null)}
+              >
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
+                  <span className="text-green-600 text-xl">🧠</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Психотип</h3>
+                <p className="text-sm text-gray-600">Второй опрос</p>
+              </Link>
+
+              <Link
+                href="/profiling/values"
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-center"
+                onClick={() => showSurveyMessage('values', null)}
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
+                  <span className="text-purple-600 text-xl">💎</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Ценности</h3>
+                <p className="text-sm text-gray-600">Третий опрос</p>
+              </Link>
+            </div>
+          </div>
 
           {/* Админ панель */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
