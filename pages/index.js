@@ -283,6 +283,77 @@ export default function Home() {
           </div>
         )}
 
+        {/* Быстрые действия */}
+        <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Быстрые действия</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link 
+              href="/profiling/attitude" 
+              className="flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
+            >
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-lg">📋</span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Опрос отношения к болезни</h3>
+                <p className="text-sm text-gray-600">Психологическое профилирование</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/profiling/typology" 
+              className="flex items-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
+            >
+              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-lg">🧠</span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Опрос психотипа</h3>
+                <p className="text-sm text-gray-600">Тип личности</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/profiling/values" 
+              className="flex items-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors"
+            >
+              <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-lg">🎨</span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Опрос ценностей</h3>
+                <p className="text-sm text-gray-600">Психосемантика</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/communication-instructions" 
+              className="flex items-center p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors"
+            >
+              <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-lg">📋</span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Инструкции по общению</h3>
+                <p className="text-sm text-gray-600">Персонализированные рекомендации</p>
+              </div>
+            </Link>
+            
+            <Link 
+              href="/admin" 
+              className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              <div className="w-10 h-10 bg-gray-500 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-lg">⚙️</span>
+              </div>
+              <div>
+                <h3 className="font-medium text-gray-900">Админ панель</h3>
+                <p className="text-sm text-gray-600">Управление опросами</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Профиль пользователя */}
         {pib && (
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm">
