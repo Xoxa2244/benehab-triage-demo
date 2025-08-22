@@ -119,10 +119,11 @@ export default function Home() {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
+    const messageText = inputMessage.trim();
     const userMessage = {
       id: Date.now(),
       type: 'user',
-      text: inputMessage,
+      text: messageText,
       timestamp: new Date()
     };
 
@@ -134,7 +135,18 @@ export default function Home() {
     setTimeout(() => {
       let response = '';
       
-      if (completedSurveys.attitude && completedSurveys.typology && completedSurveys.values) {
+      // Простая логика ответов на основе входящего сообщения
+      const lowerMessage = messageText.toLowerCase();
+      
+      if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй') || lowerMessage.includes('добрый')) {
+        response = `Привет! Я Татьяна, ваш персональный агент. Чем могу помочь?`;
+      } else if (lowerMessage.includes('врач') || lowerMessage.includes('доктор') || lowerMessage.includes('записаться')) {
+        response = `Конечно! Я помогу вам записаться к врачу. К какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы?`;
+      } else if (lowerMessage.includes('лекарство') || lowerMessage.includes('препарат') || lowerMessage.includes('таблетка')) {
+        response = `Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем?`;
+      } else if (lowerMessage.includes('симптом') || lowerMessage.includes('болит') || lowerMessage.includes('плохо')) {
+        response = `Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию.`;
+      } else if (completedSurveys.attitude && completedSurveys.typology && completedSurveys.values) {
         // Если профиль заполнен, даем персонализированный ответ
         response = `Спасибо за ваше сообщение, ${demographics?.name}! Учитывая ваш профиль, я понимаю вашу ситуацию лучше. Давайте разберем это подробнее. Что именно вас интересует?`;
       } else {
@@ -215,18 +227,22 @@ export default function Home() {
 
           {/* Быстрые действия */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Общение с Татьяной</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Профилирование</h2>
+            <p className="text-gray-600 mb-4">
+              Пройдите опросы, чтобы Татьяна могла лучше понять вас и адаптировать стиль общения
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <button
-                onClick={() => handleQuickAction('doctor')}
+              <Link
+                href="/profiling/attitude"
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
+                onClick={() => showSurveyMessage('attitude', null)}
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                  <span className="text-blue-600 text-xl">👨‍⚕️</span>
+                  <span className="text-blue-600 text-xl">🏥</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Записаться к врачу</h3>
-                <p className="text-sm text-gray-600">Помощь с записью</p>
-              </button>
+                <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
+                <p className="text-sm text-gray-600">Первый опрос</p>
+              </Link>
 
               <Link
                 href="/profiling/typology"
@@ -336,7 +352,7 @@ export default function Home() {
 
           {/* Чат с Татьяной */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Чат с Татьяной</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Общение с Татьяной</h2>
             
             {/* История сообщений */}
             <div className="mb-4 max-h-96 overflow-y-auto space-y-3">
@@ -417,50 +433,7 @@ export default function Home() {
             />
           )}
 
-          {/* Опросы для профилирования */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Профилирование</h2>
-            <p className="text-gray-600 mb-4">
-              Пройдите опросы, чтобы Татьяна могла лучше понять вас и адаптировать стиль общения
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Link
-                href="/profiling/attitude"
-                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('attitude', null)}
-              >
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                  <span className="text-blue-600 text-xl">🏥</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
-                <p className="text-sm text-gray-600">Первый опрос</p>
-              </Link>
 
-              <Link
-                href="/profiling/typology"
-                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('typology', null)}
-              >
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
-                  <span className="text-green-600 text-xl">🧠</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Психотип</h3>
-                <p className="text-sm text-gray-600">Второй опрос</p>
-              </Link>
-
-              <Link
-                href="/profiling/values"
-                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('values', null)}
-              >
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
-                  <span className="text-purple-600 text-xl">💎</span>
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Ценности</h3>
-                <p className="text-sm text-gray-600">Третий опрос</p>
-              </Link>
-            </div>
-          </div>
 
           {/* Админ панель */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
