@@ -5,11 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DemographicsCheck from '../components/DemographicsCheck';
 
-export async function getServerSideProps() {
-  return {
-    props: {}
-  };
-}
+
 
 export default function Home() {
   const [demographics, setDemographics] = useState(null);
