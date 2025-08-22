@@ -10,6 +10,12 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Проверяем, что мы в браузере
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+    
     // Проверяем наличие демографических данных
     const savedData = localStorage.getItem('benehab_demographics');
     if (savedData) {

@@ -16,6 +16,11 @@ export default function Home() {
   const [demographics, setDemographics] = useState(null);
   const [showTatianaMessage, setShowTatianaMessage] = useState(false);
   const [tatianaMessageData, setTatianaMessageData] = useState({});
+  const [completedSurveys, setCompletedSurveys] = useState({
+    attitude: false,
+    typology: false,
+    values: false
+  });
 
   useEffect(() => {
     // Проверяем, что мы в браузере
@@ -31,6 +36,13 @@ export default function Home() {
         console.error('Ошибка загрузки демографических данных:', e);
       }
     }
+
+    // Проверяем завершенные опросы
+    setCompletedSurveys({
+      attitude: !!localStorage.getItem('benehab_attitude_profile'),
+      typology: !!localStorage.getItem('benehab_typology_profile'),
+      values: !!localStorage.getItem('benehab_values_profile')
+    });
   }, []);
 
   const handleDemographicsComplete = (data) => {
@@ -183,7 +195,7 @@ export default function Home() {
                   <span className="text-gray-700">Отношение к болезни</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {localStorage.getItem('benehab_attitude_profile') ? (
+                  {completedSurveys.attitude ? (
                     <span className="text-green-600 text-sm">✓ Завершено</span>
                   ) : (
                     <span className="text-gray-400 text-sm">Не начато</span>
@@ -199,7 +211,7 @@ export default function Home() {
                   <span className="text-gray-700">Психотип</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {localStorage.getItem('benehab_typology_profile') ? (
+                  {completedSurveys.typology ? (
                     <span className="text-green-600 text-sm">✓ Завершено</span>
                   ) : (
                     <span className="text-gray-400 text-sm">Не начато</span>
@@ -215,7 +227,7 @@ export default function Home() {
                   <span className="text-gray-700">Ценности</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {localStorage.getItem('benehab_values_profile') ? (
+                  {completedSurveys.values ? (
                     <span className="text-green-600 text-sm">✓ Завершено</span>
                   ) : (
                     <span className="text-gray-400 text-sm">Не начато</span>
@@ -225,9 +237,9 @@ export default function Home() {
             </div>
 
             {/* Кнопка для просмотра инструкций */}
-            {localStorage.getItem('benehab_attitude_profile') && 
-             localStorage.getItem('benehab_typology_profile') && 
-             localStorage.getItem('benehab_values_profile') && (
+            {completedSurveys.attitude && 
+             completedSurveys.typology && 
+             completedSurveys.values && (
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <Link
                   href="/communication-instructions"
