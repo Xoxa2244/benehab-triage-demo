@@ -49,6 +49,84 @@ export default function Home() {
     setDemographics(data);
   };
 
+  const handleQuickQuestion = (questionType) => {
+    let question = '';
+    let response = '';
+    
+    switch (questionType) {
+      case 'doctor':
+        question = 'Хочу записаться к врачу';
+        response = `Конечно! Я помогу вам записаться к врачу. К какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы, и я порекомендую подходящего врача?
+
+Я могу помочь с:
+• Записью к терапевту
+• Консультацией у специалистов (кардиолог, невролог, эндокринолог)
+• Экстренной помощью при острых симптомах
+• Плановыми обследованиями
+
+Расскажите подробнее, что вас беспокоит?`;
+        break;
+      case 'medicine':
+        question = 'Хочу узнать про препарат';
+        response = `Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем, и вы хотите узнать, какие лекарства могут помочь?
+
+Я могу рассказать о:
+• Действии препаратов
+• Побочных эффектах
+• Взаимодействии с другими лекарствами
+• Правилах приема
+• Альтернативных вариантах
+
+Какой препарат вас интересует?`;
+        break;
+      case 'symptoms':
+        question = 'У меня есть симптомы';
+        response = `Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию и дать более точные рекомендации.
+
+Важно знать:
+• Когда появились симптомы
+• Насколько они интенсивны
+• Что усиливает или ослабляет их
+• Есть ли сопутствующие проблемы
+• Принимаете ли вы какие-то лекарства
+
+Опишите ваши симптомы подробнее?`;
+        break;
+      case 'general':
+        question = 'Просто хочу поговорить';
+        response = `Конечно! Я всегда рада пообщаться с вами. Расскажите, как ваши дела? Что вас беспокоит или радует сегодня? 
+
+Я здесь, чтобы:
+• Выслушать вас
+• Поддержать морально
+• Дать совет, если нужно
+• Просто пообщаться
+
+Как ваши дела? Что на душе?`;
+        break;
+      default:
+        return;
+    }
+
+    // Добавляем вопрос пользователя
+    const userMessage = {
+      id: Date.now(),
+      type: 'user',
+      text: question,
+      timestamp: new Date()
+    };
+
+    // Добавляем ответ Татьяны
+    const tatianaResponse = {
+      id: Date.now() + 1,
+      type: 'tatiana',
+      text: response,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage, tatianaResponse]);
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -72,7 +150,16 @@ export default function Home() {
       const lowerMessage = messageText.toLowerCase();
       
       if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй') || lowerMessage.includes('добрый')) {
-        response = `Привет! Я Татьяна, ваш персональный агент. Чем могу помочь?`;
+        response = `Привет! Я Татьяна, ваш персональный агент. Чем могу помочь?
+
+Я могу помочь вам с:
+• Записью к врачу
+• Информацией о препаратах
+• Анализом симптомов
+• Общими вопросами о здоровье
+• Просто пообщаться и поддержать
+
+Выберите типовой вопрос выше или напишите свой!`;
       } else if (lowerMessage.includes('врач') || lowerMessage.includes('доктор') || lowerMessage.includes('записаться')) {
         response = `Конечно! Я помогу вам записаться к врачу. К какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы?`;
       } else if (lowerMessage.includes('лекарство') || lowerMessage.includes('препарат') || lowerMessage.includes('таблетка')) {
@@ -276,6 +363,59 @@ export default function Home() {
                 </Link>
               </div>
             )}
+          </div>
+
+          {/* Быстрые вопросы */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Быстрые вопросы</h2>
+            <p className="text-gray-600 mb-4">
+              Выберите типовой вопрос или напишите свой в чате ниже
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <button
+                onClick={() => handleQuickQuestion('doctor')}
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
+                  <span className="text-blue-600 text-xl">👨‍⚕️</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Записаться к врачу</h3>
+                <p className="text-sm text-gray-600">Помощь с записью</p>
+              </button>
+
+              <button
+                onClick={() => handleQuickQuestion('medicine')}
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
+                  <span className="text-green-600 text-xl">💊</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Узнать про препарат</h3>
+                <p className="text-sm text-gray-600">Информация о лекарствах</p>
+              </button>
+
+              <button
+                onClick={() => handleQuickQuestion('symptoms')}
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
+                  <span className="text-purple-600 text-xl">🤒</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">У меня симптомы</h3>
+                <p className="text-sm text-gray-600">Рассказать о проблеме</p>
+              </button>
+
+              <button
+                onClick={() => handleQuickQuestion('general')}
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
+                  <span className="text-orange-600 text-xl">💬</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Просто поговорить</h3>
+                <p className="text-sm text-gray-600">Общение и поддержка</p>
+              </button>
+            </div>
           </div>
 
           {/* Чат с Татьяной */}
