@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DemographicsCheck from '../components/DemographicsCheck';
-import TatianaMessage from '../components/TatianaMessage';
 
 export async function getServerSideProps() {
   return {
@@ -14,8 +13,6 @@ export async function getServerSideProps() {
 
 export default function Home() {
   const [demographics, setDemographics] = useState(null);
-  const [showTatianaMessage, setShowTatianaMessage] = useState(false);
-  const [tatianaMessageData, setTatianaMessageData] = useState({});
   const [completedSurveys, setCompletedSurveys] = useState({
     attitude: false,
     typology: false,
@@ -50,70 +47,6 @@ export default function Home() {
 
   const handleDemographicsComplete = (data) => {
     setDemographics(data);
-    // Показываем приветственное сообщение от Татьяны
-    showWelcomeMessage(data);
-  };
-
-  const showWelcomeMessage = (data) => {
-    setTatianaMessageData({
-      demographics: data,
-      surveyType: 'welcome',
-      surveyResults: null
-    });
-    setShowTatianaMessage(true);
-  };
-
-  const showSurveyMessage = (surveyType, results) => {
-    setTatianaMessageData({
-      demographics: demographics,
-      surveyType: surveyType,
-      surveyResults: results
-    });
-    setShowTatianaMessage(true);
-  };
-
-  const handleQuickAction = (action) => {
-    let message = '';
-    let response = '';
-    
-    switch (action) {
-      case 'doctor':
-        message = 'Хочу записаться к врачу';
-        response = 'Конечно! Я помогу вам записаться к врачу. Скажите, к какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы, и я порекомендую подходящего врача?';
-        break;
-      case 'medicine':
-        message = 'Хочу узнать про препарат';
-        response = 'Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем, и вы хотите узнать, какие лекарства могут помочь?';
-        break;
-      case 'symptoms':
-        message = 'У меня есть симптомы';
-        response = 'Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию и дать более точные рекомендации.';
-        break;
-      case 'general':
-        message = 'Просто хочу поговорить';
-        response = 'Конечно! Я всегда рада пообщаться с вами. Расскажите, как ваши дела? Что вас беспокоит или радует сегодня? Я здесь, чтобы выслушать и поддержать вас.';
-        break;
-      default:
-        return;
-    }
-
-    // Добавляем сообщение пользователя
-    const userMessage = {
-      id: Date.now(),
-      type: 'user',
-      text: message,
-      timestamp: new Date()
-    };
-
-    // Добавляем ответ Татьяны
-    const tatianaResponse = {
-      id: Date.now() + 1,
-      type: 'tatiana',
-      text: response,
-      timestamp: new Date()
-    };
-
-    setChatMessages(prev => [...prev, userMessage, tatianaResponse]);
   };
 
   const handleSendMessage = async () => {
@@ -165,8 +98,6 @@ export default function Home() {
       setIsTyping(false);
     }, 1000);
   };
-
-
 
   return (
     <DemographicsCheck onDemographicsComplete={handleDemographicsComplete}>
@@ -225,7 +156,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Быстрые действия */}
+          {/* Профилирование */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Профилирование</h2>
             <p className="text-gray-600 mb-4">
@@ -235,7 +166,6 @@ export default function Home() {
               <Link
                 href="/profiling/attitude"
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('attitude', null)}
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
                   <span className="text-blue-600 text-xl">🏥</span>
@@ -247,7 +177,6 @@ export default function Home() {
               <Link
                 href="/profiling/typology"
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('typology', null)}
               >
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
                   <span className="text-green-600 text-xl">🧠</span>
@@ -259,7 +188,6 @@ export default function Home() {
               <Link
                 href="/profiling/values"
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-center"
-                onClick={() => showSurveyMessage('values', null)}
               >
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
                   <span className="text-purple-600 text-xl">💎</span>
@@ -320,7 +248,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span className="text-purple-600 text-sm font-medium">3</span>
+                    <span className="text-green-600 text-sm font-medium">3</span>
                   </div>
                   <span className="text-gray-700">Ценности</span>
                 </div>
@@ -362,7 +290,7 @@ export default function Home() {
                     <span className="text-white text-2xl">💬</span>
                   </div>
                   <p>Начните общение с Татьяной!</p>
-                  <p className="text-sm">Используйте кнопки выше или напишите сообщение</p>
+                  <p className="text-sm">Напишите сообщение ниже</p>
                 </div>
               ) : (
                 chatMessages.map((msg) => (
@@ -422,18 +350,6 @@ export default function Home() {
               </button>
             </div>
           </div>
-
-          {/* Сообщение от Татьяны */}
-          {showTatianaMessage && (
-            <TatianaMessage
-              demographics={tatianaMessageData.demographics}
-              surveyType={tatianaMessageData.surveyType}
-              surveyResults={tatianaMessageData.surveyResults}
-              isVisible={showTatianaMessage}
-            />
-          )}
-
-
 
           {/* Админ панель */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
