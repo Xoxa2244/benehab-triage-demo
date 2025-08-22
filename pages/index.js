@@ -297,8 +297,8 @@ export default function Home() {
               Пройдите опросы, чтобы Татьяна могла лучше понять вас и адаптировать стиль общения
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link
-                href="/profiling/attitude"
+              <button
+                onClick={() => window.location.href = '/profiling/attitude'}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors text-center"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
@@ -306,7 +306,7 @@ export default function Home() {
                 </div>
                 <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
                 <p className="text-sm text-gray-600">Первый опрос</p>
-              </Link>
+              </button>
 
               <Link
                 href="/profiling/typology"

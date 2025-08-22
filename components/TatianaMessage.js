@@ -1,4 +1,4 @@
-'use client';
+
 
 import { useState, useEffect } from 'react';
 import { UserIcon, HeartIcon, SparklesIcon } from '@heroicons/react/24/outline';
