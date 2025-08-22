@@ -1,7 +1,6 @@
 // pages/index.js
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import DemographicsCheck from '../components/DemographicsCheck';
 
 
@@ -308,8 +307,8 @@ export default function Home() {
                 <p className="text-sm text-gray-600">Первый опрос</p>
               </button>
 
-              <Link
-                href="/profiling/typology"
+              <button
+                onClick={() => window.location.href = '/profiling/typology'}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors text-center"
               >
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
@@ -317,10 +316,10 @@ export default function Home() {
                 </div>
                 <h3 className="font-medium text-gray-900 mb-1">Психотип</h3>
                 <p className="text-sm text-gray-600">Второй опрос</p>
-              </Link>
+              </button>
 
-              <Link
-                href="/profiling/values"
+              <button
+                onClick={() => window.location.href = '/profiling/values'}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors text-center"
               >
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
@@ -328,10 +327,10 @@ export default function Home() {
                 </div>
                 <h3 className="font-medium text-gray-900 mb-1">Ценности</h3>
                 <p className="text-sm text-gray-600">Третий опрос</p>
-              </Link>
+              </button>
 
-              <Link
-                href="/communication-instructions"
+              <button
+                onClick={() => window.location.href = '/communication-instructions'}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors text-center"
               >
                 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
@@ -339,7 +338,7 @@ export default function Home() {
                 </div>
                 <h3 className="font-medium text-gray-900 mb-1">Инструкции</h3>
                 <p className="text-sm text-gray-600">По общению</p>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -401,13 +400,13 @@ export default function Home() {
              completedSurveys.typology && 
              completedSurveys.values && (
               <div className="mt-6 pt-4 border-t border-gray-200">
-                <Link
-                  href="/communication-instructions"
+                <button
+                  onClick={() => window.location.href = '/communication-instructions'}
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
                 >
                   <span className="mr-2">📋</span>
                   Посмотреть инструкции по общению
-                </Link>
+                </button>
               </div>
             )}
           </div>
@@ -541,13 +540,13 @@ export default function Home() {
           {/* Админ панель */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Администрирование</h2>
-            <Link
-              href="/admin"
+            <button
+              onClick={() => window.location.href = '/admin'}
               className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
               <span className="mr-2">⚙️</span>
               Админ панель
-            </Link>
+            </button>
           </div>
         </div>
       </div>
