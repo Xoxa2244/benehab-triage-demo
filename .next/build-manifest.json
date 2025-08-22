@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/Rxrd3cq4KunFIqQt8885x/_buildManifest.js",
-    "static/Rxrd3cq4KunFIqQt8885x/_ssgManifest.js"
+    "static/iOh6xcU6avD98eTObbtx7/_buildManifest.js",
+    "static/iOh6xcU6avD98eTObbtx7/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
@@ -21,7 +21,7 @@
       "static/chunks/webpack-69bfa6990bb9e155.js",
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
-      "static/css/95154ff7525d83ad.css",
+      "static/css/5774975d8ccf3ac2.css",
       "static/chunks/pages/_app-2c81db487fff70a6.js"
     ],
     "/_error": [
@@ -35,21 +35,35 @@
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin-eab84223e5abd62d.js"
+      "static/chunks/pages/admin-440167841fbdecf4.js"
     ],
     "/admin/attitude/questions": [
       "static/chunks/webpack-69bfa6990bb9e155.js",
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin/attitude/questions-0ca6fe69fb8c0a98.js"
+      "static/chunks/pages/admin/attitude/questions-ef995142f9512f28.js"
     ],
     "/admin/attitude/types": [
       "static/chunks/webpack-69bfa6990bb9e155.js",
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin/attitude/types-da7a74d45553b97d.js"
+      "static/chunks/pages/admin/attitude/types-e120b95325f202cb.js"
+    ],
+    "/admin/typology/questions": [
+      "static/chunks/webpack-69bfa6990bb9e155.js",
+      "static/chunks/framework-7dc8a65f4a0cda33.js",
+      "static/chunks/main-4e42fc3d34d89efb.js",
+      "static/chunks/664-f0b709fe6426370a.js",
+      "static/chunks/pages/admin/typology/questions-a256cc8eed0d39bf.js"
+    ],
+    "/admin/typology/types": [
+      "static/chunks/webpack-69bfa6990bb9e155.js",
+      "static/chunks/framework-7dc8a65f4a0cda33.js",
+      "static/chunks/main-4e42fc3d34d89efb.js",
+      "static/chunks/664-f0b709fe6426370a.js",
+      "static/chunks/pages/admin/typology/types-cab7008d216666db.js"
     ],
     "/admin/values/concepts": [
       "static/chunks/webpack-69bfa6990bb9e155.js",

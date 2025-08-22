@@ -149,22 +149,22 @@ export default function AdminPanel() {
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Link 
+                <Link
                   href="/admin/typology/questions"
-                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors"
+                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
                 >
-                  <ClipboardDocumentListIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <UserGroupIcon className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Вопросы</h3>
-                  <p className="text-sm text-gray-600 text-center">Управление вопросами опроса, их формулировками и весами</p>
+                  <p className="text-sm text-gray-600 text-center">Управление вопросами и вариантами ответов для определения психотипа</p>
                 </Link>
                 
-                <Link 
+                <Link
                   href="/admin/typology/types"
-                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors"
+                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
                 >
-                  <UserGroupIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <DocumentTextIcon className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Психотипы</h3>
-                  <p className="text-sm text-gray-600 text-center">Настройка психотипов личности и их характеристик</p>
+                  <p className="text-sm text-gray-600 text-center">Управление описаниями психотипов и инструкциями по коммуникации</p>
                 </Link>
                 
                 <Link 
@@ -219,39 +219,52 @@ export default function AdminPanel() {
         </div>
 
         {/* Статистика */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <ClipboardDocumentListIcon className="h-8 w-8 text-blue-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Всего вопросов</p>
-                <p className="text-2xl font-semibold text-gray-900">127</p>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h2 className="text-lg font-medium text-gray-900 mb-6">Общая статистика</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Типы отношения к болезни */}
+            <div className="bg-green-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-green-800 mb-2">Типы отношения к болезни</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-green-700">Активных типов:</span>
+                  <span className="text-sm font-medium text-green-900">9</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-green-700">Вопросов:</span>
+                  <span className="text-sm font-medium text-green-900">41</span>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <UserGroupIcon className="h-8 w-8 text-green-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Типов личности</p>
-                <p className="text-2xl font-semibold text-gray-900">12</p>
+
+            {/* Психотипы */}
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Психотипы</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-blue-700">Активных психотипов:</span>
+                  <span className="text-sm font-medium text-blue-900">9</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-blue-700">Вопросов:</span>
+                  <span className="text-sm font-medium text-blue-900">7</span>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <SwatchIcon className="h-8 w-8 text-purple-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Понятий</p>
-                <p className="text-2xl font-semibold text-gray-900">65</p>
+
+            {/* Психосемантика */}
+            <div className="bg-purple-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-purple-800 mb-2">Психосемантика</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm text-purple-700">Количество понятий:</span>
+                  <span className="text-sm font-medium text-purple-900">15</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-purple-700">Количество категорий:</span>
+                  <span className="text-sm font-medium text-purple-900">4</span>
+                </div>
               </div>
             </div>
           </div>

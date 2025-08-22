@@ -62,36 +62,288 @@ export default function AttitudeQuestions() {
   const getDemoQuestions = () => [
     {
       id: 1,
-      text: 'Я часто думаю о том, что моя болезнь может быть неизлечимой',
+      text: 'У меня тяжёлое заболевание',
       scale: 'severity',
-      weight: 2,
+      weight: 1,
       active: true
     },
     {
       id: 2,
-      text: 'Мне кажется, что врачи не понимают серьезности моего состояния',
+      text: 'Часто чувствую слабость',
       scale: 'severity',
       weight: 1,
       active: true
     },
     {
       id: 3,
-      text: 'Благодаря болезни я получаю больше внимания от близких',
+      text: 'Болезнь помогает избегать обязанностей',
       scale: 'secondary_gain',
       weight: 1,
       active: true
     },
     {
       id: 4,
-      text: 'Я стараюсь не показывать окружающим, что болею',
+      text: 'Стараюсь не показывать, что я болею',
       scale: 'hide_resist',
       weight: 1,
       active: true
     },
     {
       id: 5,
-      text: 'Когда я болею, я стараюсь больше работать',
+      text: 'Я должен упорно трудиться',
       scale: 'work_escape',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 6,
+      text: 'Моё будущее кажется печальным',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 7,
+      text: 'Я верю в Бога',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 8,
+      text: 'Верю в эффективность гомеопатии/остеопатии',
+      scale: 'alt_med',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 9,
+      text: 'Я воздерживаюсь от алкоголя',
+      scale: 'addictions',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 10,
+      text: 'Я не курю',
+      scale: 'addictions',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 11,
+      text: 'Надеюсь, что организм сам справится',
+      scale: 'ignore',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 12,
+      text: 'Почти всегда тревожусь',
+      scale: 'anxiety',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 13,
+      text: 'Болезнь ограничивает мою жизнь',
+      scale: 'severity',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 14,
+      text: 'Мне легче получить поддержку, когда я болею',
+      scale: 'secondary_gain',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 15,
+      text: 'Скрываю симптомы от близких',
+      scale: 'hide_resist',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 16,
+      text: 'Работа помогает мне забыть о болезни',
+      scale: 'work_escape',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 17,
+      text: 'Я часто виню себя в болезни',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 18,
+      text: 'Молитва помогает мне справиться',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 19,
+      text: 'Предпочитаю народные средства',
+      scale: 'alt_med',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 20,
+      text: 'Я полностью отказался от вредных привычек',
+      scale: 'addictions',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 21,
+      text: 'Не хожу к врачам, пока не станет совсем плохо',
+      scale: 'ignore',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 22,
+      text: 'Постоянно беспокоюсь о своём здоровье',
+      scale: 'anxiety',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 23,
+      text: 'Болезнь делает меня беспомощным',
+      scale: 'severity',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 24,
+      text: 'Благодаря болезни я могу отдыхать',
+      scale: 'secondary_gain',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 25,
+      text: 'Не рассказываю о диагнозе знакомым',
+      scale: 'hide_resist',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 26,
+      text: 'Спорт отвлекает меня от проблем со здоровьем',
+      scale: 'work_escape',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 27,
+      text: 'Я не заслуживаю выздоровления',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 28,
+      text: 'Вера даёт мне силы',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 29,
+      text: 'Доверяю только натуральным препаратам',
+      scale: 'alt_med',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 30,
+      text: 'Я веду здоровый образ жизни',
+      scale: 'addictions',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 31,
+      text: 'Лечение не нужно, всё пройдёт само',
+      scale: 'ignore',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 32,
+      text: 'Часто просыпаюсь от кошмаров о болезни',
+      scale: 'anxiety',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 33,
+      text: 'Болезнь разрушает мои планы',
+      scale: 'severity',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 34,
+      text: 'Близкие больше внимания уделяют мне',
+      scale: 'secondary_gain',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 35,
+      text: 'Стыжусь своей болезни',
+      scale: 'hide_resist',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 36,
+      text: 'Карьера важнее здоровья',
+      scale: 'work_escape',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 37,
+      text: 'Я сам виноват в своих проблемах',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 38,
+      text: 'Духовность помогает мне выздороветь',
+      scale: 'low_selfesteem',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 39,
+      text: 'Официальная медицина неэффективна',
+      scale: 'alt_med',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 40,
+      text: 'Я контролирую все свои привычки',
+      scale: 'addictions',
+      weight: 1,
+      active: true
+    },
+    {
+      id: 41,
+      text: 'Не стоит тратить время на лечение',
+      scale: 'ignore',
       weight: 1,
       active: true
     }
