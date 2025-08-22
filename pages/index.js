@@ -43,66 +43,46 @@ export default function Home() {
       typology: !!localStorage.getItem('benehab_typology_profile'),
       values: !!localStorage.getItem('benehab_values_profile')
     });
+
+    // Добавляем приветственное сообщение от Татьяны
+    const welcomeMessage = {
+      id: Date.now(),
+      type: 'tatiana',
+      text: `Привет! Я Татьяна, ваш персональный агент по здоровью. 👋
+
+Я здесь, чтобы помочь вам с:
+• Записью к врачу
+• Информацией о препаратах  
+• Анализом симптомов
+• Общими вопросами о здоровье
+• Просто пообщаться и поддержать
+
+Выберите типовой вопрос выше или напишите свой в чате!`,
+      timestamp: new Date()
+    };
+
+    setChatMessages([welcomeMessage]);
   }, []);
 
   const handleDemographicsComplete = (data) => {
     setDemographics(data);
   };
 
-  const handleQuickQuestion = (questionType) => {
+  const handleQuickQuestion = async (questionType) => {
     let question = '';
-    let response = '';
     
     switch (questionType) {
       case 'doctor':
         question = 'Хочу записаться к врачу';
-        response = `Конечно! Я помогу вам записаться к врачу. К какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы, и я порекомендую подходящего врача?
-
-Я могу помочь с:
-• Записью к терапевту
-• Консультацией у специалистов (кардиолог, невролог, эндокринолог)
-• Экстренной помощью при острых симптомах
-• Плановыми обследованиями
-
-Расскажите подробнее, что вас беспокоит?`;
         break;
       case 'medicine':
         question = 'Хочу узнать про препарат';
-        response = `Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем, и вы хотите узнать, какие лекарства могут помочь?
-
-Я могу рассказать о:
-• Действии препаратов
-• Побочных эффектах
-• Взаимодействии с другими лекарствами
-• Правилах приема
-• Альтернативных вариантах
-
-Какой препарат вас интересует?`;
         break;
       case 'symptoms':
         question = 'У меня есть симптомы';
-        response = `Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию и дать более точные рекомендации.
-
-Важно знать:
-• Когда появились симптомы
-• Насколько они интенсивны
-• Что усиливает или ослабляет их
-• Есть ли сопутствующие проблемы
-• Принимаете ли вы какие-то лекарства
-
-Опишите ваши симптомы подробнее?`;
         break;
       case 'general':
         question = 'Просто хочу поговорить';
-        response = `Конечно! Я всегда рада пообщаться с вами. Расскажите, как ваши дела? Что вас беспокоит или радует сегодня? 
-
-Я здесь, чтобы:
-• Выслушать вас
-• Поддержать морально
-• Дать совет, если нужно
-• Просто пообщаться
-
-Как ваши дела? Что на душе?`;
         break;
       default:
         return;
@@ -116,15 +96,69 @@ export default function Home() {
       timestamp: new Date()
     };
 
-    // Добавляем ответ Татьяны
-    const tatianaResponse = {
-      id: Date.now() + 1,
-      type: 'tatiana',
-      text: response,
-      timestamp: new Date()
-    };
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
 
-    setChatMessages(prev => [...prev, userMessage, tatianaResponse]);
+    try {
+      // Получаем профиль пользователя для персонализации
+      const pib = {
+        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        typology_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
+      };
+
+      // Формируем сообщения для API
+      const messages = [
+        { role: 'user', content: question }
+      ];
+
+      // Добавляем контекст из предыдущих сообщений (последние 5)
+      const recentMessages = chatMessages.slice(-5).map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      // Отправляем запрос к OpenAI API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...recentMessages, ...messages],
+          meta: { pib }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const tatianaResponse = {
+        id: Date.now() + 1,
+        type: 'tatiana',
+        text: data.content || 'Извините, произошла ошибка. Попробуйте еще раз.',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, tatianaResponse]);
+    } catch (error) {
+      console.error('Error sending quick question:', error);
+      
+      // Fallback ответ в случае ошибки
+      const fallbackResponse = {
+        id: Date.now() + 1,
+        type: 'tatiana',
+        text: 'Извините, у меня временные проблемы с подключением. Попробуйте написать еще раз через минуту.',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, fallbackResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -142,48 +176,66 @@ export default function Home() {
     setInputMessage('');
     setIsTyping(true);
 
-    // Имитируем ответ Татьяны
-    setTimeout(() => {
-      let response = '';
-      
-      // Простая логика ответов на основе входящего сообщения
-      const lowerMessage = messageText.toLowerCase();
-      
-      if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй') || lowerMessage.includes('добрый')) {
-        response = `Привет! Я Татьяна, ваш персональный агент. Чем могу помочь?
+    try {
+      // Получаем профиль пользователя для персонализации
+      const pib = {
+        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        typology_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
+      };
 
-Я могу помочь вам с:
-• Записью к врачу
-• Информацией о препаратах
-• Анализом симптомов
-• Общими вопросами о здоровье
-• Просто пообщаться и поддержать
+      // Формируем сообщения для API
+      const messages = [
+        { role: 'user', content: messageText }
+      ];
 
-Выберите типовой вопрос выше или напишите свой!`;
-      } else if (lowerMessage.includes('врач') || lowerMessage.includes('доктор') || lowerMessage.includes('записаться')) {
-        response = `Конечно! Я помогу вам записаться к врачу. К какому специалисту вы хотели бы попасть? Или у вас есть конкретные симптомы?`;
-      } else if (lowerMessage.includes('лекарство') || lowerMessage.includes('препарат') || lowerMessage.includes('таблетка')) {
-        response = `Я с удовольствием расскажу вам о препарате! Какой именно препарат вас интересует? Или у вас есть конкретная проблема со здоровьем?`;
-      } else if (lowerMessage.includes('симптом') || lowerMessage.includes('болит') || lowerMessage.includes('плохо')) {
-        response = `Расскажите мне о ваших симптомах подробнее. Когда они появились? Насколько сильно выражены? Это поможет мне лучше понять вашу ситуацию.`;
-      } else if (completedSurveys.attitude && completedSurveys.typology && completedSurveys.values) {
-        // Если профиль заполнен, даем персонализированный ответ
-        response = `Спасибо за ваше сообщение, ${demographics?.name}! Учитывая ваш профиль, я понимаю вашу ситуацию лучше. Давайте разберем это подробнее. Что именно вас интересует?`;
-      } else {
-        // Если профиль не заполнен, даем общий ответ
-        response = 'Спасибо за ваше сообщение! Я готова помочь вам. Расскажите подробнее, что вас интересует, и я постараюсь дать полезный совет.';
+      // Добавляем контекст из предыдущих сообщений (последние 5)
+      const recentMessages = chatMessages.slice(-5).map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      // Отправляем запрос к OpenAI API
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...recentMessages, ...messages],
+          meta: { pib }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      const data = await response.json();
+      
       const tatianaResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: response,
+        text: data.content || 'Извините, произошла ошибка. Попробуйте еще раз.',
         timestamp: new Date()
       };
 
       setChatMessages(prev => [...prev, tatianaResponse]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Fallback ответ в случае ошибки
+      const fallbackResponse = {
+        id: Date.now() + 1,
+        type: 'tatiana',
+        text: 'Извините, у меня временные проблемы с подключением. Попробуйте написать еще раз через минуту.',
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, fallbackResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   return (
