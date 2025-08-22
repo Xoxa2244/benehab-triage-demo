@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   ClipboardDocumentListIcon, 
   UserGroupIcon, 
-  PaletteIcon,
+  SwatchIcon,
   Cog6ToothIcon,
   ChartBarIcon,
   DocumentTextIcon
@@ -32,7 +32,7 @@ export default function AdminPanel() {
     {
       id: 'values',
       name: 'Психосемантика',
-      icon: PaletteIcon,
+      icon: SwatchIcon,
       description: 'Управление понятиями и ценностными ассоциациями',
       color: 'purple'
     }
@@ -191,7 +191,7 @@ export default function AdminPanel() {
                   href="/admin/values/concepts"
                   className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
                 >
-                  <PaletteIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                  <SwatchIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Понятия</h3>
                   <p className="text-sm text-gray-600 text-center">Управление понятиями, их названиями и описаниями</p>
                 </Link>
@@ -247,7 +247,7 @@ export default function AdminPanel() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <PaletteIcon className="h-8 w-8 text-purple-500" />
+                <SwatchIcon className="h-8 w-8 text-purple-500" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Понятий</p>
