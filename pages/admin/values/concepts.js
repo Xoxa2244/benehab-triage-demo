@@ -27,24 +27,14 @@ export default function ValuesConcepts() {
   });
 
   const categories = [
-    'values', 'activities', 'people', 'events', 'emotions'
+    { id: 'values', name: 'Ценности', color: 'bg-green-100 text-green-800' },
+    { id: 'activities', name: 'Деятельность', color: 'bg-blue-100 text-blue-800' },
+    { id: 'people', name: 'Люди', color: 'bg-purple-100 text-purple-800' },
+    { id: 'events', name: 'События', color: 'bg-orange-100 text-orange-800' },
+    { id: 'emotions', name: 'Эмоции', color: 'bg-pink-100 text-pink-800' }
   ];
 
-  const categoryNames = {
-    values: 'Ценности',
-    activities: 'Деятельность',
-    people: 'Люди',
-    events: 'События',
-    emotions: 'Эмоции'
-  };
-
-  const categoryColors = {
-    values: 'bg-purple-100 text-purple-800',
-    activities: 'bg-blue-100 text-blue-800',
-    people: 'bg-green-100 text-green-800',
-    events: 'bg-orange-100 text-orange-800',
-    emotions: 'bg-pink-100 text-pink-800'
-  };
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     loadConcepts();
@@ -73,73 +63,295 @@ export default function ValuesConcepts() {
       id: 1,
       concept: 'Здоровье',
       category: 'values',
-      description: 'Физическое и психическое благополучие'
+      description: 'Физическое и психическое благополучие',
+      active: true
     },
     {
       id: 2,
       concept: 'Любовь',
       category: 'values',
-      description: 'Чувство глубокой привязанности и заботы'
+      description: 'Чувство глубокой привязанности и заботы',
+      active: true
     },
     {
       id: 3,
       concept: 'Свобода',
       category: 'values',
-      description: 'Возможность действовать по своему выбору'
+      description: 'Возможность действовать по своему выбору',
+      active: true
     },
     {
       id: 4,
       concept: 'Безопасность',
       category: 'values',
-      description: 'Защищенность от угроз и опасностей'
+      description: 'Защищенность от угроз и опасностей',
+      active: true
     },
     {
       id: 5,
-      concept: 'Работа',
-      category: 'activities',
-      description: 'Профессиональная деятельность'
+      concept: 'Богатство',
+      category: 'values',
+      description: 'Материальное благополучие и достаток',
+      active: true
     },
     {
       id: 6,
-      concept: 'Учеба',
-      category: 'activities',
-      description: 'Получение новых знаний и навыков'
+      concept: 'Знания',
+      category: 'values',
+      description: 'Образованность и интеллектуальное развитие',
+      active: true
     },
     {
       id: 7,
-      concept: 'Я сам',
-      category: 'people',
-      description: 'Личность и индивидуальность'
+      concept: 'Творчество',
+      category: 'values',
+      description: 'Создание нового и самовыражение',
+      active: true
     },
     {
       id: 8,
-      concept: 'Врач',
-      category: 'people',
-      description: 'Медицинский специалист'
+      concept: 'Семья',
+      category: 'values',
+      description: 'Близкие люди и домашний очаг',
+      active: true
     },
     {
       id: 9,
-      concept: 'Прошлое',
-      category: 'events',
-      description: 'Жизненный опыт и воспоминания'
+      concept: 'Дружба',
+      category: 'values',
+      description: 'Взаимная поддержка и понимание',
+      active: true
     },
     {
       id: 10,
-      concept: 'Будущее',
-      category: 'events',
-      description: 'Предстоящие события и планы'
+      concept: 'Успех',
+      category: 'values',
+      description: 'Достижение поставленных целей',
+      active: true
     },
     {
       id: 11,
-      concept: 'Счастье',
-      category: 'emotions',
-      description: 'Состояние радости и удовлетворения'
+      concept: 'Работа',
+      category: 'activities',
+      description: 'Профессиональная деятельность',
+      active: true
     },
     {
       id: 12,
+      concept: 'Учеба',
+      category: 'activities',
+      description: 'Получение новых знаний и навыков',
+      active: true
+    },
+    {
+      id: 13,
+      concept: 'Спорт',
+      category: 'activities',
+      description: 'Физическая активность и тренировки',
+      active: true
+    },
+    {
+      id: 14,
+      concept: 'Бизнес',
+      category: 'activities',
+      description: 'Предпринимательская деятельность',
+      active: true
+    },
+    {
+      id: 15,
+      concept: 'Религия',
+      category: 'activities',
+      description: 'Духовные практики и вера',
+      active: true
+    },
+    {
+      id: 16,
+      concept: 'Искусство',
+      category: 'activities',
+      description: 'Творческие занятия и культурная деятельность',
+      active: true
+    },
+    {
+      id: 17,
+      concept: 'Путешествия',
+      category: 'activities',
+      description: 'Поездки и новые впечатления',
+      active: true
+    },
+    {
+      id: 18,
+      concept: 'Отдых',
+      category: 'activities',
+      description: 'Восстановление сил и расслабление',
+      active: true
+    },
+    {
+      id: 19,
+      concept: 'Я сам',
+      category: 'people',
+      description: 'Личность и индивидуальность',
+      active: true
+    },
+    {
+      id: 20,
+      concept: 'Врач',
+      category: 'people',
+      description: 'Медицинский специалист',
+      active: true
+    },
+    {
+      id: 21,
+      concept: 'Медработники',
+      category: 'people',
+      description: 'Персонал медицинского учреждения',
+      active: true
+    },
+    {
+      id: 22,
+      concept: 'Коллеги',
+      category: 'people',
+      description: 'Люди на работе',
+      active: true
+    },
+    {
+      id: 23,
+      concept: 'Соседи',
+      category: 'people',
+      description: 'Люди, живущие рядом',
+      active: true
+    },
+    {
+      id: 24,
+      concept: 'Прошлое',
+      category: 'events',
+      description: 'Жизненный опыт и воспоминания',
+      active: true
+    },
+    {
+      id: 25,
+      concept: 'Настоящее',
+      category: 'events',
+      description: 'Текущий момент жизни',
+      active: true
+    },
+    {
+      id: 26,
+      concept: 'Будущее',
+      category: 'events',
+      description: 'Предстоящие события и планы',
+      active: true
+    },
+    {
+      id: 27,
+      concept: 'Болезнь',
+      category: 'events',
+      description: 'Заболевание и лечение',
+      active: true
+    },
+    {
+      id: 28,
+      concept: 'Лечение',
+      category: 'events',
+      description: 'Медицинские процедуры и терапия',
+      active: true
+    },
+    {
+      id: 29,
+      concept: 'Перемены',
+      category: 'events',
+      description: 'Изменения в жизни',
+      active: true
+    },
+    {
+      id: 30,
+      concept: 'Счастье',
+      category: 'emotions',
+      description: 'Состояние радости и удовлетворения',
+      active: true
+    },
+    {
+      id: 31,
+      concept: 'Радость',
+      category: 'emotions',
+      description: 'Положительные эмоции',
+      active: true
+    },
+    {
+      id: 32,
       concept: 'Страх',
       category: 'emotions',
-      description: 'Чувство опасности и тревоги'
+      description: 'Чувство опасности и тревоги',
+      active: true
+    },
+    {
+      id: 33,
+      concept: 'Тревога',
+      category: 'emotions',
+      description: 'Беспокойство и волнение',
+      active: true
+    },
+    {
+      id: 34,
+      concept: 'Усталость',
+      category: 'emotions',
+      description: 'Физическое и психическое истощение',
+      active: true
+    },
+    {
+      id: 35,
+      concept: 'Страдание',
+      category: 'emotions',
+      description: 'Боль и душевные муки',
+      active: true
+    },
+    {
+      id: 36,
+      concept: 'Надежда',
+      category: 'emotions',
+      description: 'Вера в лучшее будущее',
+      active: true
+    },
+    {
+      id: 37,
+      concept: 'Гордость',
+      category: 'emotions',
+      description: 'Чувство собственного достоинства',
+      active: true
+    },
+    {
+      id: 38,
+      concept: 'Стыд',
+      category: 'emotions',
+      description: 'Чувство вины и неловкости',
+      active: true
+    },
+    {
+      id: 39,
+      concept: 'Гнев',
+      category: 'emotions',
+      description: 'Раздражение и злость',
+      active: true
+    },
+    {
+      id: 40,
+      concept: 'Спокойствие',
+      category: 'emotions',
+      description: 'Внутреннее равновесие',
+      active: true
+    },
+    {
+      id: 41,
+      concept: 'Вдохновение',
+      category: 'emotions',
+      description: 'Творческий подъем и энтузиазм',
+      active: true
+    },
+    {
+      id: 42,
+      concept: 'Одиночество',
+      category: 'emotions',
+      description: 'Чувство изоляции',
+      active: true
     }
   ];
 
@@ -235,12 +447,21 @@ export default function ValuesConcepts() {
     }
   };
 
+  const getFilteredConcepts = () => {
+    if (selectedCategory === 'all') {
+      return concepts;
+    }
+    return concepts.filter(c => c.category === selectedCategory);
+  };
+
   const getCategoryName = (categoryId) => {
-    return categoryNames[categoryId] || categoryId;
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : categoryId;
   };
 
   const getCategoryColor = (categoryId) => {
-    return categoryColors[categoryId] || 'bg-gray-100 text-gray-800';
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.color : 'bg-gray-100 text-gray-800';
   };
 
   const filteredConcepts = concepts.filter(concept => 
@@ -285,13 +506,13 @@ export default function ValuesConcepts() {
         {/* Статистика */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           {categories.map((category) => {
-            const count = concepts.filter(c => c.category === category).length;
+            const count = concepts.filter(c => c.category === category.id).length;
             return (
-              <div key={category} className="bg-white rounded-lg shadow-sm border p-4">
+              <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4">
                 <div className="flex items-center">
-                  <TagIcon className={`h-8 w-8 ${categoryColors[category].replace('bg-', 'text-').replace('-100', '-500')}`} />
+                  <TagIcon className={`h-8 w-8 ${category.color.replace('bg-', 'text-').replace('-100', '-500')}`} />
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-500">{getCategoryName(category)}</p>
+                    <p className="text-sm font-medium text-gray-500">{category.name}</p>
                     <p className="text-2xl font-semibold text-gray-900">{count}</p>
                   </div>
                 </div>
@@ -304,12 +525,19 @@ export default function ValuesConcepts() {
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Фильтры по категориям</h2>
           <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${selectedCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+            >
+              Все категории
+            </button>
             {categories.map((category) => (
               <button
-                key={category}
-                className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(category)}`}
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedCategory === category.id ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
               >
-                {getCategoryName(category)}
+                {category.name}
               </button>
             ))}
           </div>
@@ -345,8 +573,8 @@ export default function ValuesConcepts() {
                   >
                     <option value="">Выберите категорию</option>
                     {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {getCategoryName(category)}
+                      <option key={category.id} value={category.id}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
@@ -390,12 +618,12 @@ export default function ValuesConcepts() {
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
-              Понятия ({filteredConcepts.length})
+              Понятия ({getFilteredConcepts().length})
             </h3>
           </div>
           
           <div className="divide-y divide-gray-200">
-            {filteredConcepts.map((concept) => (
+            {getFilteredConcepts().map((concept) => (
               <div key={concept.id} className="p-6">
                 {editingConcept?.id === concept.id ? (
                   <div className="space-y-4">
@@ -422,8 +650,8 @@ export default function ValuesConcepts() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                         >
                           {categories.map((category) => (
-                            <option key={category} value={category}>
-                              {getCategoryName(category)}
+                            <option key={category.id} value={category.id}>
+                              {category.name}
                             </option>
                           ))}
                         </select>
@@ -506,18 +734,18 @@ export default function ValuesConcepts() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">Описание категорий</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((category) => (
-              <div key={category} className="p-4 border border-gray-200 rounded-lg">
+              <div key={category.id} className="p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center mb-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(category)}`}>
-                    {getCategoryName(category)}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(category.id)}`}>
+                    {category.name}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {category === 'values' && 'Основные жизненные ценности и принципы'}
-                  {category === 'activities' && 'Виды деятельности и увлечения'}
-                  {category === 'people' && 'Люди и социальные роли'}
-                  {category === 'events' && 'Жизненные события и периоды'}
-                  {category === 'emotions' && 'Эмоциональные состояния и чувства'}
+                  {category.name === 'Ценности' && 'Основные жизненные ценности и принципы'}
+                  {category.name === 'Деятельность' && 'Виды деятельности и увлечения'}
+                  {category.name === 'Люди' && 'Люди и социальные роли'}
+                  {category.name === 'События' && 'Жизненные события и периоды'}
+                  {category.name === 'Эмоции' && 'Эмоциональные состояния и чувства'}
                 </p>
               </div>
             ))}

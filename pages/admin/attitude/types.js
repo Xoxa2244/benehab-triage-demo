@@ -277,6 +277,19 @@ export default function AttitudeTypes() {
     }
   ];
 
+  // Правильные названия типов согласно CSV файлу
+  const typeNames = {
+    severity: 'Восприятие своего состояния как тяжелого',
+    secondary_gain: 'Вторичная выгода заболевания',
+    hide_resist: 'Стремление скрыть свою болезнь',
+    work_escape: 'Стремление «убежать» в работу или спорт',
+    low_selfesteem: 'Сниженная самооценка, неудовлетворенность собой',
+    alt_med: 'Вера в альтернативную медицину и стремление к самолечению',
+    addictions: 'Вредные привычки, химические зависимости, аддикции',
+    ignore: 'Игнорирование болезни',
+    anxiety: 'Склонность к тревожным расстройствам'
+  };
+
   const handleEditType = (type) => {
     setEditingType({ ...type });
   };
@@ -897,8 +910,8 @@ export default function AttitudeTypes() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {type.id}
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {typeNames[type.id] || type.id}
                           </span>
                           <h3 className="text-lg font-medium text-gray-900">{type.name}</h3>
                         </div>

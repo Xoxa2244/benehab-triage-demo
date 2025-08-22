@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/iOh6xcU6avD98eTObbtx7/_buildManifest.js",
-    "static/iOh6xcU6avD98eTObbtx7/_ssgManifest.js"
+    "static/E_keVV9ZGU4xx2twQ-1Tw/_buildManifest.js",
+    "static/E_keVV9ZGU4xx2twQ-1Tw/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
@@ -42,14 +42,14 @@
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin/attitude/questions-ef995142f9512f28.js"
+      "static/chunks/pages/admin/attitude/questions-4884413176f45905.js"
     ],
     "/admin/attitude/types": [
       "static/chunks/webpack-69bfa6990bb9e155.js",
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin/attitude/types-e120b95325f202cb.js"
+      "static/chunks/pages/admin/attitude/types-60d5d086c6a34583.js"
     ],
     "/admin/typology/questions": [
       "static/chunks/webpack-69bfa6990bb9e155.js",
@@ -70,7 +70,7 @@
       "static/chunks/framework-7dc8a65f4a0cda33.js",
       "static/chunks/main-4e42fc3d34d89efb.js",
       "static/chunks/664-f0b709fe6426370a.js",
-      "static/chunks/pages/admin/values/concepts-53bdf6144e69b5ce.js"
+      "static/chunks/pages/admin/values/concepts-5b4042c89e7ae140.js"
     ],
     "/communication-instructions": [
       "static/chunks/webpack-69bfa6990bb9e155.js",

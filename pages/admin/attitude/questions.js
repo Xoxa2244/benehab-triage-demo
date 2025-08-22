@@ -106,7 +106,7 @@ export default function AttitudeQuestions() {
       id: 7,
       text: 'Я верю в Бога',
       scale: 'low_selfesteem',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -120,14 +120,14 @@ export default function AttitudeQuestions() {
       id: 9,
       text: 'Я воздерживаюсь от алкоголя',
       scale: 'addictions',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
       id: 10,
       text: 'Я не курю',
       scale: 'addictions',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -183,7 +183,7 @@ export default function AttitudeQuestions() {
       id: 18,
       text: 'Молитва помогает мне справиться',
       scale: 'low_selfesteem',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -197,7 +197,7 @@ export default function AttitudeQuestions() {
       id: 20,
       text: 'Я полностью отказался от вредных привычек',
       scale: 'addictions',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -253,7 +253,7 @@ export default function AttitudeQuestions() {
       id: 28,
       text: 'Вера даёт мне силы',
       scale: 'low_selfesteem',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -267,7 +267,7 @@ export default function AttitudeQuestions() {
       id: 30,
       text: 'Я веду здоровый образ жизни',
       scale: 'addictions',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -323,7 +323,7 @@ export default function AttitudeQuestions() {
       id: 38,
       text: 'Духовность помогает мне выздороветь',
       scale: 'low_selfesteem',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -337,7 +337,7 @@ export default function AttitudeQuestions() {
       id: 40,
       text: 'Я контролирую все свои привычки',
       scale: 'addictions',
-      weight: 1,
+      weight: -1,
       active: true
     },
     {
@@ -348,6 +348,21 @@ export default function AttitudeQuestions() {
       active: true
     }
   ];
+
+  // Правильные названия типов согласно CSV файлу
+  const scaleNames = {
+    severity: 'Восприятие своего состояния как тяжелого',
+    secondary_gain: 'Вторичная выгода заболевания',
+    hide_resist: 'Стремление скрыть свою болезнь',
+    work_escape: 'Стремление «убежать» в работу или спорт',
+    low_selfesteem: 'Сниженная самооценка, неудовлетворенность собой',
+    alt_med: 'Вера в альтернативную медицину и стремление к самолечению',
+    addictions: 'Вредные привычки, химические зависимости, аддикции',
+    ignore: 'Игнорирование болезни',
+    anxiety: 'Склонность к тревожным расстройствам'
+  };
+
+  const [selectedScale, setSelectedScale] = useState('all');
 
   const handleEditQuestion = (question) => {
     setEditingQuestion({ ...question });
@@ -441,9 +456,27 @@ export default function AttitudeQuestions() {
     }
   };
 
-  const getScaleName = (scaleId) => {
-    const scale = scales.find(s => s.id === scaleId);
-    return scale ? scale.name : scaleId;
+  const getFilteredQuestions = () => {
+    if (selectedScale === 'all') {
+      return questions;
+    }
+    return questions.filter(q => q.scale === selectedScale);
+  };
+
+  const getScaleName = (scale) => {
+    return scaleNames[scale] || scale;
+  };
+
+  const getWeightColor = (weight) => {
+    if (weight > 0) return 'text-green-600';
+    if (weight < 0) return 'text-red-600';
+    return 'text-gray-600';
+  };
+
+  const getWeightLabel = (weight) => {
+    if (weight > 0) return 'Положительный';
+    if (weight < 0) return 'Отрицательный';
+    return 'Нейтральный';
   };
 
   const getScaleColor = (scaleId) => {
@@ -500,10 +533,17 @@ export default function AttitudeQuestions() {
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Фильтры</h2>
           <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedScale('all')}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${selectedScale === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+            >
+              Все
+            </button>
             {scales.map((scale) => (
               <button
                 key={scale.id}
-                className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+                onClick={() => setSelectedScale(scale.id)}
+                className={`px-3 py-1 rounded-full text-sm font-medium ${selectedScale === scale.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 {scale.name}
               </button>
@@ -586,12 +626,12 @@ export default function AttitudeQuestions() {
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
-              Вопросы ({questions.length})
+              Вопросы ({getFilteredQuestions().length})
             </h3>
           </div>
           
           <div className="divide-y divide-gray-200">
-            {questions.map((question) => (
+            {getFilteredQuestions().map((question) => (
               <div key={question.id} className="p-6">
                 {editingQuestion?.id === question.id ? (
                   <div className="space-y-4">
@@ -660,12 +700,12 @@ export default function AttitudeQuestions() {
                 ) : (
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScaleColor(question.scale)}`}>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           {getScaleName(question.scale)}
                         </span>
                         <span className="text-sm text-gray-500">
-                          Вес: {question.weight}
+                          Вес: <span className={`${getWeightColor(question.weight)} font-semibold`}>{question.weight}</span> ({getWeightLabel(question.weight)})
                         </span>
                         {question.active ? (
                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
