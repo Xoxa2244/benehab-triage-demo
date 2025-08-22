@@ -69,9 +69,7 @@ export default function Home() {
     setShowTatianaMessage(true);
   };
 
-  const closeTatianaMessage = () => {
-    setShowTatianaMessage(false);
-  };
+
 
   return (
     <DemographicsCheck onDemographicsComplete={handleDemographicsComplete}>
@@ -252,6 +250,16 @@ export default function Home() {
             )}
           </div>
 
+          {/* Сообщение от Татьяны */}
+          {showTatianaMessage && (
+            <TatianaMessage
+              demographics={tatianaMessageData.demographics}
+              surveyType={tatianaMessageData.surveyType}
+              surveyResults={tatianaMessageData.surveyResults}
+              isVisible={showTatianaMessage}
+            />
+          )}
+
           {/* Админ панель */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Администрирование</h2>
@@ -264,15 +272,6 @@ export default function Home() {
             </Link>
           </div>
         </div>
-
-        {/* Сообщение от Татьяны */}
-        <TatianaMessage
-          demographics={tatianaMessageData.demographics}
-          surveyType={tatianaMessageData.surveyType}
-          surveyResults={tatianaMessageData.surveyResults}
-          isVisible={showTatianaMessage}
-          onClose={closeTatianaMessage}
-        />
       </div>
     </DemographicsCheck>
   );
