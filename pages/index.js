@@ -102,7 +102,7 @@ export default function Home() {
       };
 
       // Отладочная информация
-      console.log('=== QUICK QUESTION PROFILE DEBUG ===');
+      console.log('🚨 === QUICK QUESTION PROFILE DEBUG === 🚨');
       console.log('Profile loaded:', profile);
       console.log('Attitude exists:', !!profile.attitude);
       console.log('Typology exists:', !!profile.typology);
@@ -110,7 +110,14 @@ export default function Home() {
       if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
       if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
       if (profile.values) console.log('Values keys:', Object.keys(profile.values));
-      console.log('=== END QUICK QUESTION DEBUG ===');
+      console.log('🚨 === END QUICK QUESTION DEBUG === 🚨');
+      
+      // Дополнительная проверка - показываем в UI
+      if (profile.attitude || profile.typology || profile.values) {
+        console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
+      } else {
+        console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
+      }
 
       // Формируем сообщения для API
       const messages = [
@@ -190,7 +197,7 @@ export default function Home() {
       };
 
       // Отладочная информация
-      console.log('=== SEND MESSAGE PROFILE DEBUG ===');
+      console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
       console.log('Profile loaded:', profile);
       console.log('Attitude exists:', !!profile.attitude);
       console.log('Typology exists:', !!profile.typology);
@@ -198,7 +205,14 @@ export default function Home() {
       if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
       if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
       if (profile.values) console.log('Values keys:', Object.keys(profile.values));
-      console.log('=== END SEND MESSAGE DEBUG ===');
+      console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
+      
+      // Дополнительная проверка - показываем в UI
+      if (profile.attitude || profile.typology || profile.values) {
+        console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
+      } else {
+        console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
+      }
 
       // Формируем сообщения для API
       const messages = [

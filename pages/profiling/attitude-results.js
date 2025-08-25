@@ -37,6 +37,18 @@ export default function AttitudeResults() {
     setTimeout(() => {
       setShowTatianaMessage(true);
     }, 1000);
+
+    // Отладочная информация
+    console.log('🚨 === ATTITUDE RESULTS DEBUG === 🚨');
+    console.log('Profile loaded from localStorage:', profile);
+    if (profile) {
+      console.log('Profile keys:', Object.keys(profile));
+      if (profile.scales) {
+        console.log('Scales keys:', Object.keys(profile.scales));
+        console.log('Scales values:', profile.scales);
+      }
+    }
+    console.log('🚨 === END ATTITUDE RESULTS DEBUG === 🚨');
   }, []);
 
   const closeTatianaMessage = () => {

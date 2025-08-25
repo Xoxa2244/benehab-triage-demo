@@ -93,9 +93,20 @@ export default function AttitudeSurvey() {
       if (response.ok) {
         const result = await response.json();
         
+        // Отладочная информация
+        console.log('🚨 === ATTITUDE SURVEY DEBUG === 🚨');
+        console.log('API Response:', result);
+        console.log('Profile structure:', Object.keys(result.profile || {}));
+        if (result.profile && result.profile.scales) {
+          console.log('Scales found:', Object.keys(result.profile.scales));
+          console.log('Scales values:', result.profile.scales);
+        }
+        console.log('🚨 === END ATTITUDE DEBUG === 🚨');
+        
         // Сохраняем профиль
         if (typeof window !== 'undefined') {
           localStorage.setItem('benehab_attitude_profile', JSON.stringify(result.profile));
+          console.log('✅ Профиль сохранен в localStorage');
         }
 
         // Переходим к странице результата
