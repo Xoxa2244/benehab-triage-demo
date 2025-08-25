@@ -43,9 +43,15 @@ export default function AttitudeResults() {
     console.log('Profile loaded from localStorage:', profile);
     if (profile) {
       console.log('Profile keys:', Object.keys(profile));
-      if (profile.scales) {
-        console.log('Scales keys:', Object.keys(profile.scales));
-        console.log('Scales values:', profile.scales);
+      if (profile.levels) {
+        console.log('Levels keys:', Object.keys(profile.levels));
+        console.log('Levels values:', profile.levels);
+      }
+      if (profile.risk_tags) {
+        console.log('Risk tags:', profile.risk_tags);
+      }
+      if (profile.comm_flags) {
+        console.log('Communication flags:', profile.comm_flags);
       }
     }
     console.log('🚨 === END ATTITUDE RESULTS DEBUG === 🚨');

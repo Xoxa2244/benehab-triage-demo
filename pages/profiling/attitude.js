@@ -97,9 +97,15 @@ export default function AttitudeSurvey() {
         console.log('🚨 === ATTITUDE SURVEY DEBUG === 🚨');
         console.log('API Response:', result);
         console.log('Profile structure:', Object.keys(result.profile || {}));
-        if (result.profile && result.profile.scales) {
-          console.log('Scales found:', Object.keys(result.profile.scales));
-          console.log('Scales values:', result.profile.scales);
+        if (result.profile && result.profile.levels) {
+          console.log('Levels found:', Object.keys(result.profile.levels));
+          console.log('Levels values:', result.profile.levels);
+        }
+        if (result.profile && result.profile.risk_tags) {
+          console.log('Risk tags:', result.profile.risk_tags);
+        }
+        if (result.profile && result.profile.comm_flags) {
+          console.log('Communication flags:', result.profile.comm_flags);
         }
         console.log('🚨 === END ATTITUDE DEBUG === 🚨');
         
