@@ -118,11 +118,18 @@ export default async function handler(req, res) {
   try {
     const { messages = [], profile = null } = req.body || {};
     
+    // Отладочная информация
+    console.log('=== CHAT API DEBUG ===');
+    console.log('Profile received:', JSON.stringify(profile, null, 2));
+    console.log('Messages received:', messages.length);
+    
     // Строим персонализированный промпт на основе профиля
     const personalization = buildPersonalizedPrompt(profile);
     const system = BASE + personalization;
     
-    console.log('System prompt:', system); // Для отладки
+    console.log('System prompt length:', system.length);
+    console.log('Personalization length:', personalization.length);
+    console.log('=== END DEBUG ===');
     
     const response = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -132,7 +139,8 @@ export default async function handler(req, res) {
     
     res.status(200).json({ 
       content: response.choices?.[0]?.message?.content || 'Готово.',
-      profile_used: !!profile 
+      profile_used: !!profile,
+      profile_debug: profile ? Object.keys(profile) : []
     });
     
   } catch (error) {
