@@ -1,6 +1,5 @@
 // pages/api/chat.js
 import OpenAI from 'openai';
-import { getCommunicationInstructions, generatePersonalizedPrompt } from '../../lib/communication-instructions';
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -13,38 +12,131 @@ Triage: если есть опасные симптомы — немедленн
 Препараты: допускается фактическая справка (показания, противопоказания, предосторожности, частые побочные эффекты) — БЕЗ дозировок и без назначения. Если просят дозу — напомни, что дозировки определяет врач.
 Слоты для записи: 13:00, 15:00, 17:00 — только после явного согласия. После выбора скажи: "Спасибо, вы записаны".`;
 
-function buildPersonalizedPrompt(pib) {
-  if (!pib) return '';
+function buildPersonalizedPrompt(profile) {
+  if (!profile) return '';
   
-  // Получаем инструкции по коммуникации на основе профилей
-  const attitudeProfile = pib.attitude_profile;
-  const typologyProfile = pib.typology_profile;
+  let prompt = '\n\nПЕРСОНАЛИЗАЦИЯ СТИЛЯ ОБЩЕНИЯ:\n';
   
-  if (!attitudeProfile && !typologyProfile) return '';
+  // Анализ отношения к болезни (attitude)
+  if (profile.attitude && profile.attitude.scales) {
+    const scales = profile.attitude.scales;
+    prompt += '\nОТНОШЕНИЕ К БОЛЕЗНИ:\n';
+    
+    if (scales.severity !== undefined) {
+      if (scales.severity > 7) {
+        prompt += '- Пациент высоко оценивает серьезность заболевания. Будь особенно внимательна к переживаниям, давай четкую структурированную информацию, создавай ощущение безопасности.\n';
+      } else if (scales.severity < 4) {
+        prompt += '- Пациент оптимистично смотрит на состояние. Поддерживай позитивный настрой, но помоги не упустить важные детали.\n';
+      }
+    }
+    
+    if (scales.anxiety !== undefined && scales.anxiety > 5) {
+      prompt += '- Пациент склонен к тревожности. Давай четкую, предсказуемую информацию, создавай ощущение стабильности, пошагово объясняй каждый этап.\n';
+    }
+    
+    if (scales.secondary_gain !== undefined && scales.secondary_gain > 3) {
+      prompt += '- Пациент может воспринимать болезнь как источник поддержки. Поддерживай, но помоги найти здоровые способы получения внимания.\n';
+    }
+    
+    if (scales.hide_resist !== undefined && scales.hide_resist > 5) {
+      prompt += '- Пациент стремится скрыть болезнь. Будь особенно деликатна, создавай безопасное пространство для откровенного разговора.\n';
+    }
+    
+    if (scales.work_escape !== undefined && scales.work_escape > 5) {
+      prompt += '- Пациент склонен уходить в работу. Уважай активность, но помоги найти баланс между работой и здоровьем.\n';
+    }
+  }
   
-  const instructions = getCommunicationInstructions(attitudeProfile, typologyProfile);
+  // Анализ психотипа (typology)
+  if (profile.typology && profile.typology.dominant_type) {
+    const type = profile.typology.dominant_type;
+    prompt += '\nПСИХОТИП:\n';
+    
+    const typeInstructions = {
+      'sensitive': '- Пациент очень чувствительный и ранимый. Общайся особенно бережно, используй мягкие формулировки, подтверждай чувства, избегай резких формулировок.\n',
+      'dysthymic': '- Пациент склонен к самокритике. Подчеркивай достижения, давай маленькие достижимые шаги, помогай видеть позитивные стороны.\n',
+      'demonstrative': '- Пациент любит быть в центре внимания. Давай пространство для самовыражения, признавай достижения, создавай возможности поделиться успехами.\n',
+      'excitable': '- Пациент импульсивен и любит действовать быстро. Давай краткие четкие инструкции, помогай с планированием, создавай структурированные планы.\n',
+      'cyclothymic': '- У пациента переменчивое настроение. Адаптируйся к текущему состоянию, предлагай гибкие планы, поддерживай в периоды спада.\n',
+      'stuck': '- Пациент упорен и принципиален. Уважай принципы, помогай переводить упорство в конструктивное русло, находи компромиссы.\n',
+      'pedantic': '- Пациент осторожен и любит порядок. Давай детальную информацию, создавай структурированные планы, обеспечивай предсказуемость.\n',
+      'anxious': '- Пациент склонен к беспокойству. Создавай ощущение безопасности, давай четкие гарантии, пошагово объясняй каждый процесс.\n',
+      'hyperthymic': '- Пациент энергичен и оптимистичен. Поддерживай энтузиазм, помогай направлять энергию в конструктивное русло, создавай динамичные планы.\n'
+    };
+    
+    if (typeInstructions[type]) {
+      prompt += typeInstructions[type];
+    }
+  }
   
-  // Генерируем персонализированный промпт
-  return generatePersonalizedPrompt(instructions);
+  // Анализ ценностей (values)
+  if (profile.values && profile.values.indices) {
+    const indices = profile.values.indices;
+    prompt += '\nСИСТЕМА ЦЕННОСТЕЙ:\n';
+    
+    if (indices.life_satisfaction !== undefined) {
+      if (indices.life_satisfaction > 0.6) {
+        prompt += '- Пациент доволен жизнью и смотрит в будущее с оптимизмом. Поддерживай позитивный настрой, помогай укреплять то, что работает хорошо.\n';
+      } else if (indices.life_satisfaction < 0.3) {
+        prompt += '- Пациент переживает сложный период. Будь особенно внимательна к чувствам, помоги найти источники радости и поддержки.\n';
+      }
+    }
+    
+    if (indices.future_orientation !== undefined) {
+      if (indices.future_orientation > 0.5) {
+        prompt += '- Пациент ориентирован на будущее. Помогай планировать и достигать долгосрочных целей, создавай долгосрочные стратегии.\n';
+      } else {
+        prompt += '- Пациент сосредоточен на настоящем. Помогай находить баланс между текущими потребностями и долгосрочными планами.\n';
+      }
+    }
+    
+    if (indices.self_attitude !== undefined) {
+      if (indices.self_attitude > 0.6) {
+        prompt += '- У пациента здоровая самооценка. Поддерживай уверенность, помогай развивать сильные стороны.\n';
+      } else {
+        prompt += '- Пациент иногда сомневается в себе. Помогай видеть достоинства, развивать уверенность, признавать достижения.\n';
+      }
+    }
+    
+    if (indices.treatment_attitude !== undefined) {
+      if (indices.treatment_attitude > 0.5) {
+        prompt += '- Пациент позитивно относится к лечению. Поддерживай доверие к медицине, помогай принимать обоснованные решения.\n';
+      } else {
+        prompt += '- У пациента есть сомнения в отношении лечения. Подробно объясняй каждый этап, отвечай на все вопросы, создавай ощущение безопасности.\n';
+      }
+    }
+  }
+  
+  prompt += '\nИСПОЛЬЗУЙ ЭТИ ДАННЫЕ ДЛЯ АДАПТАЦИИ СТИЛЯ ОБЩЕНИЯ В КАЖДОМ ОТВЕТЕ.';
+  
+  return prompt;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  
   try {
-    const { messages = [], meta = {} } = req.body || {};
+    const { messages = [], profile = null } = req.body || {};
     
-    // Строим персонализированный промпт
-    const personalization = buildPersonalizedPrompt(meta.pib);
+    // Строим персонализированный промпт на основе профиля
+    const personalization = buildPersonalizedPrompt(profile);
     const system = BASE + personalization;
     
-    const r = await client.chat.completions.create({
+    console.log('System prompt:', system); // Для отладки
+    
+    const response = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       temperature: 0.7,
       messages: [{ role: 'system', content: system }, ...messages],
     });
-    res.status(200).json({ content: r.choices?.[0]?.message?.content || 'Готово.' });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: 'Server error' });
+    
+    res.status(200).json({ 
+      content: response.choices?.[0]?.message?.content || 'Готово.',
+      profile_used: !!profile 
+    });
+    
+  } catch (error) {
+    console.error('Chat API error:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 }

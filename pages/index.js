@@ -94,11 +94,11 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      // Получаем профиль пользователя для персонализации
-      const pib = {
-        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        typology_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
+      // Загружаем профиль пользователя для персонализации
+      const profile = {
+        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
       };
 
       // Формируем сообщения для API
@@ -112,7 +112,7 @@ export default function Home() {
         content: msg.text
       }));
 
-      // Отправляем запрос к OpenAI API
+      // Отправляем запрос к OpenAI API с профилем
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -120,7 +120,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           messages: [...recentMessages, ...messages],
-          meta: { pib }
+          profile: profile
         }),
       });
 
@@ -171,11 +171,11 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      // Получаем профиль пользователя для персонализации
-      const pib = {
-        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        typology_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
+      // Загружаем профиль пользователя для персонализации
+      const profile = {
+        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
       };
 
       // Формируем сообщения для API
@@ -189,7 +189,7 @@ export default function Home() {
         content: msg.text
       }));
 
-      // Отправляем запрос к OpenAI API
+      // Отправляем запрос к OpenAI API с профилем
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -197,7 +197,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           messages: [...recentMessages, ...messages],
-          meta: { pib }
+          profile: profile
         }),
       });
 
