@@ -1,14 +1,4 @@
-import webpush from 'web-push';
-
-// VAPID ключи (в демо-режиме используем заглушки)
-const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa1HI0Z-NZcvtVq2kfKjEFKvdkJDIBFUCQoTfGa7u2XBAKN-WWd1W01sfFjId0';
-const VAPID_PRIVATE_KEY = 'your-vapid-private-key-here';
-
-webpush.setVapidDetails(
-  'mailto:demo@benehab.com',
-  VAPID_PUBLIC_KEY,
-  VAPID_PRIVATE_KEY
-);
+// API для отправки push-уведомлений (демо-режим)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -31,8 +21,9 @@ export default async function handler(req, res) {
 
     res.status(200).json({ 
       success: true, 
-      message: 'Push-уведомление отправлено',
-      sentAt: new Date().toISOString()
+      message: 'Push-уведомление отправлено (демо-режим)',
+      sentAt: new Date().toISOString(),
+      note: 'В демо-режиме уведомления не отправляются реально'
     });
 
   } catch (error) {

@@ -26,25 +26,20 @@ self.addEventListener('push', (event) => {
       
       const options = {
         body: data.body || 'Не забудьте о назначении',
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
         tag: data.tag || 'benehab-reminder',
         data: data,
         actions: [
           {
             action: 'done',
-            title: 'Выполнил(а)',
-            icon: '/favicon.ico'
+            title: 'Выполнил(а)'
           },
           {
             action: 'not_done',
-            title: 'Не получилось',
-            icon: '/favicon.ico'
+            title: 'Не получилось'
           },
           {
             action: 'mute_current',
-            title: 'Отключить это напоминание',
-            icon: '/favicon.ico'
+            title: 'Отключить это напоминание'
           }
         ],
         requireInteraction: true,
@@ -60,8 +55,6 @@ self.addEventListener('push', (event) => {
       // Fallback уведомление
       const options = {
         body: 'Не забудьте о назначении',
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
         tag: 'benehab-reminder-fallback',
         requireInteraction: true
       };
