@@ -1,5 +1,4 @@
 // Service Worker для Benehab - Push-уведомления
-// Доступен по адресу /sw.js
 
 const CACHE_NAME = 'benehab-v1';
 const NOTIFICATION_TITLE = 'Напоминание от Benehab';
