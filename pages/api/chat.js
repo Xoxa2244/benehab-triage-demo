@@ -114,6 +114,8 @@ export default async function handler(req, res) {
       context.activeAssignments.forEach((assignment, index) => {
         console.log(`   ${index + 1}. ${assignment.title} (${assignment.type})`);
       });
+    } else {
+      console.log('🎯 УЛУЧШЕННЫЙ API: Контекст назначений отсутствует или пуст');
     }
 
     // Пытаемся использовать OpenAI если доступен
@@ -139,6 +141,8 @@ export default async function handler(req, res) {
 
         // Добавляем информацию о назначениях в промпт
         if (context && context.activeAssignments && context.activeAssignments.length > 0) {
+          console.log('🎯 УЛУЧШЕННЫЙ API: Добавляю назначения в промпт OpenAI');
+          
           systemPrompt += `\n\nАКТИВНЫЕ НАЗНАЧЕНИЯ ПОЛЬЗОВАТЕЛЯ (ОБЯЗАТЕЛЬНО УЧТИ):
 У пользователя ${context.activeAssignments.length} невыполненное назначение:`;
           
@@ -158,6 +162,10 @@ export default async function handler(req, res) {
 - Напомни о важности выполнения
 - Спроси о сложностях
 - Будь проактивной и настойчивой`;
+          
+          console.log('🎯 УЛУЧШЕННЫЙ API: Промпт OpenAI обновлен с назначениями');
+        } else {
+          console.log('🎯 УЛУЧШЕННЫЙ API: Назначений нет, промпт OpenAI без назначений');
         }
         
         const messages = [
@@ -192,6 +200,7 @@ export default async function handler(req, res) {
     }
     
     // Используем улучшенный fallback ответ
+    console.log('🎯 УЛУЧШЕННЫЙ API: Используем fallback ответ');
     const fallbackResponse = getFallbackResponse(message, profile, context);
     
     res.status(200).json({
@@ -210,7 +219,7 @@ export default async function handler(req, res) {
     res.status(500).json({ 
       error: 'Критическая ошибка',
       details: error.message,
-      fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
+      fallback: 'Извините, у меня технические проблемы. Попробуйте еще раз через минуту.',
       note: 'Критический fallback (УЛУЧШЕННЫЙ API)'
     });
   }
