@@ -137,12 +137,14 @@ async function handleAction(action, data) {
       
       // Отправляем сообщение в главное окно для обновления UI
       const clients = await self.clients.matchAll();
+      const responseData = await response.json();
+      
       clients.forEach(client => {
         client.postMessage({
           type: 'OCCURRENCE_ACTION',
           action,
           occurrenceId: data.occurrenceId,
-          data: await response.json()
+          data: responseData
         });
       });
     } else {
@@ -226,6 +228,7 @@ async function handlePushRegistration(data) {
     
     // Отправляем ошибку в главное окно
     const clients = await self.clients.matchAll();
+    clients.forEach(client => {
       client.postMessage({
         type: 'PUSH_REGISTRATION_ERROR',
         error: error.message
