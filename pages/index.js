@@ -223,7 +223,7 @@ export default function Home() {
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
       // Отправляем запрос к OpenAI API с профилем и контекстом назначений
-      const response = await fetch('/api/chat-new', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ export default function Home() {
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
       // Отправляем запрос к OpenAI API с профилем и контекстом назначений
-      const response = await fetch('/api/chat-new', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
