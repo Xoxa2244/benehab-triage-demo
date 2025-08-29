@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import DemographicsCheck from '../components/DemographicsCheck';
 
-
-
 export default function Home() {
   const [demographics, setDemographics] = useState(null);
   const [completedSurveys, setCompletedSurveys] = useState({
@@ -95,41 +93,27 @@ export default function Home() {
 
     try {
       // Загружаем профиль пользователя для персонализации
-      const profile = {
-        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
-      };
+      const attitudeProfile = localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null;
+      const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
+      const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
       // Отладочная информация
       console.log('🚨 === QUICK QUESTION PROFILE DEBUG === 🚨');
-      console.log('Profile loaded:', profile);
-      console.log('Attitude exists:', !!profile.attitude);
-      console.log('Typology exists:', !!profile.typology);
-      console.log('Values exists:', !!profile.values);
-      if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
-      if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
-      if (profile.values) console.log('Values keys:', Object.keys(profile.values));
+      console.log('Attitude profile:', attitudeProfile);
+      console.log('Accentuation profile:', accentuationProfile);
+      console.log('Values profile:', valuesProfile);
       console.log('🚨 === END QUICK QUESTION DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
-      if (profile.attitude || profile.typology || profile.values) {
+      if (attitudeProfile || accentuationProfile || valuesProfile) {
         console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
       } else {
         console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
       }
 
-      // Формируем сообщения для API
-      const messages = [
-        { role: 'user', content: question }
-      ];
-
-      // Добавляем контекст из предыдущих сообщений (последние 5)
-      const recentMessages = chatMessages.slice(-5).map(msg => ({
-        role: msg.type === 'user' ? 'user' : 'assistant',
-        content: msg.text
-      }));
-
+      // Получаем базовый промпт из localStorage
+      const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
+      
       // Отправляем запрос к OpenAI API с профилем
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -137,8 +121,14 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [...recentMessages, ...messages],
-          profile: profile
+          message: question,
+          profile: {
+            attitude_profile: attitudeProfile,
+            accentuation_profile: accentuationProfile,
+            values_profile: valuesProfile,
+            demographics: demographics
+          },
+          basePromptOverride: basePrompt
         }),
       });
 
@@ -151,7 +141,7 @@ export default function Home() {
       const tatianaResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: data.content || 'Извините, произошла ошибка. Попробуйте еще раз.',
+        text: data.response || 'Извините, произошла ошибка. Попробуйте еще раз.',
         timestamp: new Date()
       };
 
@@ -190,41 +180,27 @@ export default function Home() {
 
     try {
       // Загружаем профиль пользователя для персонализации
-      const profile = {
-        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
-      };
+      const attitudeProfile = localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null;
+      const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
+      const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
       // Отладочная информация
       console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
-      console.log('Profile loaded:', profile);
-      console.log('Attitude exists:', !!profile.attitude);
-      console.log('Typology exists:', !!profile.typology);
-      console.log('Values exists:', !!profile.values);
-      if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
-      if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
-      if (profile.values) console.log('Values keys:', Object.keys(profile.values));
+      console.log('Attitude profile:', attitudeProfile);
+      console.log('Accentuation profile:', accentuationProfile);
+      console.log('Values profile:', valuesProfile);
       console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
-      if (profile.attitude || profile.typology || profile.values) {
+      if (attitudeProfile || accentuationProfile || valuesProfile) {
         console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
       } else {
         console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
       }
 
-      // Формируем сообщения для API
-      const messages = [
-        { role: 'user', content: messageText }
-      ];
-
-      // Добавляем контекст из предыдущих сообщений (последние 5)
-      const recentMessages = chatMessages.slice(-5).map(msg => ({
-        role: msg.type === 'user' ? 'user' : 'assistant',
-        content: msg.text
-      }));
-
+      // Получаем базовый промпт из localStorage
+      const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
+      
       // Отправляем запрос к OpenAI API с профилем
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -232,8 +208,14 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          messages: [...recentMessages, ...messages],
-          profile: profile
+          message: messageText,
+          profile: {
+            attitude_profile: attitudeProfile,
+            accentuation_profile: accentuationProfile,
+            values_profile: valuesProfile,
+            demographics: demographics
+          },
+          basePromptOverride: basePrompt
         }),
       });
 
@@ -246,7 +228,7 @@ export default function Home() {
       const tatianaResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: data.content || 'Извините, произошла ошибка. Попробуйте еще раз.',
+        text: data.response || 'Извините, произошла ошибка. Попробуйте еще раз.',
         timestamp: new Date()
       };
 
@@ -366,14 +348,14 @@ export default function Home() {
               </button>
 
               <button
-                onClick={() => window.location.href = '/communication-instructions'}
+                onClick={() => window.location.href = '/debug-prompts'}
                 className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors text-center"
               >
                 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
-                  <span className="text-orange-600 text-xl">📋</span>
+                  <span className="text-orange-600 text-xl">🔍</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Инструкции</h3>
-                <p className="text-sm text-gray-600">По общению</p>
+                <h3 className="font-medium text-gray-900 mb-1">Отладка</h3>
+                <p className="text-sm text-gray-600">Промптов</p>
               </button>
             </div>
           </div>
@@ -431,7 +413,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Кнопка для просмотра инструкций */}
+            {/* Кнопка для настройки базового промпта */}
             {completedSurveys.attitude && 
              completedSurveys.typology && 
              completedSurveys.values && (
