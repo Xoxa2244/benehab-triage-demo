@@ -1,4 +1,4 @@
-// pages/api/tatiana.js - Новый API для Татьяны (обход кэширования Vercel)
+// pages/api/chat.js - Восстановленный рабочий API для Татьяны
 import OpenAI from 'openai';
 
 const openai = OpenAI({
@@ -59,13 +59,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('🎯 НОВЫЙ TATIANA API: Получено сообщение:', message);
-    console.log('🎯 НОВЫЙ TATIANA API: Профиль:', profile ? 'Есть' : 'Нет');
-    console.log('🎯 НОВЫЙ TATIANA API: Контекст назначений:', context ? 'Есть' : 'Нет');
+    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Получено сообщение:', message);
+    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Профиль:', profile ? 'Есть' : 'Нет');
+    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Контекст назначений:', context ? 'Есть' : 'Нет');
 
     // Пытаемся использовать OpenAI
     try {
-      console.log('🎯 НОВЫЙ TATIANA API: Пытаемся использовать OpenAI...');
+      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Пытаемся использовать OpenAI...');
       
       const systemPrompt = `Ты — "Татьяна", ассистент по здоровью Benehab. Говори тёпло, с эмпатией, адаптируйся под пользователя. Не ставь диагнозы, не назначай лекарства. О препаратах давай только справочную информацию БЕЗ дозировок.`;
       
@@ -82,17 +82,17 @@ export default async function handler(req, res) {
       });
 
       const aiResponse = completion.choices[0].message.content;
-      console.log('🎯 НОВЫЙ TATIANA API: OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
+      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
 
       res.status(200).json({
         response: aiResponse,
         success: true,
         timestamp: new Date().toISOString(),
-        note: 'AI ответ от OpenAI (НОВЫЙ TATIANA API)'
+        note: 'AI ответ от OpenAI (ВОССТАНОВЛЕННЫЙ API)'
       });
       
     } catch (openaiError) {
-      console.log('🎯 НОВЫЙ TATIANA API: OpenAI недоступен, используем fallback:', openaiError.message);
+      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: OpenAI недоступен, используем fallback:', openaiError.message);
       
       // Используем fallback ответ
       const fallbackResponse = getFallbackResponse(message, profile, context);
@@ -101,20 +101,20 @@ export default async function handler(req, res) {
         response: fallbackResponse,
         success: true,
         timestamp: new Date().toISOString(),
-        note: 'Fallback ответ (НОВЫЙ TATIANA API)',
+        note: 'Fallback ответ (ВОССТАНОВЛЕННЫЙ API)',
         openai_error: openaiError.message
       });
     }
 
   } catch (error) {
-    console.error('🎯 НОВЫЙ TATIANA API: Критическая ошибка:', error);
+    console.error('🔄 ВОССТАНОВЛЕННЫЙ API: Критическая ошибка:', error);
     
     // Критический fallback
     res.status(500).json({ 
       error: 'Критическая ошибка',
       details: error.message,
       fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
-      note: 'Критический fallback (НОВЫЙ TATIANA API)'
+      note: 'Критический fallback (ВОССТАНОВЛЕННЫЙ API)'
     });
   }
 }
