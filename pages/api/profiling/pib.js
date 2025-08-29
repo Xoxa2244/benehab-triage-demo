@@ -9,24 +9,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { attitude_profile, typology_profile, values_profile, demographics, patient_meta = {} } = req.body;
+    const { attitude_profile, accentuation_profile, values_profile, demographics, patient_meta = {} } = req.body;
+
+    // Отладочная информация
+    console.log('🔍 DEBUG: Полученные профили:');
+    console.log('Attitude Profile:', JSON.stringify(attitude_profile, null, 2));
+    console.log('Accentuation Profile:', JSON.stringify(accentuation_profile, null, 2));
+    console.log('Values Profile:', JSON.stringify(values_profile, null, 2));
 
     // Проверяем наличие хотя бы одного профиля
-    if (!attitude_profile && !typology_profile && !values_profile) {
+    if (!attitude_profile && !accentuation_profile && !values_profile) {
       return res.status(400).json({ 
         error: 'Необходим хотя бы один профиль для генерации PIB' 
       });
     }
 
     // Генерируем PIB
-    const pib = generatePIB(attitude_profile, typology_profile, values_profile, demographics, patient_meta);
+    const pib = generatePIB(attitude_profile, accentuation_profile, values_profile, demographics, patient_meta);
 
     // Генерируем промпт для ИИ
     let prompt = '';
     
     try {
-      // Получаем инструкции по коммуникации
-      const instructions = getCommunicationInstructions(attitude_profile, typology_profile);
+      // Получаем инструкции по коммуникации (передаем правильные параметры)
+      const instructions = getCommunicationInstructions(attitude_profile, accentuation_profile);
+      
+      // Отладочная информация
+      console.log('🔍 DEBUG: Сгенерированные инструкции:', JSON.stringify(instructions, null, 2));
       
       // Генерируем персонализированный промпт
       prompt = generatePersonalizedPrompt(instructions);
