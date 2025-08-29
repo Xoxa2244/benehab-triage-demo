@@ -357,6 +357,17 @@ export default function Home() {
                 <h3 className="font-medium text-gray-900 mb-1">Отладка</h3>
                 <p className="text-sm text-gray-600">Промптов</p>
               </button>
+
+              <button
+                onClick={() => window.location.href = '/assignments'}
+                className="group p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-center"
+              >
+                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-200 transition-colors">
+                  <span className="text-indigo-600 text-xl">📋</span>
+                </div>
+                <h3 className="font-medium text-gray-900 mb-1">Назначения</h3>
+                <p className="text-sm text-gray-600">Управление</p>
+              </button>
             </div>
           </div>
 
