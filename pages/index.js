@@ -191,24 +191,25 @@ export default function Home() {
     try {
       // Загружаем профиль пользователя для персонализации
       const profile = {
-        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
+        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        accentuation_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null,
+        demographics: localStorage.getItem('benehab_demographics') ? JSON.parse(localStorage.getItem('benehab_demographics')) : null
       };
 
       // Отладочная информация
       console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
       console.log('Profile loaded:', profile);
-      console.log('Attitude exists:', !!profile.attitude);
-      console.log('Typology exists:', !!profile.typology);
-      console.log('Values exists:', !!profile.values);
-      if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
-      if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
-      if (profile.values) console.log('Values keys:', Object.keys(profile.values));
+      console.log('Attitude Profile exists:', !!profile.attitude_profile);
+      console.log('Accentuation Profile exists:', !!profile.accentuation_profile);
+      console.log('Values Profile exists:', !!profile.values_profile);
+      if (profile.attitude_profile) console.log('Attitude Profile keys:', Object.keys(profile.attitude_profile));
+      if (profile.accentuation_profile) console.log('Accentuation Profile keys:', Object.keys(profile.accentuation_profile));
+      if (profile.values_profile) console.log('Values Profile keys:', Object.keys(profile.values_profile));
       console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
-      if (profile.attitude || profile.typology || profile.values) {
+      if (profile.attitude_profile || profile.accentuation_profile || profile.values_profile) {
         console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
       } else {
         console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
