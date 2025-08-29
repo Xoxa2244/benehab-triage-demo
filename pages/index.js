@@ -223,7 +223,7 @@ export default function Home() {
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
       // Отправляем запрос к OpenAI API с профилем и контекстом назначений
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/chat-new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ export default function Home() {
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
       // Отправляем запрос к OpenAI API с профилем и контекстом назначений
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/chat-new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +340,7 @@ export default function Home() {
             occurrences: occurrences
           }
         }),
-      });
+        });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
