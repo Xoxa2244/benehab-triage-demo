@@ -9,12 +9,17 @@ export default function DebugPrompts() {
   const [demographics, setDemographics] = useState(null);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [loading, setLoading] = useState(false);
+  const [basePrompt, setBasePrompt] = useState('Базовый промпт не настроен');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     loadData();
   }, []);
 
   const loadData = () => {
+    if (!isClient) return;
+    
     try {
       // Загружаем все данные из localStorage
       const pib = localStorage.getItem('benehab.pib');
@@ -22,12 +27,14 @@ export default function DebugPrompts() {
       const typology = localStorage.getItem('benehab_typology_profile');
       const values = localStorage.getItem('benehab_values_profile');
       const demo = localStorage.getItem('benehab_demographics');
+      const base = localStorage.getItem('benehab_base_prompt');
 
       if (pib) setPibData(JSON.parse(pib));
       if (attitude) setAttitudeProfile(JSON.parse(attitude));
       if (typology) setTypologyProfile(JSON.parse(typology));
       if (values) setValuesProfile(JSON.parse(values));
       if (demo) setDemographics(JSON.parse(demo));
+      if (base) setBasePrompt(base);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     }
@@ -82,6 +89,8 @@ export default function DebugPrompts() {
   };
 
   const clearAllData = () => {
+    if (!isClient) return;
+    
     localStorage.clear();
     setPibData(null);
     setAttitudeProfile(null);
@@ -89,7 +98,29 @@ export default function DebugPrompts() {
     setValuesProfile(null);
     setDemographics(null);
     setGeneratedPrompt('');
+    setBasePrompt('Базовый промпт не настроен');
   };
+
+  // Не рендерим содержимое до загрузки на клиенте
+  if (!isClient) {
+    return (
+      <>
+        <Head>
+          <title>Отладка промптов - Benehab</title>
+        </Head>
+        <div className="min-h-screen bg-gray-50 p-6">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+              🔍 Отладка промптов Benehab
+            </h1>
+            <div className="text-center py-8">
+              <p>Загрузка...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -169,7 +200,7 @@ export default function DebugPrompts() {
             <h2 className="text-xl font-semibold mb-3">⚙️ Базовый промпт Татьяны:</h2>
             <div className="bg-white p-4 rounded-lg border border-gray-300">
               <pre className="whitespace-pre-wrap text-sm text-gray-800 overflow-x-auto">
-                {localStorage.getItem('benehab_base_prompt') || 'Базовый промпт не настроен'}
+                {basePrompt}
               </pre>
             </div>
           </div>
