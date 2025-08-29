@@ -7,6 +7,7 @@ export default function BasePrompt() {
   const [savedPrompt, setSavedPrompt] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
+  const [showJsonRules, setShowJsonRules] = useState(false);
 
   useEffect(() => {
     // Загружаем сохраненный базовый промпт
@@ -71,6 +72,10 @@ Triage: если есть опасные симптомы — немедленн
     setTimeout(() => setSaveStatus(''), 3000);
   };
 
+  const handleShowJsonRules = () => {
+    setShowJsonRules(!showJsonRules);
+  };
+
   return (
     <>
       <Head>
@@ -110,6 +115,52 @@ Triage: если есть опасные симптомы — немедленн
               </p>
             </div>
           )}
+
+          {/* JSON правила */}
+          <div className="mb-6">
+            <button
+              onClick={handleShowJsonRules}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 mb-4"
+            >
+              {showJsonRules ? '🔽 Скрыть' : '📋 Показать'} JSON правила
+            </button>
+            
+            {showJsonRules && (
+              <div className="bg-white p-6 rounded-lg border border-gray-300">
+                <h3 className="text-lg font-semibold mb-4">📋 JSON правила для базового промпта</h3>
+                <p className="text-gray-600 mb-4">
+                  Эти правила автоматически генерируют базовый промпт и корректируют его на основе профилирования пациента.
+                </p>
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  <pre className="text-sm text-gray-800 overflow-x-auto">
+                    {`{
+  "version": "1.0",
+  "description": "Универсальные правила общения для ИИ-ассистента Татьяны",
+  "general_principles": {
+    "communication_style": "respectful_supportive_no_pressure",
+    "core_components": ["emotional", "cognitive", "behavioral"],
+    "adaptation": "psychotype_based",
+    "main_goals": ["reduce_anxiety", "support_motivation", "help_follow_medical_instructions"]
+  },
+  "emotional_work": { /* Работа с эмоциями */ },
+  "cognitive_work": { /* Когнитивная работа */ },
+  "behavioral_support": { /* Поведенческая поддержка */ },
+  "motivation_work": { /* Работа с мотивацией */ },
+  "safety_rules": { /* Правила безопасности */ },
+  "communication_format": { /* Формат общения */ }
+}`}
+                  </pre>
+                </div>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>• <strong>Эмоциональная работа</strong> - адаптация к эмоциональному состоянию пациента</p>
+                  <p>• <strong>Когнитивная работа</strong> - работа с установками и убеждениями</p>
+                  <p>• <strong>Поведенческая поддержка</strong> - направление поведения в нужное русло</p>
+                  <p>• <strong>Мотивация</strong> - использование ценностей пациента как мотиваторов</p>
+                  <p>• <strong>Безопасность</strong> - ограничения и правила для кризисных ситуаций</p>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Редактор промпта */}
           <div className="bg-white p-6 rounded-lg border border-gray-300 mb-6">
@@ -158,9 +209,11 @@ Triage: если есть опасные симптомы — немедленн
           <div className="bg-blue-50 p-6 rounded-lg border border-blue-300">
             <h2 className="text-xl font-semibold mb-3 text-blue-900">📖 Как это работает:</h2>
             <ul className="text-blue-800 space-y-2">
-              <li>• <strong>Базовый промпт</strong> - это основа для всех ответов Татьяны</li>
-              <li>• <strong>Опросный промпт</strong> - корректирует базовый на основе вашего профилирования</li>
+              <li>• <strong>JSON правила</strong> - универсальная основа для всех пользователей</li>
+              <li>• <strong>Базовый промпт</strong> - генерируется из правил и может редактироваться вручную</li>
+              <li>• <strong>Опросный промпт</strong> - корректирует базовый на основе профилирования</li>
               <li>• <strong>Итоговый промпт</strong> = Базовый + Опросный (с приоритетом опросного)</li>
+              <li>• <strong>Автоматическая корректировка</strong> - система усиливает нужные блоки на основе профиля</li>
               <li>• Изменения сохраняются автоматически в браузере</li>
               <li>• Для применения изменений перезапустите чат</li>
             </ul>
