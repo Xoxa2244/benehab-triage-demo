@@ -1,9 +1,20 @@
-// pages/api/chat.js - Восстановленный рабочий API для Татьяны
+// pages/api/chat.js - Тестовая версия для локального тестирования
 import OpenAI from 'openai';
 
-const openai = OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Инициализируем OpenAI только если есть API ключ
+let openai = null;
+try {
+  if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    console.log('✅ OpenAI инициализирован');
+  } else {
+    console.log('⚠️ OPENAI_API_KEY не найден, используем только fallback');
+  }
+} catch (error) {
+  console.log('⚠️ Ошибка инициализации OpenAI:', error.message);
+}
 
 // Fallback ответы для разных типов вопросов
 function getFallbackResponse(message, profile, context) {
@@ -59,62 +70,67 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Получено сообщение:', message);
-    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Профиль:', profile ? 'Есть' : 'Нет');
-    console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Контекст назначений:', context ? 'Есть' : 'Нет');
+    console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: Получено сообщение:', message);
+    console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: Профиль:', profile ? 'Есть' : 'Нет');
+    console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: Контекст назначений:', context ? 'Есть' : 'Нет');
 
-    // Пытаемся использовать OpenAI
-    try {
-      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: Пытаемся использовать OpenAI...');
-      
-      const systemPrompt = `Ты — "Татьяна", ассистент по здоровью Benehab. Говори тёпло, с эмпатией, адаптируйся под пользователя. Не ставь диагнозы, не назначай лекарства. О препаратах давай только справочную информацию БЕЗ дозировок.`;
-      
-      const messages = [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
-      ];
+    // Пытаемся использовать OpenAI если доступен
+    if (openai) {
+      try {
+        console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: Пытаемся использовать OpenAI...');
+        
+        const systemPrompt = `Ты — "Татьяна", ассистент по здоровью Benehab. Говори тёпло, с эмпатией, адаптируйся под пользователя. Не ставь диагнозы, не назначай лекарства. О препаратах давай только справочную информацию БЕЗ дозировок.`;
+        
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message }
+        ];
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        max_tokens: 1000,
-        temperature: 0.7,
-      });
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: messages,
+          max_tokens: 1000,
+          temperature: 0.7,
+        });
 
-      const aiResponse = completion.choices[0].message.content;
-      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
+        const aiResponse = completion.choices[0].message.content;
+        console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
 
-      res.status(200).json({
-        response: aiResponse,
-        success: true,
-        timestamp: new Date().toISOString(),
-        note: 'AI ответ от OpenAI (ВОССТАНОВЛЕННЫЙ API)'
-      });
-      
-    } catch (openaiError) {
-      console.log('🔄 ВОССТАНОВЛЕННЫЙ API: OpenAI недоступен, используем fallback:', openaiError.message);
-      
-      // Используем fallback ответ
-      const fallbackResponse = getFallbackResponse(message, profile, context);
-      
-      res.status(200).json({
-        response: fallbackResponse,
-        success: true,
-        timestamp: new Date().toISOString(),
-        note: 'Fallback ответ (ВОССТАНОВЛЕННЫЙ API)',
-        openai_error: openaiError.message
-      });
+        res.status(200).json({
+          response: aiResponse,
+          success: true,
+          timestamp: new Date().toISOString(),
+          note: 'AI ответ от OpenAI (ЛОКАЛЬНЫЙ ТЕСТ)'
+        });
+        return;
+        
+      } catch (openaiError) {
+        console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: OpenAI недоступен, используем fallback:', openaiError.message);
+      }
+    } else {
+      console.log('🧪 ЛОКАЛЬНЫЙ ТЕСТ: OpenAI не инициализирован, используем fallback');
     }
+    
+    // Используем fallback ответ
+    const fallbackResponse = getFallbackResponse(message, profile, context);
+    
+    res.status(200).json({
+      response: fallbackResponse,
+      success: true,
+      timestamp: new Date().toISOString(),
+      note: 'Fallback ответ (ЛОКАЛЬНЫЙ ТЕСТ)',
+      openai_available: !!openai
+    });
 
   } catch (error) {
-    console.error('🔄 ВОССТАНОВЛЕННЫЙ API: Критическая ошибка:', error);
+    console.error('🧪 ЛОКАЛЬНЫЙ ТЕСТ: Критическая ошибка:', error);
     
     // Критический fallback
     res.status(500).json({ 
       error: 'Критическая ошибка',
       details: error.message,
       fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
-      note: 'Критический fallback (ВОССТАНОВЛЕННЫЙ API)'
+      note: 'Критический fallback (ЛОКАЛЬНЫЙ ТЕСТ)'
     });
   }
 }
