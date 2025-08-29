@@ -1,4 +1,4 @@
-// pages/api/chat.js - Надежная версия Татьяны с AI + fallback
+// pages/api/chat.js - Надежная версия Татьяны с AI + fallback - ОБНОВЛЕНО: 29.08.2025 18:11
 import OpenAI from 'openai';
 
 const openai = OpenAI({
