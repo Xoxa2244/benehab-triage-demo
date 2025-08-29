@@ -191,25 +191,24 @@ export default function Home() {
     try {
       // Загружаем профиль пользователя для персонализации
       const profile = {
-        attitude_profile: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
-        accentuation_profile: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
-        values_profile: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null,
-        demographics: localStorage.getItem('benehab_demographics') ? JSON.parse(localStorage.getItem('benehab_demographics')) : null
+        attitude: localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null,
+        typology: localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null,
+        values: localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null
       };
 
       // Отладочная информация
       console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
       console.log('Profile loaded:', profile);
-      console.log('Attitude Profile exists:', !!profile.attitude_profile);
-      console.log('Accentuation Profile exists:', !!profile.accentuation_profile);
-      console.log('Values Profile exists:', !!profile.values_profile);
-      if (profile.attitude_profile) console.log('Attitude Profile keys:', Object.keys(profile.attitude_profile));
-      if (profile.accentuation_profile) console.log('Accentuation Profile keys:', Object.keys(profile.accentuation_profile));
-      if (profile.values_profile) console.log('Values Profile keys:', Object.keys(profile.values_profile));
+      console.log('Attitude exists:', !!profile.attitude);
+      console.log('Typology exists:', !!profile.typology);
+      console.log('Values exists:', !!profile.values);
+      if (profile.attitude) console.log('Attitude keys:', Object.keys(profile.attitude));
+      if (profile.typology) console.log('Typology keys:', Object.keys(profile.typology));
+      if (profile.values) console.log('Values keys:', Object.keys(profile.values));
       console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
-      if (profile.attitude_profile || profile.accentuation_profile || profile.values_profile) {
+      if (profile.attitude || profile.typology || profile.values) {
         console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
       } else {
         console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
@@ -438,11 +437,11 @@ export default function Home() {
              completedSurveys.values && (
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <button
-                  onClick={() => window.location.href = '/communication-instructions'}
+                  onClick={() => window.location.href = '/base-prompt'}
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
                 >
-                  <span className="mr-2">📋</span>
-                  Посмотреть инструкции по общению
+                  <span className="mr-2">⚙️</span>
+                  Настроить базовый промпт
                 </button>
               </div>
             )}
