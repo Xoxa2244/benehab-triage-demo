@@ -57,7 +57,7 @@ function getFallbackResponse(message, profile, context) {
     response += `О препаратах могу дать общую информацию (показания, противопоказания, побочные эффекты), но дозировки определяет только врач. Что именно вас интересует?`;
   } else if (lowerMessage.includes('симптом') || lowerMessage.includes('болит') || lowerMessage.includes('плохо')) {
     response += `Понимаю, что вас что-то беспокоит. Расскажите подробнее - когда началось, что именно болит, есть ли другие симптомы?`;
-  } else if (lowerMessage.includes('назначение') || lowerMessage.includes('помощь') || lowerMessage.includes('задача')) {
+  } else if (lowerMessage.includes('назначение') || lowerMessage.includes('помощь') || lowerMessage.includes('задача') || lowerMessage.includes('напомни') || lowerMessage.includes('что назначили')) {
     response += `Конечно, помогу с назначениями! `;
     
     if (context && context.activeAssignments && context.activeAssignments.length > 0) {
@@ -70,6 +70,15 @@ function getFallbackResponse(message, profile, context) {
         }
         response += `Что именно нужно сделать? Есть ли сложности?\n\n`;
       });
+      
+      // Дополнительная помощь
+      response += `💡 **Что могу предложить:**\n`;
+      response += `• Помочь с планированием времени\n`;
+      response += `• Обсудить сложности выполнения\n`;
+      response += `• Настроить напоминания\n`;
+      response += `• Адаптировать план под ваши возможности\n\n`;
+      
+      response += `С каким назначением нужна помощь в первую очередь?`;
     } else {
       response += `Сейчас у вас нет активных назначений. Хотите создать новое?`;
     }
@@ -219,7 +228,7 @@ export default async function handler(req, res) {
     res.status(500).json({ 
       error: 'Критическая ошибка',
       details: error.message,
-      fallback: 'Извините, у меня технические проблемы. Попробуйте еще раз через минуту.',
+      fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
       note: 'Критический fallback (УЛУЧШЕННЫЙ API)'
     });
   }
