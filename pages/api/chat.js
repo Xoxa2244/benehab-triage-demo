@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { getCommunicationInstructions, generatePersonalizedPrompt } from '../../lib/communication-instructions';
 import { generateBasePrompt, adjustBasePrompt } from '../../lib/base-prompt-generator';
 
-const openai = new OpenAI({
+const openai = OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -16,7 +16,7 @@ Triage: если есть опасные симптомы — немедленн
 Лёгкие типичные симптомы — поддержка, отдых/жидкость/самонаблюдение.
 Средние, требующие наблюдения — предложить записаться к врачу, но слоты давай только если человек согласился.
 Препараты: допускается фактическая справка (показания, противопоказания, предосторожности, частые побочные эффекты) — БЕЗ дозировок и без назначения. Если просят дозу — напомни, что дозировки определяет врач.
-Слоты для записи: 13:00, 15:00, 17:00 — только после явного согласия. После выбора скажи: "Спасибо, вы записаны".`;
+Слоты для записи: 13:00, 15:00, 17:00 — только после явного согласия. После выбора скажи: "Спасибобо, вы записаны".`;
 }
 
 export default async function handler(req, res) {
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, profile, basePromptOverride } = req.body;
+    const { message, profile, basePromptOverride, context } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -69,8 +69,43 @@ export default async function handler(req, res) {
       }
     }
 
+    // Добавляем контекст назначений если есть
+    let assignmentsContext = '';
+    if (context && (context.activeAssignments || context.allAssignments)) {
+      assignmentsContext = '\n\nКОНТЕКСТ НАЗНАЧЕНИЙ:\n';
+      
+      if (context.activeAssignments && context.activeAssignments.length > 0) {
+        assignmentsContext += `АКТИВНЫЕ НАЗНАЧЕНИЯ (${context.activeAssignments.length}):\n`;
+        context.activeAssignments.forEach((assignment, index) => {
+          assignmentsContext += `${index + 1}. ${assignment.title} (${assignment.type}) - ${assignment.description}\n`;
+          if (assignment.scheduledDate) {
+            assignmentsContext += `   Запланировано на: ${assignment.scheduledDate}\n`;
+          }
+        });
+      }
+      
+      if (context.allAssignments && context.allAssignments.length > 0) {
+        assignmentsContext += `\nВСЕГО НАЗНАЧЕНИЙ: ${context.allAssignments.length}\n`;
+      }
+      
+      if (context.occurrences && context.occurrences.length > 0) {
+        const pendingOccurrences = context.occurrences.filter(occ => occ.status === 'PENDING');
+        if (pendingOccurrences.length > 0) {
+          assignmentsContext += `\nОЖИДАЮТ ВЫПОЛНЕНИЯ: ${pendingOccurrences.length} вхождений\n`;
+        }
+      }
+      
+      assignmentsContext += '\nИНСТРУКЦИИ ПО НАЗНАЧЕНИЯМ:\n';
+      assignmentsContext += '- Если пользователь просит помощи с назначениями, предложите конкретные действия\n';
+      assignmentsContext += '- Помогите с планированием и мотивацией выполнения\n';
+      assignmentsContext += '- Предложите адаптировать назначения под возможности пользователя\n';
+      assignmentsContext += '- При необходимости помогите записаться к врачу для корректировки\n';
+      
+      console.log('Контекст назначений добавлен (длина):', assignmentsContext.length);
+    }
+
     // Формируем итоговый системный промпт
-    const systemPrompt = basePrompt + personalization;
+    const systemPrompt = basePrompt + personalization + assignmentsContext;
     const total_prompt_length = systemPrompt.length;
     
     console.log('Итоговый промпт (общая длина):', total_prompt_length);
@@ -98,19 +133,16 @@ export default async function handler(req, res) {
     const response = completion.choices[0].message.content;
 
     res.status(200).json({
-      response,
-      prompt_info: {
-        base_prompt_length: basePrompt.length,
-        personalization_length: personalization.length,
-        total_prompt_length,
-        profile_used: !!profile
-      }
+      response: response,
+      prompt_length: total_prompt_length,
+      has_profile: !!profile,
+      has_assignments: !!(context && (context.activeAssignments || context.allAssignments))
     });
 
   } catch (error) {
-    console.error('Ошибка в API чата:', error);
+    console.error('Error in chat API:', error);
     res.status(500).json({ 
-      error: 'Internal server error',
+      error: 'Internal server error', 
       details: error.message 
     });
   }

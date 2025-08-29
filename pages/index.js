@@ -13,6 +13,7 @@ export default function Home() {
   const [chatMessages, setChatMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [activeAssignments, setActiveAssignments] = useState([]);
 
   useEffect(() => {
     // Проверяем, что мы в браузере
@@ -36,6 +37,9 @@ export default function Home() {
       values: !!localStorage.getItem('benehab_values_profile')
     });
 
+    // Загружаем активные назначения
+    loadActiveAssignments();
+
     // Добавляем приветственное сообщение от Татьяны
     const welcomeMessage = {
       id: Date.now(),
@@ -54,6 +58,99 @@ export default function Home() {
     };
 
     setChatMessages([welcomeMessage]);
+  }, []);
+
+  // Загрузка активных назначений
+  const loadActiveAssignments = () => {
+    try {
+      const assignments = localStorage.getItem('benehab_assignments');
+      if (assignments) {
+        const parsed = JSON.parse(assignments);
+        const active = parsed.filter(assignment => {
+          // Проверяем, есть ли активные вхождения
+          const occurrences = localStorage.getItem('benehab_occurrences');
+          if (occurrences) {
+            const parsedOccurrences = JSON.parse(occurrences);
+            return parsedOccurrences.some(occ => 
+              occ.assignment_id === assignment.id && 
+              ['PENDING', 'NO_RESPONSE'].includes(occ.status)
+            );
+          }
+          return false;
+        });
+        setActiveAssignments(active);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки назначений:', error);
+    }
+  };
+
+  // Проверка и предложение помощи с назначениями
+  useEffect(() => {
+    if (activeAssignments.length > 0 && chatMessages.length === 1) {
+      // Добавляем предложение помощи с назначениями
+      const assignmentHelpMessage = {
+        id: Date.now() + 1,
+        type: 'tatiana',
+        text: `Я вижу, что у вас есть активные назначения! 📋
+
+У вас ${activeAssignments.length} назначение(й), которые требуют внимания. Хотите, чтобы я помогла вам с ними?
+
+Вы можете:
+• Посмотреть детали назначений
+• Получить напоминания
+• Обсудить сложности с выполнением
+• Запланировать новые встречи
+
+Просто скажите "помоги с назначениями" или выберите соответствующий вопрос выше!`,
+        timestamp: new Date()
+      };
+
+      setChatMessages(prev => [...prev, assignmentHelpMessage]);
+    }
+  }, [activeAssignments, chatMessages.length]);
+
+  // Слушатель сообщений от Service Worker
+  useEffect(() => {
+    const handleServiceWorkerMessage = (event) => {
+      if (event.data && event.data.type === 'OCCURRENCE_ACTION') {
+        // Обновляем назначения после действия пользователя
+        loadActiveAssignments();
+        
+        // Добавляем сообщение от Татьяны
+        let responseText = '';
+        switch (event.data.action) {
+          case 'done':
+            responseText = 'Отлично! Я рада, что вы выполнили назначение. 🎉 Хотите обсудить что-то еще или нужна помощь с другими назначениями?';
+            break;
+          case 'not_done':
+            responseText = 'Понимаю, что не получилось выполнить назначение. Давайте разберемся, что помешало и как можно адаптировать план. 🤔';
+            break;
+          case 'mute_current':
+            responseText = 'Хорошо, я отключила текущие напоминания для этого назначения. Но помните, что важно не забывать о здоровье! 💪';
+            break;
+          default:
+            responseText = 'Спасибо за обратную связь! Есть ли что-то еще, с чем я могу помочь?';
+        }
+        
+        const responseMessage = {
+          id: Date.now(),
+          type: 'tatiana',
+          text: responseText,
+          timestamp: new Date()
+        };
+        
+        setChatMessages(prev => [...prev, responseMessage]);
+      }
+    };
+
+    // Добавляем слушатель
+    navigator.serviceWorker?.addEventListener('message', handleServiceWorkerMessage);
+    
+    // Очистка
+    return () => {
+      navigator.serviceWorker?.removeEventListener('message', handleServiceWorkerMessage);
+    };
   }, []);
 
   const handleDemographicsComplete = (data) => {
@@ -76,6 +173,12 @@ export default function Home() {
       case 'general':
         question = 'Просто хочу поговорить';
         break;
+      case 'assignments':
+        question = 'Помоги с назначениями';
+        break;
+      case 'reminders':
+        question = 'Настрой напоминания';
+        break;
       default:
         return;
     }
@@ -97,11 +200,16 @@ export default function Home() {
       const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
       const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
+      // Загружаем активные назначения для контекста
+      const assignments = localStorage.getItem('benehab_assignments') ? JSON.parse(localStorage.getItem('benehab_assignments')) : [];
+      const occurrences = localStorage.getItem('benehab_occurrences') ? JSON.parse(localStorage.getItem('benehab_occurrences')) : [];
+
       // Отладочная информация
       console.log('🚨 === QUICK QUESTION PROFILE DEBUG === 🚨');
       console.log('Attitude profile:', attitudeProfile);
       console.log('Accentuation profile:', accentuationProfile);
       console.log('Values profile:', valuesProfile);
+      console.log('Active assignments:', activeAssignments);
       console.log('🚨 === END QUICK QUESTION DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
@@ -114,7 +222,7 @@ export default function Home() {
       // Получаем базовый промпт из localStorage
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
-      // Отправляем запрос к OpenAI API с профилем
+      // Отправляем запрос к OpenAI API с профилем и контекстом назначений
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -128,7 +236,12 @@ export default function Home() {
             values_profile: valuesProfile,
             demographics: demographics
           },
-          basePromptOverride: basePrompt
+          basePromptOverride: basePrompt,
+          context: {
+            activeAssignments: activeAssignments,
+            allAssignments: assignments,
+            occurrences: occurrences
+          }
         }),
       });
 
@@ -153,7 +266,7 @@ export default function Home() {
       const fallbackResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: 'Извините, у меня временные проблемы с подключением. Попробуйте написать еще раз через минуту.',
+        text: 'Извините, у меня временные проблемы с подключением. Попробуйте еще раз через минуту.',
         timestamp: new Date()
       };
 
@@ -184,11 +297,16 @@ export default function Home() {
       const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
       const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
+      // Загружаем активные назначения для контекста
+      const assignments = localStorage.getItem('benehab_assignments') ? JSON.parse(localStorage.getItem('benehab_assignments')) : [];
+      const occurrences = localStorage.getItem('benehab_occurrences') ? JSON.parse(localStorage.getItem('benehab_occurrences')) : [];
+
       // Отладочная информация
       console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
       console.log('Attitude profile:', attitudeProfile);
       console.log('Accentuation profile:', accentuationProfile);
       console.log('Values profile:', valuesProfile);
+      console.log('Active assignments:', activeAssignments);
       console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
       
       // Дополнительная проверка - показываем в UI
@@ -201,7 +319,7 @@ export default function Home() {
       // Получаем базовый промпт из localStorage
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
-      // Отправляем запрос к OpenAI API с профилем
+      // Отправляем запрос к OpenAI API с профилем и контекстом назначений
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -215,7 +333,12 @@ export default function Home() {
             values_profile: valuesProfile,
             demographics: demographics
           },
-          basePromptOverride: basePrompt
+          basePromptOverride: basePrompt,
+          context: {
+            activeAssignments: activeAssignments,
+            allAssignments: assignments,
+            occurrences: occurrences
+          }
         }),
       });
 
@@ -240,7 +363,7 @@ export default function Home() {
       const fallbackResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: 'Извините, у меня временные проблемы с подключением. Попробуйте написать еще раз через минуту.',
+        text: 'Извините, у меня временные проблемы с подключением. Попробуйте еще раз через минуту.',
         timestamp: new Date()
       };
 
