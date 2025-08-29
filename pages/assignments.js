@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { 
+  initializePushNotifications, 
+  getPushNotificationStatus, 
+  sendTestNotification,
+  unsubscribeFromPushNotifications 
+} from '../lib/push-notifications';
 
 // Типы назначений
 const ASSIGNMENT_TYPES = [
@@ -38,10 +44,13 @@ export default function Assignments() {
   });
   const [showForm, setShowForm] = useState(false);
   const [occurrences, setOccurrences] = useState([]);
+  const [pushStatus, setPushStatus] = useState(null);
+  const [pushLoading, setPushLoading] = useState(false);
 
   useEffect(() => {
     loadAssignments();
     loadOccurrences();
+    loadPushStatus();
   }, []);
 
   const loadAssignments = () => {
@@ -64,6 +73,11 @@ export default function Assignments() {
     } catch (error) {
       console.error('Ошибка загрузки событий:', error);
     }
+  };
+
+  const loadPushStatus = () => {
+    const status = getPushNotificationStatus();
+    setPushStatus(status);
   };
 
   const saveAssignments = (newAssignments) => {
@@ -222,6 +236,52 @@ export default function Assignments() {
     return typeObj ? typeObj.icon : '📋';
   };
 
+  const handleInitializePush = async () => {
+    setPushLoading(true);
+    try {
+      const result = await initializePushNotifications();
+      if (result.success) {
+        alert('✅ ' + result.message);
+        loadPushStatus();
+      } else {
+        alert('❌ ' + result.error);
+      }
+    } catch (error) {
+      alert('❌ Ошибка: ' + error.message);
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
+  const handleTestNotification = async () => {
+    try {
+      const result = await sendTestNotification();
+      if (result.success) {
+        alert('✅ ' + result.message);
+      } else {
+        alert('❌ ' + result.error);
+      }
+    } catch (error) {
+      alert('❌ Ошибка: ' + error.message);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    if (confirm('Отписаться от push-уведомлений?')) {
+      try {
+        const result = await unsubscribeFromPushNotifications();
+        if (result.success) {
+          alert('✅ ' + result.message);
+          loadPushStatus();
+        } else {
+          alert('❌ ' + result.error);
+        }
+      } catch (error) {
+        alert('❌ Ошибка: ' + error.message);
+      }
+    }
+  };
+
   return (
     <>
       <Head>
@@ -253,6 +313,68 @@ export default function Assignments() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Push-уведомления */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-4">🔔 Push-уведомления</h2>
+            
+            {pushStatus && (
+              <div className="mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-3 h-3 rounded-full ${pushStatus.supported ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                    <span>Поддержка: {pushStatus.supported ? '✅' : '❌'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-3 h-3 rounded-full ${
+                      pushStatus.permission === 'granted' ? 'bg-green-500' : 
+                      pushStatus.permission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
+                    }`}></span>
+                    <span>Разрешение: {pushStatus.permission}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-3 h-3 rounded-full ${pushStatus.subscribed ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                    <span>Подписка: {pushStatus.subscribed ? '✅' : '❌'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-3">
+              {!pushStatus?.subscribed ? (
+                <button
+                  onClick={handleInitializePush}
+                  disabled={pushLoading || !pushStatus?.supported}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {pushLoading ? '⏳ Настройка...' : '🔔 Включить уведомления'}
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handleTestNotification}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    🧪 Тестовое уведомление
+                  </button>
+                  <button
+                    onClick={handleUnsubscribe}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    🔕 Отключить уведомления
+                  </button>
+                </>
+              )}
+            </div>
+
+            {pushStatus?.permission === 'denied' && (
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  ⚠️ Разрешение на уведомления отклонено. Включите их в настройках браузера.
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Кнопка добавления */}
           <div className="mb-6">
             <button
