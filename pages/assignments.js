@@ -282,6 +282,18 @@ export default function Assignments() {
     }
   };
 
+  const checkNotifications = async () => {
+    try {
+      const result = await getPushNotificationStatus();
+      alert('✅ Текущий статус уведомлений:\n' +
+            `Поддержка: ${result.supported ? '✅' : '❌'}\n` +
+            `Разрешение: ${result.permission}\n` +
+            `Подписка: ${result.subscribed ? '✅' : '❌'}`);
+    } catch (error) {
+      alert('❌ Ошибка при проверке уведомлений: ' + error.message);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -355,6 +367,12 @@ export default function Assignments() {
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     🧪 Тестовое уведомление
+                  </button>
+                  <button
+                    onClick={checkNotifications}
+                    className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+                  >
+                    🔍 Проверить уведомления
                   </button>
                   <button
                     onClick={handleUnsubscribe}
