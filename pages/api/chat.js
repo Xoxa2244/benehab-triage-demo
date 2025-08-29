@@ -1,22 +1,32 @@
 // pages/api/chat.js
 import OpenAI from 'openai';
-import { getCommunicationInstructions, generatePersonalizedPrompt } from '../../lib/communication-instructions';
-import { generateBasePrompt, adjustBasePrompt } from '../../lib/base-prompt-generator';
 
 const openai = OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Дефолтный базовый промпт
-function getDefaultBasePrompt() {
+// Простой базовый промпт для Татьяны
+function getBasePrompt() {
   return `Ты — "Татьяна", ассистент по здоровью Benehab.
-Говори тёпло и просто. Уважай выбор человека. 
-Не ставь диагнозы, не назначай лекарства.
-Triage: если есть опасные симптомы — немедленно советуй вызвать скорую/обратиться в неотложку и не продолжай обычную беседу пока пользователь не подтвердит безопасность.
-Лёгкие типичные симптомы — поддержка, отдых/жидкость/самонаблюдение.
-Средние, требующие наблюдения — предложить записаться к врачу, но слоты давай только если человек согласился.
-Препараты: допускается фактическая справка (показания, противопоказания, предосторожности, частые побочные эффекты) — БЕЗ дозировок и без назначения. Если просят дозу — напомни, что дозировки определяет врач.
-Слоты для записи: 13:00, 15:00, 17:00 — только после явного согласия. После выбора скажи: "Спасибобо, вы записаны".`;
+
+ОСНОВНЫЕ ПРИНЦИПЫ:
+- Говори тёпло и просто, с эмпатией
+- Уважай выбор человека, не дави
+- Не ставь диагнозы, не назначай лекарства
+- Если есть опасные симптомы — советуй вызвать скорую
+- Лёгкие симптомы — поддержка и отдых
+- Средние симптомы — предложить записаться к врачу
+- О препаратах давай только справочную информацию (показания, противопоказания, побочные эффекты) БЕЗ дозировок
+
+ТОН ОБЩЕНИЯ:
+- Дружелюбный и поддерживающий
+- Профессиональный, но не формальный
+- Используй эмодзи для теплоты
+- Задавай уточняющие вопросы при необходимости
+
+СЛОТЫ ДЛЯ ЗАПИСИ:
+- 13:00, 15:00, 17:00 (только после согласия пользователя)
+- После выбора: "Спасибо, вы записаны на [время]"`;
 }
 
 export default async function handler(req, res) {
@@ -25,90 +35,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, profile, basePromptOverride, context } = req.body;
+    const { message, profile, context } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Получаем базовый промпт
-    // Если клиент передает basePromptOverride, используем его
-    // Иначе используем дефолтный
-    const basePrompt = basePromptOverride || getDefaultBasePrompt();
-    console.log('Базовый промпт (длина):', basePrompt.length);
+    console.log('Получено сообщение:', message);
+    console.log('Профиль:', profile ? 'Есть' : 'Нет');
+    console.log('Контекст назначений:', context ? 'Есть' : 'Нет');
 
-    // Генерируем персонализированный промпт на основе профиля
-    let personalization = '';
+    // Формируем системный промпт
+    let systemPrompt = getBasePrompt();
     
+    // Добавляем информацию о профиле если есть
     if (profile) {
-      try {
-        // Получаем инструкции по общению на основе профиля
-        const instructions = getCommunicationInstructions(
-          profile.attitude_profile || profile.attitude,
-          profile.accentuation_profile || profile.typology,
-          profile.values_profile || profile.values
-        );
-
-        // Генерируем персонализированный промпт
-        const personalizedPrompt = generatePersonalizedPrompt(instructions);
-        
-        // Корректируем базовый промпт на основе профиля
-        const adjustedBasePrompt = adjustBasePrompt(basePrompt, profile);
-        
-        personalization = `\n\nПЕРСОНАЛИЗАЦИЯ НА ОСНОВЕ ПРОФИЛИРОВАНИЯ:\n${personalizedPrompt}`;
-        
-        // Добавляем демографические данные если есть
-        if (profile.demographics) {
-          personalization += `\n\nДЕМОГРАФИЧЕСКИЕ ДАННЫЕ:\nВозраст: ${profile.demographics.age}, Пол: ${profile.demographics.gender}, Вес: ${profile.demographics.weight}кг, Рост: ${profile.demographics.height}см`;
-        }
-        
-        console.log('Персонализация (длина):', personalization.length);
-      } catch (error) {
-        console.error('Ошибка генерации персонализации:', error);
-        personalization = '\n\nОШИБКА ПЕРСОНАЛИЗАЦИИ: Используется базовый промпт без адаптации.';
+      if (profile.demographics) {
+        systemPrompt += `\n\nИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ:\nВозраст: ${profile.demographics.age}, Пол: ${profile.demographics.gender}`;
+      }
+      
+      // Простая персонализация на основе профилей
+      if (profile.attitude_profile) {
+        systemPrompt += '\n\nПРОФИЛЬ ОТНОШЕНИЯ К БОЛЕЗНИ: Учитывай особенности отношения к здоровью';
+      }
+      
+      if (profile.accentuation_profile) {
+        systemPrompt += '\n\nПСИХОТИП: Адаптируй общение под индивидуальные особенности';
       }
     }
 
     // Добавляем контекст назначений если есть
-    let assignmentsContext = '';
-    if (context && (context.activeAssignments || context.allAssignments)) {
-      assignmentsContext = '\n\nКОНТЕКСТ НАЗНАЧЕНИЙ:\n';
-      
-      if (context.activeAssignments && context.activeAssignments.length > 0) {
-        assignmentsContext += `АКТИВНЫЕ НАЗНАЧЕНИЯ (${context.activeAssignments.length}):\n`;
-        context.activeAssignments.forEach((assignment, index) => {
-          assignmentsContext += `${index + 1}. ${assignment.title} (${assignment.type}) - ${assignment.description}\n`;
-          if (assignment.scheduledDate) {
-            assignmentsContext += `   Запланировано на: ${assignment.scheduledDate}\n`;
-          }
-        });
-      }
-      
-      if (context.allAssignments && context.allAssignments.length > 0) {
-        assignmentsContext += `\nВСЕГО НАЗНАЧЕНИЙ: ${context.allAssignments.length}\n`;
-      }
-      
-      if (context.occurrences && context.occurrences.length > 0) {
-        const pendingOccurrences = context.occurrences.filter(occ => occ.status === 'PENDING');
-        if (pendingOccurrences.length > 0) {
-          assignmentsContext += `\nОЖИДАЮТ ВЫПОЛНЕНИЯ: ${pendingOccurrences.length} вхождений\n`;
-        }
-      }
-      
-      assignmentsContext += '\nИНСТРУКЦИИ ПО НАЗНАЧЕНИЯМ:\n';
-      assignmentsContext += '- Если пользователь просит помощи с назначениями, предложите конкретные действия\n';
-      assignmentsContext += '- Помогите с планированием и мотивацией выполнения\n';
-      assignmentsContext += '- Предложите адаптировать назначения под возможности пользователя\n';
-      assignmentsContext += '- При необходимости помогите записаться к врачу для корректировки\n';
-      
-      console.log('Контекст назначений добавлен (длина):', assignmentsContext.length);
+    if (context && context.activeAssignments && context.activeAssignments.length > 0) {
+      systemPrompt += `\n\nАКТИВНЫЕ НАЗНАЧЕНИЯ:\nУ пользователя есть ${context.activeAssignments.length} активное назначение. Предложи помощь с планированием и выполнением.`;
     }
 
-    // Формируем итоговый системный промпт
-    const systemPrompt = basePrompt + personalization + assignmentsContext;
-    const total_prompt_length = systemPrompt.length;
-    
-    console.log('Итоговый промпт (общая длина):', total_prompt_length);
+    console.log('Системный промпт готов, длина:', systemPrompt.length);
 
     // Формируем сообщения для OpenAI
     const messages = [
@@ -122,6 +83,8 @@ export default async function handler(req, res) {
       }
     ];
 
+    console.log('Отправляем запрос к OpenAI...');
+
     // Вызываем OpenAI API
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -131,19 +94,22 @@ export default async function handler(req, res) {
     });
 
     const response = completion.choices[0].message.content;
+    console.log('Получен ответ от OpenAI:', response.substring(0, 100) + '...');
 
     res.status(200).json({
       response: response,
-      prompt_length: total_prompt_length,
-      has_profile: !!profile,
-      has_assignments: !!(context && (context.activeAssignments || context.allAssignments))
+      success: true,
+      timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error('Error in chat API:', error);
+    console.error('Ошибка в API чата:', error);
+    
+    // Возвращаем понятную ошибку
     res.status(500).json({ 
-      error: 'Internal server error', 
-      details: error.message 
+      error: 'Ошибка обработки сообщения',
+      details: error.message,
+      fallback: 'Извините, у меня временные проблемы. Попробуйте написать еще раз через минуту.'
     });
   }
 }
