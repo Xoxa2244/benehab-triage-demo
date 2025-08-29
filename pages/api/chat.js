@@ -1,38 +1,50 @@
-// pages/api/chat.js - AI версия Татьяны
+// pages/api/chat.js - Временная версия с fallback
 import OpenAI from 'openai';
 
 const openai = OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Базовый промпт для Татьяны
-function getBasePrompt() {
-  return `Ты — "Татьяна", ассистент по здоровью Benehab.
-
-ОСНОВНЫЕ ПРИНЦИПЫ:
-• Говори тёпло и просто, с эмпатией
-• Уважай выбор человека, не дави
-• Не ставь диагнозы, не назначай лекарства
-• Если есть опасные симптомы — советуй вызвать скорую
-• Лёгкие симптомы — поддержка и отдых
-• Средние симптомы — предложить записаться к врачу
-• О препаратах давай только справочную информацию (показания, противопоказания, побочные эффекты) БЕЗ дозировок
-
-ТОН ОБЩЕНИЯ:
-• Дружелюбный и поддерживающий
-• Профессиональный, но не формальный
-• Используй эмодзи для теплоты
-• Задавай уточняющие вопросы при необходимости
-• Адаптируйся под индивидуальные особенности пациента
-
-СЛОТЫ ДЛЯ ЗАПИСИ:
-• 13:00, 15:00, 17:00 (только после согласия пользователя)
-• После выбора: "Спасибо, вы записаны на [время]"
-
-ПЕРСОНАЛИЗАЦИЯ:
-• Учитывай возраст, пол и особенности пациента
-• Адаптируй тон под психотип (если известен)
-• Предлагай помощь с учетом индивидуальных потребностей`;
+// Fallback ответы для разных типов вопросов
+function getFallbackResponse(message, profile, context) {
+  const lowerMessage = message.toLowerCase();
+  
+  let response = `Привет! Я Татьяна, ваш помощник по здоровью. 👋\n\n`;
+  
+  // Анализируем сообщение и даем соответствующий ответ
+  if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй')) {
+    response += `Рада вас видеть! Как ваше самочувствие сегодня?`;
+  } else if (lowerMessage.includes('врач') || lowerMessage.includes('запись')) {
+    response += `Хотите записаться к врачу? У нас есть свободные слоты: 13:00, 15:00, 17:00. Какое время вам удобно?`;
+  } else if (lowerMessage.includes('препарат') || lowerMessage.includes('лекарство') || lowerMessage.includes('таблетка')) {
+    response += `О препаратах могу дать общую информацию (показания, противопоказания, побочные эффекты), но дозировки определяет только врач. Что именно вас интересует?`;
+  } else if (lowerMessage.includes('симптом') || lowerMessage.includes('болит') || lowerMessage.includes('плохо')) {
+    response += `Понимаю, что вас что-то беспокоит. Расскажите подробнее - когда началось, что именно болит, есть ли другие симптомы?`;
+  } else if (lowerMessage.includes('назначение') || lowerMessage.includes('помощь')) {
+    response += `Конечно, помогу с назначениями! Что именно нужно сделать?`;
+  } else {
+    response += `Интересный вопрос! Расскажите подробнее, что вас интересует.`;
+  }
+  
+  // Добавляем информацию о профиле если есть
+  if (profile && profile.demographics) {
+    response += `\n\nЯ вижу, что вы ${profile.demographics.age} лет, ${profile.demographics.gender === 'male' ? 'мужчина' : 'женщина'}. `;
+    
+    if (profile.demographics.age < 30) {
+      response += `В вашем возрасте важно заботиться о здоровье для будущего! 💪`;
+    } else if (profile.demographics.age > 60) {
+      response += `В вашем возрасте особенно важно регулярно проходить обследования. 🏥`;
+    }
+  }
+  
+  // Добавляем информацию о назначениях если есть
+  if (context && context.activeAssignments && context.activeAssignments.length > 0) {
+    response += `\n\nУ вас есть ${context.activeAssignments.length} активное назначение. Хотите, чтобы я помогла с планированием?`;
+  }
+  
+  response += `\n\nЯ здесь, чтобы поддержать вас! 💙`;
+  
+  return response;
 }
 
 export default async function handler(req, res) {
@@ -51,87 +63,58 @@ export default async function handler(req, res) {
     console.log('Профиль:', profile ? 'Есть' : 'Нет');
     console.log('Контекст назначений:', context ? 'Есть' : 'Нет');
 
-    // Формируем системный промпт
-    let systemPrompt = getBasePrompt();
-    
-    // Добавляем информацию о профиле если есть
-    if (profile) {
-      if (profile.demographics) {
-        systemPrompt += `\n\nИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ:\nВозраст: ${profile.demographics.age}, Пол: ${profile.demographics.gender}`;
-        
-        // Адаптируем тон под возраст
-        if (profile.demographics.age < 30) {
-          systemPrompt += '\n• Молодой пациент → более активный, мотивирующий тон';
-        } else if (profile.demographics.age > 60) {
-          systemPrompt += '\n• Пожилой пациент → более спокойный, уважительный тон, больше объяснений';
-        }
-      }
+    // Пытаемся использовать OpenAI
+    try {
+      console.log('Пытаемся использовать OpenAI...');
       
-      // Простая персонализация на основе профилей
-      if (profile.attitude_profile) {
-        systemPrompt += '\n\nПРОФИЛЬ ОТНОШЕНИЯ К БОЛЕЗНИ: Учитывай особенности отношения к здоровью, адаптируй подход';
-      }
+      const systemPrompt = `Ты — "Татьяна", ассистент по здоровью Benehab. Говори тёпло, с эмпатией, адаптируйся под пользователя. Не ставь диагнозы, не назначай лекарства. О препаратах давай только справочную информацию БЕЗ дозировок.`;
       
-      if (profile.accentuation_profile) {
-        systemPrompt += '\n\nПСИХОТИП: Адаптируй общение под индивидуальные особенности личности';
-      }
-    }
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ];
 
-    // Добавляем контекст назначений если есть
-    if (context && context.activeAssignments && context.activeAssignments.length > 0) {
-      systemPrompt += `\n\nАКТИВНЫЕ НАЗНАЧЕНИЯ:\nУ пользователя есть ${context.activeAssignments.length} активное назначение. Предложи конкретную помощь с планированием и выполнением.`;
-      
-      // Добавляем детали назначений
-      context.activeAssignments.forEach((assignment, index) => {
-        systemPrompt += `\n• ${assignment.title} (${assignment.type}) - ${assignment.description}`;
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        max_tokens: 1000,
+        temperature: 0.7,
+      });
+
+      const aiResponse = completion.choices[0].message.content;
+      console.log('OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
+
+      res.status(200).json({
+        response: aiResponse,
+        success: true,
+        timestamp: new Date().toISOString(),
+        note: 'AI ответ от OpenAI'
       });
       
-      systemPrompt += '\n\nИНСТРУКЦИИ ПО НАЗНАЧЕНИЯМ:\n- Предложи конкретные действия для выполнения\n- Помоги с планированием времени\n- Поддержи мотивацию\n- При необходимости помоги адаптировать план';
+    } catch (openaiError) {
+      console.log('OpenAI недоступен, используем fallback:', openaiError.message);
+      
+      // Используем fallback ответ
+      const fallbackResponse = getFallbackResponse(message, profile, context);
+      
+      res.status(200).json({
+        response: fallbackResponse,
+        success: true,
+        timestamp: new Date().toISOString(),
+        note: 'Fallback ответ (OpenAI недоступен)',
+        openai_error: openaiError.message
+      });
     }
 
-    console.log('Системный промпт готов, длина:', systemPrompt.length);
-
-    // Формируем сообщения для OpenAI
-    const messages = [
-      {
-        role: 'system',
-        content: systemPrompt
-      },
-      {
-        role: 'user',
-        content: message
-      }
-    ];
-
-    console.log('Отправляем запрос к OpenAI...');
-
-    // Вызываем OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: messages,
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
-
-    const response = completion.choices[0].message.content;
-    console.log('Получен ответ от OpenAI:', response.substring(0, 100) + '...');
-
-    res.status(200).json({
-      response: response,
-      success: true,
-      timestamp: new Date().toISOString(),
-      note: 'AI версия Татьяны с персонализацией'
-    });
-
   } catch (error) {
-    console.error('Ошибка в API чата:', error);
+    console.error('Критическая ошибка в API чата:', error);
     
-    // Возвращаем понятную ошибку с fallback
+    // Критический fallback
     res.status(500).json({ 
-      error: 'Ошибка обработки сообщения',
+      error: 'Критическая ошибка',
       details: error.message,
-      fallback: 'Извините, у меня временные проблемы с AI. Но я здесь и готова помочь! Что вас беспокоит? Могу дать общие советы по здоровью.',
-      note: 'Используется fallback ответ'
+      fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
+      note: 'Критический fallback'
     });
   }
 }
