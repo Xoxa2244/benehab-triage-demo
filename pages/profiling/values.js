@@ -13,19 +13,20 @@ export default function ValuesSurvey() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [validationErrors, setValidationErrors] = useState({});
   const itemsPerPage = 5;
 
   const colors = [
-    { name: 'red', label: 'Red', class: 'bg-red-500' },
-    { name: 'blue', label: 'Blue', class: 'bg-blue-500' },
-    { name: 'green', label: 'Green', class: 'bg-green-500' },
-    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-400' },
-    { name: 'purple', label: 'Purple', class: 'bg-purple-500' },
-    { name: 'orange', label: 'Orange', class: 'bg-orange-500' },
-    { name: 'pink', label: 'Pink', class: 'bg-pink-500' },
-    { name: 'brown', label: 'Brown', class: 'bg-yellow-800' },
-    { name: 'gray', label: 'Gray', class: 'bg-gray-500' },
-    { name: 'black', label: 'Black', class: 'bg-gray-900' },
+    { name: 'red', label: 'Red', class: 'bg-red-400' },
+    { name: 'blue', label: 'Blue', class: 'bg-blue-400' },
+    { name: 'green', label: 'Green', class: 'bg-green-400' },
+    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-300' },
+    { name: 'purple', label: 'Purple', class: 'bg-purple-400' },
+    { name: 'orange', label: 'Orange', class: 'bg-orange-400' },
+    { name: 'pink', label: 'Pink', class: 'bg-pink-400' },
+    { name: 'brown', label: 'Brown', class: 'bg-yellow-700' },
+    { name: 'gray', label: 'Gray', class: 'bg-gray-400' },
+    { name: 'black', label: 'Black', class: 'bg-gray-700' },
     { name: 'white', label: 'White', class: 'bg-white border-2 border-gray-300' }
   ];
 
@@ -106,8 +107,11 @@ export default function ValuesSurvey() {
   
   const goToNextPage = () => {
     console.log('goToNextPage called:', { currentPage, totalPages, canGoToNextPage: canGoToNextPage() });
-    if (currentPage < totalPages && canGoToNextPage()) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      if (validateCurrentPage()) {
+        setCurrentPage(currentPage + 1);
+        setValidationErrors({});
+      }
     }
   };
   
@@ -139,11 +143,33 @@ export default function ValuesSurvey() {
     return currentPage > 1;
   };
 
+  const validateCurrentPage = () => {
+    const errors = {};
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+    const pageItems = items.slice(startIndex, endIndex);
+    
+    pageItems.forEach(item => {
+      if (!colorAssociations[item.concept]) {
+        errors[item.concept] = true;
+      }
+    });
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleColorSelect = (concept, color) => {
     setColorAssociations(prev => ({
       ...prev,
       [concept]: color
     }));
+    // Clear validation error for this concept
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[concept];
+      return newErrors;
+    });
     saveProgress();
   };
 
@@ -326,9 +352,11 @@ export default function ValuesSurvey() {
                 <div key={item.id} className="group relative">
                   <div className={`
                     bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
-                    ${colorAssociations[item.concept] 
-                      ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                    ${validationErrors[item.concept]
+                      ? 'border-red-400 shadow-lg shadow-red-100 bg-red-50'
+                      : colorAssociations[item.concept] 
+                        ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                     }
                   `}>
                     {/* Concept name */}

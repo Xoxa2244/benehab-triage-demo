@@ -9,6 +9,7 @@ export default function AttitudeSurvey() {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const itemsPerPage = 5;
 
@@ -61,8 +62,11 @@ export default function AttitudeSurvey() {
   const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   
   const goToNextPage = () => {
-    if (currentPage < totalPages && canGoToNextPage()) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      if (validateCurrentPage()) {
+        setCurrentPage(currentPage + 1);
+        setValidationErrors({});
+      }
     }
   };
   
@@ -88,10 +92,34 @@ export default function AttitudeSurvey() {
     return currentPage === totalPages;
   };
 
+  const validateCurrentPage = () => {
+    const errors = {};
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+    const pageItems = items.slice(startIndex, endIndex);
+    
+    pageItems.forEach(item => {
+      if (answers[item.id - 1] === null) {
+        errors[item.id] = true;
+      }
+    });
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAnswer = (questionIndex, value) => {
     const newAnswers = [...answers];
     newAnswers[questionIndex] = value;
     setAnswers(newAnswers);
+    
+    // Clear validation error for this question
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[questionIndex + 1];
+      return newErrors;
+    });
+    
     saveProgress();
   };
 
@@ -233,9 +261,11 @@ export default function AttitudeSurvey() {
               <div key={item.id} className="group relative">
                 <div className={`
                   bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
-                  ${answers[item.id - 1] !== null 
-                    ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  ${validationErrors[item.id]
+                    ? 'border-red-400 shadow-lg shadow-red-100 bg-red-50'
+                    : answers[item.id - 1] !== null 
+                      ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                   }
                 `}>
                   {/* Question number and text */}

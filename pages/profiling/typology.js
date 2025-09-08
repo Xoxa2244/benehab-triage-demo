@@ -9,6 +9,7 @@ export default function TypologySurvey() {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [progress, setProgress] = useState(0);
+  const [validationErrors, setValidationErrors] = useState({});
 
   const itemsPerPage = 5;
 
@@ -70,8 +71,11 @@ export default function TypologySurvey() {
   const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   
   const goToNextPage = () => {
-    if (currentPage < totalPages && canGoToNextPage()) {
-      setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) {
+      if (validateCurrentPage()) {
+        setCurrentPage(currentPage + 1);
+        setValidationErrors({});
+      }
     }
   };
   
@@ -97,6 +101,22 @@ export default function TypologySurvey() {
     return currentPage === totalPages;
   };
 
+  const validateCurrentPage = () => {
+    const errors = {};
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+    const pageItems = items.slice(startIndex, endIndex);
+    
+    pageItems.forEach(item => {
+      if (!answers[item.id] || answers[item.id].length === 0) {
+        errors[item.id] = true;
+      }
+    });
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAnswer = (questionId, optionId) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers;
@@ -116,6 +136,14 @@ export default function TypologySurvey() {
       ...prev,
       [questionId]: newAnswers
     }));
+    
+    // Clear validation error for this question
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[questionId];
+      return newErrors;
+    });
+    
     saveProgress();
   };
 
@@ -263,9 +291,11 @@ export default function TypologySurvey() {
               <div key={item.id} className="group relative">
                 <div className={`
                   bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
-                  ${getSelectedCount(item.id) > 0 
-                    ? 'border-blue-300 shadow-lg shadow-blue-100' 
-                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  ${validationErrors[item.id]
+                    ? 'border-red-400 shadow-lg shadow-red-100 bg-red-50'
+                    : getSelectedCount(item.id) > 0 
+                      ? 'border-blue-300 shadow-lg shadow-blue-100' 
+                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                   }
                 `}>
                   {/* Question number and text */}
