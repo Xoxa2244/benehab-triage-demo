@@ -1,64 +1,64 @@
 id,question_text,option_id,option_text,ptype
-1,"Вы отличаетесь",1,"Повышенной чувствительностью",sensitive
-1,"Вы отличаетесь",2,"Склонностью к пониженному настроению",dysthymic
-1,"Вы отличаетесь",3,"Переменчивостью настроения",cyclothymic
-1,"Вы отличаетесь",4,"Большой силой чувств и влечений",excitable
-1,"Вы отличаетесь",5,"Периодическими подъемами и спадами настроения",cyclothymic
-1,"Вы отличаетесь",6,"Длительностью переживаний",stuck
-1,"Вы отличаетесь",7,"Сдержанностью чувств",pedantic
-1,"Вы отличаетесь",8,"Скрытностью своих подлинных переживаний",anxious
-1,"Вы отличаетесь",9,"Приподнятым настроением",hyperthymic
-2,"Вы часто",1,"Бываете озабочены своим здоровьем",sensitive
-2,"Вы часто",2,"Критикуете себя",dysthymic
-2,"Вы часто",3,"Демонстрируете свои чувства",demonstrative
-2,"Вы часто",4,"Не сдерживаете себя",excitable
-2,"Вы часто",5,"Бываете то энергичным, то вялым",cyclothymic
-2,"Вы часто",6,"Бываете упрямыми",stuck
-2,"Вы часто",7,"Сомневаетесь при выборе решения",pedantic
-2,"Вы часто",8,"Ограничиваете свои контакты с окружающими",anxious
-2,"Вы часто",9,"Легко увлекаетесь новым",hyperthymic
-3,"Вы стремитесь",1,"К отдыху",sensitive
-3,"Вы стремитесь",2,"Соответствовать требованиям окружающих",dysthymic
-3,"Вы стремитесь",3,"Вызвать интерес к себе",demonstrative
-3,"Вы стремитесь",4,"К немедленному достижению желаемого",excitable
-3,"Вы стремитесь",5,"Действовать под влиянием текущего настроения",cyclothymic
-3,"Вы стремитесь",6,"К постоянству и превосходству",stuck
-3,"Вы стремитесь",7,"К безопасности",pedantic
-3,"Вы стремитесь",8,"Держаться в некотором уединении",anxious
-3,"Вы стремитесь",9,"К переменам",hyperthymic
-4,"Вам бывает трудно в ситуациях",1,"Высоких нагрузок",sensitive
-4,"Вам бывает трудно в ситуациях",2,"Неудач или критики",dysthymic
-4,"Вам бывает трудно в ситуациях",3,"Когда Вас не замечают",demonstrative
-4,"Вам бывает трудно в ситуациях",4,"Препятствий или вынужденного ожидания",excitable
-4,"Вам бывает трудно в ситуациях",5,"Необходимости регулярно поддерживать высокий уровень активности",cyclothymic
-4,"Вам бывает трудно в ситуациях",6,"Непостоянства или неуважения со стороны других",stuck
-4,"Вам бывает трудно в ситуациях",7,"Угрозы, возможных ошибок, недостатка информации или времени",pedantic
-4,"Вам бывает трудно в ситуациях",8,"Большого количества контактов",anxious
-4,"Вам бывает трудно в ситуациях",9,"Большого количества запретов",hyperthymic
-5,"Вы способны",1,"«Уходить в болезнь»",sensitive
-5,"Вы способны",2,"Жертвовать своими интересами",dysthymic
-5,"Вы способны",3,"Производить впечатление",demonstrative
-5,"Вы способны",4,"Действовать быстро, не раздумывая",excitable
-5,"Вы способны",5,"Временами действовать интенсивно, временами испытывать апатию",cyclothymic
-5,"Вы способны",6,"Преодолевать большое количество препятствий",stuck
-5,"Вы способны",7,"Предварительно все обдумывать",pedantic
-5,"Вы способны",8,"К воображению и фантазии",anxious
-5,"Вы способны",9,"Активно действовать",hyperthymic
-6,"Часто Вы чувствуете",1,"Усталость, слабость или боль",sensitive
-6,"Часто Вы чувствуете",2,"Печаль или вину",dysthymic
-6,"Часто Вы чувствуете",3,"Стремление себя показать",demonstrative
-6,"Часто Вы чувствуете",4,"Гнев или возмущение",excitable
-6,"Часто Вы чувствуете",5,"То жизнерадостность, то подавленность",cyclothymic
-6,"Часто Вы чувствуете",6,"Недоверие к другим",stuck
-6,"Часто Вы чувствуете",7,"Тревогу и неуверенность",pedantic
-6,"Часто Вы чувствуете",8,"Одиночество",anxious
-6,"Часто Вы чувствуете",9,"Радость",hyperthymic
-7,"Вы умеете",1,"Тонко чувствовать состояние своего организма",sensitive
-7,"Вы умеете",2,"Принимать ответственность на себя",dysthymic
-7,"Вы умеете",3,"Нравиться окружающим",demonstrative
-7,"Вы умеете",4,"Атаковать противника",excitable
-7,"Вы умеете",5,"Игнорировать жесткие ограничения и требования",cyclothymic
-7,"Вы умеете",6,"Предъявлять требования к другим людям",stuck
-7,"Вы умеете",7,"Соблюдать порядок и точность",pedantic
-7,"Вы умеете",8,"Сосредоточиться на своих мыслях",anxious
-7,"Вы умеете",9,"Поддерживать широкий круг контактов",hyperthymic
+1,"You are characterized by",1,"Increased sensitivity",sensitive
+1,"You are characterized by",2,"Tendency to low mood",dysthymic
+1,"You are characterized by",3,"Mood variability",cyclothymic
+1,"You are characterized by",4,"Great strength of feelings and drives",excitable
+1,"You are characterized by",5,"Periodic ups and downs of mood",cyclothymic
+1,"You are characterized by",6,"Duration of experiences",stuck
+1,"You are characterized by",7,"Restraint of feelings",pedantic
+1,"You are characterized by",8,"Concealment of your true experiences",anxious
+1,"You are characterized by",9,"Elevated mood",hyperthymic
+2,"You often",1,"Worry about your health",sensitive
+2,"You often",2,"Criticize yourself",dysthymic
+2,"You often",3,"Demonstrate your feelings",demonstrative
+2,"You often",4,"Don't restrain yourself",excitable
+2,"You often",5,"Are either energetic or lethargic",cyclothymic
+2,"You often",6,"Are stubborn",stuck
+2,"You often",7,"Doubt when making decisions",pedantic
+2,"You often",8,"Limit your contacts with others",anxious
+2,"You often",9,"Easily get carried away by new things",hyperthymic
+3,"You strive for",1,"Rest",sensitive
+3,"You strive for",2,"Meeting the requirements of others",dysthymic
+3,"You strive for",3,"Arousing interest in yourself",demonstrative
+3,"You strive for",4,"Immediate achievement of desired",excitable
+3,"You strive for",5,"Acting under the influence of current mood",cyclothymic
+3,"You strive for",6,"Constancy and superiority",stuck
+3,"You strive for",7,"Safety",pedantic
+3,"You strive for",8,"Maintaining some solitude",anxious
+3,"You strive for",9,"Change",hyperthymic
+4,"You find it difficult in situations of",1,"High loads",sensitive
+4,"You find it difficult in situations of",2,"Failures or criticism",dysthymic
+4,"You find it difficult in situations of",3,"When you are not noticed",demonstrative
+4,"You find it difficult in situations of",4,"Obstacles or forced waiting",excitable
+4,"You find it difficult in situations of",5,"Necessity to regularly maintain high activity level",cyclothymic
+4,"You find it difficult in situations of",6,"Inconstancy or disrespect from others",stuck
+4,"You find it difficult in situations of",7,"Threats, possible errors, lack of information or time",pedantic
+4,"You find it difficult in situations of",8,"Large number of contacts",anxious
+4,"You find it difficult in situations of",9,"Large number of restrictions",hyperthymic
+5,"You are capable of",1,"'Going into illness'",sensitive
+5,"You are capable of",2,"Sacrificing your interests",dysthymic
+5,"You are capable of",3,"Making an impression",demonstrative
+5,"You are capable of",4,"Acting quickly without thinking",excitable
+5,"You are capable of",5,"Sometimes acting intensively, sometimes experiencing apathy",cyclothymic
+5,"You are capable of",6,"Overcoming a large number of obstacles",stuck
+5,"You are capable of",7,"Thinking everything through beforehand",pedantic
+5,"You are capable of",8,"Imagination and fantasy",anxious
+5,"You are capable of",9,"Acting actively",hyperthymic
+6,"Often you feel",1,"Fatigue, weakness or pain",sensitive
+6,"Often you feel",2,"Sadness or guilt",dysthymic
+6,"Often you feel",3,"Desire to show yourself",demonstrative
+6,"Often you feel",4,"Anger or indignation",excitable
+6,"Often you feel",5,"Either cheerfulness or depression",cyclothymic
+6,"Often you feel",6,"Distrust of others",stuck
+6,"Often you feel",7,"Anxiety and uncertainty",pedantic
+6,"Often you feel",8,"Loneliness",anxious
+6,"Often you feel",9,"Joy",hyperthymic
+7,"You know how to",1,"Subtly feel the state of your body",sensitive
+7,"You know how to",2,"Take responsibility on yourself",dysthymic
+7,"You know how to",3,"Please others",demonstrative
+7,"You know how to",4,"Attack the opponent",excitable
+7,"You know how to",5,"Ignore rigid restrictions and requirements",cyclothymic
+7,"You know how to",6,"Make demands on other people",stuck
+7,"You know how to",7,"Maintain order and accuracy",pedantic
+7,"You know how to",8,"Focus on your thoughts",anxious
+7,"You know how to",9,"Maintain a wide circle of contacts",hyperthymic

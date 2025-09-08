@@ -22,7 +22,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
-    // Загружаем сохраненные данные при открытии формы
+    // Load saved data when opening the form
     const savedData = localStorage.getItem('benehab_demographics');
     if (savedData) {
       try {
@@ -30,7 +30,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
         setFormData(parsed);
         setIsSubmitted(true);
       } catch (e) {
-        console.error('Ошибка загрузки демографических данных:', e);
+        console.error('Error loading demographic data:', e);
       }
     }
   }, []);
@@ -39,31 +39,31 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
     const newErrors = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = 'Имя обязательно для заполнения';
+      newErrors.name = 'Name is required';
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Имя должно содержать минимум 2 символа';
+      newErrors.name = 'Name must be at least 2 characters';
     }
     
     if (!formData.gender) {
-      newErrors.gender = 'Выберите пол';
+      newErrors.gender = 'Select gender';
     }
     
     if (!formData.weight) {
-      newErrors.weight = 'Введите вес';
+      newErrors.weight = 'Enter weight';
     } else if (isNaN(formData.weight) || formData.weight < 30 || formData.weight > 300) {
-      newErrors.weight = 'Вес должен быть от 30 до 300 кг';
+      newErrors.weight = 'Weight must be between 30 and 300 kg';
     }
     
     if (!formData.height) {
-      newErrors.height = 'Введите рост';
+      newErrors.height = 'Enter height';
     } else if (isNaN(formData.height) || formData.height < 100 || formData.height > 250) {
-      newErrors.height = 'Рост должен быть от 100 до 250 см';
+      newErrors.height = 'Height must be between 100 and 250 cm';
     }
     
     if (!formData.age) {
-      newErrors.age = 'Введите возраст';
+      newErrors.age = 'Enter age';
     } else if (isNaN(formData.age) || formData.age < 12 || formData.age > 120) {
-      newErrors.age = 'Возраст должен быть от 12 до 120 лет';
+      newErrors.age = 'Age must be between 12 and 120 years';
     }
     
     setErrors(newErrors);
@@ -74,7 +74,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
     e.preventDefault();
     
     if (validateForm()) {
-      // Сохраняем данные в localStorage
+      // Save data to localStorage
       localStorage.setItem('benehab_demographics', JSON.stringify(formData));
       setIsSubmitted(true);
       onComplete(formData);
@@ -83,14 +83,14 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Очищаем ошибку при вводе
+    // Clear error on input
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
   const getGenderLabel = (gender) => {
-    return gender === 'male' ? 'Мужской' : gender === 'female' ? 'Женский' : '';
+    return gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : '';
   };
 
   if (!isOpen) return null;
@@ -101,7 +101,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
-              Расскажите о себе
+              Tell us about yourself
             </h2>
             <button
               onClick={onClose}
@@ -114,11 +114,11 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Имя */}
+            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <UserIcon className="inline w-4 h-4 mr-2" />
-                Имя *
+                Name *
               </label>
               <input
                 type="text"
@@ -127,7 +127,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.name ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Введите ваше имя"
+                placeholder="Enter your name"
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -137,10 +137,10 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
               )}
             </div>
 
-            {/* Пол */}
+            {/* Gender */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Пол *
+                Gender *
               </label>
               <div className="flex space-x-4">
                 <label className="flex items-center">
@@ -152,7 +152,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                     onChange={(e) => handleInputChange('gender', e.target.value)}
                     className="mr-2 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700">Мужской</span>
+                  <span className="text-sm text-gray-700">Male</span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -163,7 +163,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                     onChange={(e) => handleInputChange('gender', e.target.value)}
                     className="mr-2 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700">Женский</span>
+                  <span className="text-sm text-gray-700">Female</span>
                 </label>
               </div>
               {errors.gender && (
@@ -174,11 +174,11 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
               )}
             </div>
 
-            {/* Вес */}
+            {/* Weight */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <ScaleIcon className="inline w-4 h-4 mr-2" />
-                Вес (кг) *
+                Weight (kg) *
               </label>
               <input
                 type="number"
@@ -187,7 +187,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.weight ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Например: 70"
+                placeholder="e.g.: 70"
                 min="30"
                 max="300"
               />
@@ -199,11 +199,11 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
               )}
             </div>
 
-            {/* Рост */}
+            {/* Height */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Square3Stack3DIcon className="inline w-4 h-4 mr-2" />
-                Рост (см) *
+                Height (cm) *
               </label>
               <input
                 type="number"
@@ -212,7 +212,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.height ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Например: 175"
+                placeholder="e.g.: 175"
                 min="100"
                 max="250"
               />
@@ -224,11 +224,11 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
               )}
             </div>
 
-            {/* Возраст */}
+            {/* Age */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <CalendarIcon className="inline w-4 h-4 mr-2" />
-                Возраст *
+                Age *
               </label>
               <input
                 type="number"
@@ -237,7 +237,7 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.age ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="Например: 35"
+                placeholder="e.g.: 35"
                 min="12"
                 max="120"
               />
@@ -249,24 +249,24 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
               )}
             </div>
 
-            {/* Кнопка отправки */}
+            {/* Submit button */}
             <div className="pt-4">
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
               >
-                Сохранить и продолжить
+                Save and Continue
               </button>
             </div>
           </form>
 
-          {/* Информация о том, зачем нужны эти данные */}
+          {/* Information about why this data is needed */}
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <h3 className="text-sm font-medium text-blue-800 mb-2">
-              Зачем нужны эти данные?
+              Why do we need this data?
             </h3>
             <p className="text-sm text-blue-700">
-              Эта информация поможет Татьяне, вашему персональному агенту, лучше понять вас и адаптировать стиль общения под ваши индивидуальные особенности. Мы гарантируем конфиденциальность всех данных.
+              This information will help Tatiana, your personal agent, better understand you and adapt her communication style to your individual characteristics. We guarantee the confidentiality of all data.
             </p>
           </div>
         </div>

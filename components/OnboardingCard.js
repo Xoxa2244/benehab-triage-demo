@@ -15,17 +15,17 @@ export default function OnboardingCard({ onDone }) {
 
   return (
     <div className="bg-white border rounded-2xl p-4 shadow-sm space-y-3">
-      <div className="font-medium">Привет! Я — Татьяна, твой ассистент по здоровью.</div>
+      <div className="font-medium">Hello! I am Tatiana, your health assistant.</div>
       <div className="text-sm text-gray-700">
-        Я помогу записаться к врачу, ответить на вопросы по препаратам и напоминать о назначениях.
-        <br />Чтобы лучше подстроиться, скажи, пожалуйста: возраст, рост и вес.
+        I will help you book doctor appointments, answer questions about medications and remind you about assignments.
+        <br />To better adapt, please tell me: age, height and weight.
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <input placeholder="Возраст" value={age} onChange={(e) => setAge(e.target.value)} className="px-3 py-2 border rounded-xl" />
-        <input placeholder="Рост (см)" value={height} onChange={(e) => setHeight(e.target.value)} className="px-3 py-2 border rounded-xl" />
-        <input placeholder="Вес (кг)" value={weight} onChange={(e) => setWeight(e.target.value)} className="px-3 py-2 border rounded-xl" />
+        <input placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} className="px-3 py-2 border rounded-xl" />
+        <input placeholder="Height (cm)" value={height} onChange={(e) => setHeight(e.target.value)} className="px-3 py-2 border rounded-xl" />
+        <input placeholder="Weight (kg)" value={weight} onChange={(e) => setWeight(e.target.value)} className="px-3 py-2 border rounded-xl" />
       </div>
-      <button onClick={save} className="px-4 py-2 rounded-xl bg-emerald-600 text-white">Продолжить</button>
+      <button onClick={save} className="px-4 py-2 rounded-xl bg-emerald-600 text-white">Continue</button>
     </div>
   );
 }

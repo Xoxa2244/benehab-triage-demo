@@ -21,7 +21,7 @@ export default function TatianaMessage({
   const generateMessage = () => {
     setIsTyping(true);
     
-    // Имитируем печатание
+    // Simulate typing
     setTimeout(() => {
       const personalizedMessage = createPersonalizedMessage();
       setMessage(personalizedMessage);
@@ -32,9 +32,9 @@ export default function TatianaMessage({
   const createPersonalizedMessage = () => {
     const { name } = demographics;
     
-    let baseMessage = `Привет, ${name}! 👋\n\n`;
+    let baseMessage = `Hello, ${name}! 👋\n\n`;
     
-    // Персонализация на основе типа опроса и результатов
+    // Personalization based on survey type and results
     switch (surveyType) {
       case 'attitude':
         baseMessage += generateAttitudeMessage(surveyResults);
@@ -46,33 +46,33 @@ export default function TatianaMessage({
         baseMessage += generateValuesMessage(surveyResults);
         break;
       default:
-        baseMessage += `Я буду рада помочь вам в решении ваших вопросов. `;
+        baseMessage += `I will be happy to help you with your questions. `;
     }
 
-    // Завершающая часть с интеграцией всех результатов
+    // Final part with integration of all results
     baseMessage += generateIntegrationMessage();
-    baseMessage += `\n\nТеперь я понимаю вас гораздо лучше и буду общаться с вами в наиболее подходящем стиле. `;
-    baseMessage += `Если у вас есть вопросы или нужна поддержка, я здесь для вас! 💙`;
+    baseMessage += `\n\nNow I understand you much better and will communicate with you in the most appropriate style. `;
+    baseMessage += `If you have questions or need support, I am here for you! 💙`;
 
     return baseMessage;
   };
 
   const generateAttitudeMessage = (results) => {
     if (!results || !results.scales) {
-      return `Я понимаю, что отношение к болезни - это очень личная тема. `;
+      return `I understand that attitude to illness is a very personal topic. `;
     }
     
-    let message = `Исходя из ваших ответов об отношении к болезни, я вижу следующие особенности:\n\n`;
+    let message = `Based on your answers about attitude to illness, I see the following features:\n\n`;
     
     const scales = results.scales;
     const insights = [];
     
-    // Анализ основных шкал с конкретными рекомендациями
+    // Analysis of main scales with specific recommendations
     if (scales.severity !== undefined) {
       if (scales.severity > 7) {
         insights.push({
-          trait: "высокая оценка серьезности заболевания",
-          approach: "буду особенно внимательна к вашим переживаниям, давать четкую структурированную информацию и создавать ощущение безопасности"
+          trait: "high assessment of disease severity",
+          approach: "I will be especially attentive to your experiences, give clear structured information and create a sense of security"
         });
       } else if (scales.severity < 4) {
         insights.push({
@@ -278,18 +278,18 @@ export default function TatianaMessage({
   return (
     <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200 p-6 mb-6">
       <div className="flex items-start space-x-4">
-        {/* Аватар Татьяны */}
+        {/* Tatiana's avatar */}
         <div className="flex-shrink-0">
           <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
             <HeartIcon className="w-6 h-6 text-white" />
           </div>
         </div>
 
-        {/* Содержимое сообщения */}
+        {/* Message content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Татьяна</h3>
-            <span className="text-sm text-gray-500">Ваш персональный агент</span>
+            <h3 className="text-lg font-semibold text-gray-900">Tatiana</h3>
+            <span className="text-sm text-gray-500">Your personal agent</span>
           </div>
 
           {isTyping ? (
@@ -299,7 +299,7 @@ export default function TatianaMessage({
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                 <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
-              <span>Татьяна анализирует ваши результаты...</span>
+              <span>Tatiana is analyzing your results...</span>
             </div>
           ) : (
             <div className="text-gray-700 whitespace-pre-line leading-relaxed">

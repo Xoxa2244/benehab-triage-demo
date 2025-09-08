@@ -1,64 +1,64 @@
 id,question_text,column
-1,Я легко расстраиваюсь из-за мелочей,1
-2,Я часто чувствую себя уязвимым,1
-3,Мне важно, чтобы меня понимали,1
-4,Я остро реагирую на критику,1
-5,Мне нужно время, чтобы привыкнуть к новому,1
-6,Я чувствую эмоции других людей,1
-7,Мне важно чувствовать поддержку,1
-8,Я часто чувствую усталость,2
-9,Мне трудно радоваться,2
-10,Я склонен к пессимизму,2
-11,Мне нужно больше времени для восстановления,2
-12,Я часто чувствую себя подавленным,2
-13,Мне трудно сосредоточиться,2
-14,Я часто чувствую тревогу,2
-15,Мне важно быть в центре внимания,3
-16,Я люблю рассказывать истории,3
-17,Мне нравится быть на виду,3
-18,Я легко завожу знакомства,3
-19,Мне важно производить впечатление,3
-20,Я люблю быть лидером,3
-21,Мне нравится выступать публично,3
-22,Мое настроение часто меняется,4
-23,Я легко возбуждаюсь,4
-24,Мне трудно контролировать эмоции,4
-25,Я часто действую импульсивно,4
-26,Мне трудно планировать,4
-27,Я часто меняю планы,4
-28,Мне трудно доводить дела до конца,4
-29,Я часто беспокоюсь,5
-30,Мне трудно расслабиться,5
-31,Я часто чувствую напряжение,5
-32,Мне трудно принимать решения,5
-33,Я часто переживаю о будущем,5
-34,Мне трудно справляться со стрессом,5
-35,Я часто чувствую себя небезопасно,5
-36,Мне важно, чтобы все было по порядку,6
-37,Я внимателен к деталям,6
-38,Мне нужно все планировать,6
-39,Я люблю структуру и порядок,6
-40,Мне важно следовать правилам,6
-41,Я часто проверяю, все ли сделано правильно,6
-42,Мне трудно принимать неопределенность,6
-43,Я часто чувствую восторг,7
-44,Мне легко вдохновляться,7
-45,Я часто чувствую энтузиазм,7
-46,Мне нравится мечтать,7
-47,Я часто чувствую вдохновение,7
-48,Мне легко увлекаться новым,7
-49,Я часто чувствую радость,7
-50,Я легко плачу,8
-51,Я остро реагирую на искусство,8
-52,Мне легко сопереживать,8
-53,Я часто чувствую глубокие эмоции,8
-54,Мне важно чувствовать красоту,8
-55,Я легко трогаюсь до слез,8
-56,Мне важно эмоциональное общение,8
-57,Я часто испытываю раздражение,9
-58,Я легко выхожу из себя,9
-59,Мне трудно сдерживать гнев,9
-60,Я часто конфликтую с окружающими,9
-61,Мне трудно прощать обиды,9
-62,Я часто чувствую несправедливость,9
-63,Мне трудно контролировать агрессию,9
+1,I easily get upset over trifles,1
+2,I often feel vulnerable,1
+3,It's important for me to be understood,1
+4,I react sharply to criticism,1
+5,I need time to get used to new things,1
+6,I feel other people's emotions,1
+7,It's important for me to feel support,1
+8,I often feel tired,2
+9,It's hard for me to be happy,2
+10,I tend to be pessimistic,2
+11,I need more time to recover,2
+12,I often feel depressed,2
+13,It's hard for me to concentrate,2
+14,I often feel anxious,2
+15,It's important for me to be the center of attention,3
+16,I love telling stories,3
+17,I like being in the spotlight,3
+18,I easily make acquaintances,3
+19,It's important for me to make an impression,3
+20,I love being a leader,3
+21,I like speaking in public,3
+22,My mood often changes,4
+23,I easily get excited,4
+24,It's hard for me to control emotions,4
+25,I often act impulsively,4
+26,It's hard for me to plan,4
+27,I often change plans,4
+28,It's hard for me to finish things,4
+29,I often worry,5
+30,It's hard for me to relax,5
+31,I often feel tense,5
+32,It's hard for me to make decisions,5
+33,I often worry about the future,5
+34,It's hard for me to cope with stress,5
+35,I often feel unsafe,5
+36,It's important for me that everything is in order,6
+37,I pay attention to details,6
+38,I need to plan everything,6
+39,I love structure and order,6
+40,It's important for me to follow rules,6
+41,I often check if everything is done correctly,6
+42,It's hard for me to accept uncertainty,6
+43,I often feel delight,7
+44,It's easy for me to get inspired,7
+45,I often feel enthusiasm,7
+46,I like to dream,7
+47,I often feel inspiration,7
+48,It's easy for me to get carried away by new things,7
+49,I often feel joy,7
+50,I cry easily,8
+51,I react sharply to art,8
+52,It's easy for me to empathize,8
+53,I often feel deep emotions,8
+54,It's important for me to feel beauty,8
+55,I easily get moved to tears,8
+56,It's important for me to have emotional communication,8
+57,I often experience irritation,9
+58,I easily lose my temper,9
+59,It's hard for me to restrain anger,9
+60,I often conflict with others,9
+61,It's hard for me to forgive offenses,9
+62,I often feel injustice,9
+63,It's hard for me to control aggression,9

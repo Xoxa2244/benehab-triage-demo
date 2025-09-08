@@ -1,138 +1,138 @@
 {
   "severity": {
-    "problem": "Восприятие своего состояния как тяжелого",
-    "profile_name": "Страдающий",
-    "solomin": "Субъективная оценка тяжести своего заболевания, которая коррелирует с убеждением в неизлечимости и суицидальными мыслями",
+    "problem": "Perception of one's condition as severe",
+    "profile_name": "Suffering",
+    "solomin": "Subjective assessment of the severity of one's disease, which correlates with belief in incurability and suicidal thoughts",
     "do": [
-      "1. Начинать коммуникацию с объяснения того, что будет происходить",
-      "2. Сообщите о вашей готовности выслушать жалобы пациента и назначить все необходимые исследования.",
-      "3. Обсудите возможные варианты действий, убедитесь, что пациент понял и согласен с планом действий",
-      "4. Побуждайте пациента вести дневник симптомов для отслеживания изменений самочувствия и ыявления закономерностей"
+      "1. Start communication by explaining what will happen",
+      "2. Inform about your readiness to listen to patient complaints and prescribe all necessary examinations.",
+      "3. Discuss possible courses of action, make sure the patient understands and agrees with the action plan",
+      "4. Encourage the patient to keep a symptom diary to track changes in well-being and identify patterns"
     ],
     "avoid": [
-      "1. Не обесценивать объем симптомов, даже если они кажутся надуманными и незначительными"
+      "1. Do not devalue the volume of symptoms, even if they seem contrived and insignificant"
     ],
-    "difficulties": "- Физические страдания \n- большой объем жалоб\n- плохое самочувствие (которое может выражаться в подаленности, низкой энергии, раздражительности и др)",
-    "extreme": "Низкие значения (0-2): Низкая оценка серьезности заболевания - увеличить частоту взаимодействия на 20%, увеличить количество разъяснительных мероприятий\nВысокие значения (10-16): Уверенность в бессмысленности лечения или скрытое желание покончить с собой - направить на консультацию с психотерапевтом"
+    "difficulties": "- Physical suffering \n- large volume of complaints\n- poor well-being (which can be expressed in depression, low energy, irritability, etc)",
+    "extreme": "Low values (0-2): Low assessment of disease severity - increase interaction frequency by 20%, increase number of explanatory measures\nHigh values (10-16): Belief in meaninglessness of treatment or hidden desire to end life - refer for consultation with psychotherapist"
   },
   "secondary_gain": {
-    "problem": "Вторичная выгода заболевания",
-    "profile_name": "Прагматический",
-    "solomin": "Вторичная выгода заболевания",
+    "problem": "Secondary gain of illness",
+    "profile_name": "Pragmatic",
+    "solomin": "Secondary gain of illness",
     "do": [
-      "1. Последовательность и ясность позиции мед персонала (\"Предлагаю следовать намеченному плану и сверяться с самочувствием. И если вам что-то не понятно, я отвечу на все вопросы\").",
-      "2. Баланс поддержки и возвращения ответсвенности пациенту \"Только совместными усилиями вы сможете улучшить качество жизни\"",
-      "3. Побуждайте пациента вести дневник симптомов для отслеживания изменений самочувствия и ыявления закономерностей"
+      "1. Consistency and clarity of medical staff position (\"I suggest following the planned course and checking with your well-being. And if something is not clear, I will answer all questions\").",
+      "2. Balance of support and returning responsibility to the patient \"Only through joint efforts will you be able to improve your quality of life\"",
+      "3. Encourage the patient to keep a symptom diary to track changes in well-being and identify patterns"
     ],
     "avoid": [
-      "1. Не давать гипер заботу",
-      "2. Не говорить намеками и двойными посланиями"
+      "1. Do not give hyper care",
+      "2. Do not speak in hints and double messages"
     ],
-    "difficulties": "- Болезнь приносит выгоду пациенту: забота близких, избегание ответсвенности\n- демонстративность симптомов, возможно преувеличение симптомов\n- средний уровень активности в отношении лечения\n- избыточная выгода от болезни может побуждать к избеганию сотрудничества и лечения",
-    "extreme": "Низкие значения: - \nВысокие значения (4-8): Потеря какого-либо преимуще-ства, которое бо-лезнь предостав-ляет респонденту - направление на консультацию с психотерапевтом"
+    "difficulties": "- Illness brings benefit to the patient: care from loved ones, avoiding responsibility\n- demonstrativeness of symptoms, possibly exaggeration of symptoms\n- average level of activity regarding treatment\n- excessive benefit from illness may encourage avoidance of cooperation and treatment",
+    "extreme": "Low values: - \nHigh values (4-8): Loss of any advantage that illness provides to the respondent - referral for consultation with psychotherapist"
   },
   "hide_resist": {
-    "problem": "Стремление скрыть свою болезнь ",
-    "profile_name": "Скрывающий",
-    "solomin": "Стремление скрыть свою болезнь и сопротивление болезни",
+    "problem": "Desire to hide one's illness",
+    "profile_name": "Hiding",
+    "solomin": "Desire to hide one's illness and resistance to illness",
     "do": [
-      "1. Валидация проблемы и поддержка (Я вижу, что вам сложно описывать/говорить о вашем диагнозе, но я здесь чтобы помочь вам)",
-      "2. Рассказать об опыте врача в лечении данного заболевания",
-      "3. Расскажите о важности выявления проблем на ранней стадии и привенттвных мерах для сохранения своей активной жизненной позиции",
-      "4. Дать время на принятие своей болезни и в спойоном темпе информировать о болезни",
-      "5. Поощрайте регулярность посещения встреч и исследований"
+      "1. Validation of the problem and support (I see that it's difficult for you to describe/talk about your diagnosis, but I'm here to help you)",
+      "2. Tell about the doctor's experience in treating this disease",
+      "3. Tell about the importance of identifying problems at an early stage and preventive measures to maintain your active life position",
+      "4. Give time to accept your illness and inform about the illness at a calm pace",
+      "5. Encourage regularity of visits and examinations"
     ],
     "avoid": [
-      "1. не давить, когда пациент сопротивляется давать информацию о себе"
+      "1. do not pressure when the patient resists giving information about themselves"
     ],
-    "difficulties": "- Слишком низкие значения шкалы могут свидетельствовать о недостатке желания бороться с болезнью, слишком высокие - о чувстве стыда за собственную болезнь, нежелании жаловаться. \n- имеют много страхов , связанных со здоровьем: осуждение, потеря соц статуса, соц ограничений ; ф ожидании высоких фин расходов на лечение, \n- с трудом идут на диалог\n- могут пропускать назначенные визиты\n- могут просто не знать досточно о своем состоянии\n- Низкий уровень сотрудничества: много сопротивления к тому, что говорит медперсонал, нарушают рекомендации, избирательно относятся к рекомендациям.",
-    "extreme": "Низкие значения (0-3): Недостаточно упорное стремления к выздоровлению - увеличить частоту взаимодействия на 20%, дать больше поддержки, возможна консультаци психотреапевта\nВысокие значения (8-10): Стремление замаскировать симптомы заболевания - необходимо исследование мотивационной сферы так делать через психотерапию"
+    "difficulties": "- Too low scale values may indicate lack of desire to fight the disease, too high - feeling of shame for one's own illness, unwillingness to complain. \n- have many fears related to health: condemnation, loss of social status, social restrictions; expectation of high financial costs for treatment, \n- have difficulty engaging in dialogue\n- may miss scheduled visits\n- may simply not know enough about their condition\n- Low level of cooperation: much resistance to what medical staff says, violate recommendations, are selective about recommendations.",
+    "extreme": "Low values (0-3): Insufficient persistent desire for recovery - increase interaction frequency by 20%, give more support, possible psychotherapist consultation\nHigh values (8-10): Desire to mask disease symptoms - investigation of motivational sphere through psychotherapy"
   },
   "work_escape": {
-    "problem": "Стремление «убежать» в работу или спорт",
-    "profile_name": "Деятельный",
-    "solomin": "Стремление «убежать» в работу или спорт",
+    "problem": "Desire to 'escape' into work or sports",
+    "profile_name": "Active",
+    "solomin": "Desire to 'escape' into work or sports",
     "do": [
-      "1. Дозированное приподнесенее информации о болезни: \"Позвольте я подробнее расскажу об этой процедуре?\"",
-      "2. Признание важности сохранения соц статуса: \"я понимаю, как много для вас значит поддерживать активный образ жизни, и ваше здоровье - важная часть вашей активной жизненной позиции\".",
-      "3. Хвалите даже за минимальное выполнение назначений врача.",
-      "4. Фокусировка на ценности здоровья как основы сохранения работоспосбности"
+      "1. Dosed presentation of information about the disease: \"Let me tell you more about this procedure?\"",
+      "2. Recognition of the importance of maintaining social status: \"I understand how much it means to you to maintain an active lifestyle, and your health is an important part of your active life position\".",
+      "3. Praise even for minimal compliance with doctor's prescriptions.",
+      "4. Focus on the value of health as the basis for maintaining work capacity"
     ],
     "avoid": [
-      "Не пытаться доказать пациенту, что он не прав."
+      "Do not try to prove to the patient that they are wrong."
     ],
-    "difficulties": "- Низкий уровень сотрудничества: много сопротивления к тому, что говорит медперсонал, нарушают рекомендации, избирательно относятся к рекомендациям.\n- Неактивен в отношении лечения \n- Часто испытывает чувство стыда из-за болезни и ее влияния на жизнь\n- Работа гораздо важнее здоровья, ппогружается с головой в работу (больше, чем до болезни). Слишком важно сохранить свой соц статус",
-    "extreme": "Низкие значения: -\nВысокие значения (8-10): Трудоголизм, зависимость от работы - увеличить частоту взаимодействия на 20%, давать больше эмпатии и важности сохранять активность, но делать это через здоровье"
+    "difficulties": "- Low level of cooperation: much resistance to what medical staff says, violate recommendations, are selective about recommendations.\n- Inactive regarding treatment \n- Often experiences shame due to illness and its impact on life\n- Work is much more important than health, immerses headlong in work (more than before illness). Too important to maintain social status",
+    "extreme": "Low values: -\nHigh values (8-10): Workaholism, work addiction - increase interaction frequency by 20%, give more empathy and importance of maintaining activity, but do it through health"
   },
   "low_selfesteem": {
-    "problem": "Сниженная самооценка, неудовлетворенность собой, ",
+    "problem": "Reduced self-esteem, self-dissatisfaction",
     "profile_name": "nan",
-    "solomin": "Сниженная самооценка, неудовлетворенность собой, склонность к депрессии, потребность в психотерапии, отсутствие религиозных убеждений",
+    "solomin": "Reduced self-esteem, self-dissatisfaction, tendency to depression, need for psychotherapy, absence of religious beliefs",
     "do": [
-      "используем базовый сценарий коммуникации"
+      "use basic communication scenario"
     ],
     "avoid": [
       "nan"
     ],
     "difficulties": "nan",
-    "extreme": "Низкие значения (-2-0): чрезмерная самоуверенность - увеличить частоту встреч 20%, чуть больше контроля\nВысокие значения (3-6): дефицит мотивации - увеличить частоту взаимодействия на 20%, дать больше поддержки, возможна консультаци психотреапевта"
+    "extreme": "Low values (-2-0): excessive self-confidence - increase meeting frequency by 20%, slightly more control\nHigh values (3-6): motivation deficit - increase interaction frequency by 20%, give more support, possible psychotherapist consultation"
   },
   "alt_med": {
-    "problem": "Вера в альтернативную медицину и стремление к самолечению",
-    "profile_name": "Недоверчивый",
-    "solomin": "Вера в альтернативную медицину и стремление к самолечению",
+    "problem": "Belief in alternative medicine and desire for self-treatment",
+    "profile_name": "Distrustful",
+    "solomin": "Belief in alternative medicine and desire for self-treatment",
     "do": [
-      "1. Признавать право выбирать способ лечения \"Я полагаю. у вас были важные основания для того чтобы использовать нетрадицонные методы, и вы в праве выбирать способы лечния и поддержания здоровья\"",
-      "2. Давайте дозированную информацю об опыте клиники, врача , о болезни, привенттивных мерах \"Позвольте рассказать об опыте нашего врача\"",
-      "3. Приглашайте в совсметное состалвение плана лечния \"Все ли понятно или про какую-то процедуру рассказать подробнее?\""
+      "1. Acknowledge the right to choose treatment method \"I believe you had important reasons for using non-traditional methods, and you have the right to choose ways of treatment and maintaining health\"",
+      "2. Give dosed information about clinic experience, doctor, about the disease, preventive measures \"Let me tell you about our doctor's experience\"",
+      "3. Invite to jointly create a treatment plan \"Is everything clear or should I tell you more about some procedure?\""
     ],
     "avoid": [
-      "1. Не критиковать выбор пациента, не называть это эффектом плацебо"
+      "1. Do not criticize the patient's choice, do not call it placebo effect"
     ],
-    "difficulties": "- Низкий уровень сотрудничества\n- Могут обследоваться, но назначения врача не выполнять или делать это выборочно\n- могут иметь негативный опыт лечения, который привел их в нетрадиц ионную медицину\n- могут говорить , что принимают лекарства, но на самом деле этого не делать\n- очень много информации черпают из интернета",
-    "extreme": "Низкие значения: - \nВысокие значения (6-12): недоверие к оф медицине - продолжать работу на выстаривание безопасных отношений"
+    "difficulties": "- Low level of cooperation\n- May undergo examinations but not follow doctor's prescriptions or do it selectively\n- may have negative treatment experience that led them to alternative medicine\n- may say they take medications but actually don't\n- get a lot of information from the internet",
+    "extreme": "Low values: - \nHigh values (6-12): distrust of official medicine - continue working on building safe relationships"
   },
   "addictions": {
-    "problem": "Вредные привычки, химические зависимости, аддикции",
+    "problem": "Bad habits, chemical addictions, addictions",
     "profile_name": "nan",
-    "solomin": "Вредные привычки, химические зависимости, аддикции",
+    "solomin": "Bad habits, chemical addictions, addictions",
     "do": [
-      "используем базовый сценарий коммуникации"
+      "use basic communication scenario"
     ],
     "avoid": [
       "nan"
     ],
     "difficulties": "nan",
-    "extreme": "Низкие значения: - \nВысокие значения (-2-6): зависимость - рекомендация консультации нарколога"
+    "extreme": "Low values: - \nHigh values (-2-6): addiction - recommendation for narcologist consultation"
   },
   "ignore": {
-    "problem": "Игнорирование болезни",
-    "profile_name": "Игнорирующий",
-    "solomin": "Игнорирование болезни",
+    "problem": "Ignoring illness",
+    "profile_name": "Ignoring",
+    "solomin": "Ignoring illness",
     "do": [
-      "1. тактично уточняйте хочет ли пациент больше узнать о процедуре/назначениях/симптомах. Уточняйте как все прошло? Предлагайте пациенту почитать про способы лечения и течение заболевания. Использования достоверные источники информации о болезни.",
-      "2. Признавайте важность жить полной жизнью и еще большей важности заниматься здоровьем, чтобы сохранить активность. \"Я понимаю, что для вас ценно жить полной жизнью, но это сложно, игнорируя свое здоровье. Я здесь, чтобы помочь вам пройти этот путь.\"",
-      "3. Хвалите за выполнение рекомендаций.",
-      "4. Фокусируйте внимание пациента на симптомах, а не диагнозе. \"Наблюдайте как меняется ваше самочувствие. Возможно, вам кажется, что вы стали чувствовать себя хуже, на самом деле, вы стали наблюдателеньнее к себе, и не пропускаете важное. Продолжайте следовать назначениям врача.\""
+      "1. tactfully clarify if the patient wants to learn more about the procedure/prescriptions/symptoms. Ask how everything went? Suggest the patient read about treatment methods and disease course. Use reliable sources of information about the disease.",
+      "2. Acknowledge the importance of living a full life and even greater importance of taking care of health to maintain activity. \"I understand that it's valuable for you to live a full life, but it's difficult to do this while ignoring your health. I'm here to help you go through this path.\"",
+      "3. Praise for following recommendations.",
+      "4. Focus the patient's attention on symptoms, not diagnosis. \"Observe how your well-being changes. Perhaps you think you've started feeling worse, but actually you've become more observant of yourself and don't miss important things. Continue following the doctor's prescriptions.\""
     ],
     "avoid": [
-      "1. Не давить на пациента.",
-      "2. Избегайте конфронтаций с пациентом"
+      "1. Do not pressure the patient.",
+      "2. Avoid confrontations with the patient"
     ],
-    "difficulties": "- отбрасывает мысли о болезни, отрицает заболевание. Не воспринимает серьезно риски, связанные с болезнью\n- Игнорирует рекомендации мед персонала\n- Неактивны в отношении лечения \n- С одной стороны испытывают напряжение (могут тревожиться и раздражаться) от необходимости перестроить ценности, с другой стороны стремятся быть равнодушными в отношении происходящего со здоровьемю \n- Видит симптомы как случайные колебания организма. Стремится жить обычной жизнью, не учитывая изменения в связи с болезнью.",
-    "extreme": "Низкие значения: - \nВысокие значения (4-6): беспечное отношение к здоровью - увеличить частоту взаимодействия на 20%, увеличить количество разъяснительных мероприятий"
+    "difficulties": "- dismisses thoughts about illness, denies the disease. Does not take seriously the risks associated with the disease\n- Ignores medical staff recommendations\n- Inactive regarding treatment \n- On one hand experiences tension (may worry and get irritated) from the need to restructure values, on the other hand strives to be indifferent about what's happening with health\n- Sees symptoms as random fluctuations of the body. Strives to live an ordinary life without considering changes related to illness.",
+    "extreme": "Low values: - \nHigh values (4-6): careless attitude to health - increase interaction frequency by 20%, increase number of explanatory measures"
   },
   "anxiety": {
-    "problem": "Склонность к тревожным расстройствам",
+    "problem": "Tendency to anxiety disorders",
     "profile_name": "nan",
-    "solomin": "Склонность к тревожным расстройствам",
+    "solomin": "Tendency to anxiety disorders",
     "do": [
-      "используем базовый сценарий коммуникации"
+      "use basic communication scenario"
     ],
     "avoid": [
       "nan"
     ],
     "difficulties": "nan",
-    "extreme": "\"Низкие значения: - \nВысокие значения (3-6): переоценка веротяности негативных событий - рекомендации консультации психотерапевта"
+    "extreme": "Low values: - \nHigh values (3-6): overestimation of probability of negative events - recommendation for psychotherapist consultation"
   }
 }

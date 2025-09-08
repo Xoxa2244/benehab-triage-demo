@@ -8,33 +8,33 @@ import {
   unsubscribeFromPushNotifications 
 } from '../lib/push-notifications';
 
-// Типы назначений
+// Assignment types
 const ASSIGNMENT_TYPES = [
-  { value: 'назначение', label: 'Назначение', icon: '🏥' },
-  { value: 'прием препарата', label: 'Прием препарата', icon: '💊' },
-  { value: 'использование носимого устройства', label: 'Носимое устройство', icon: '⌚' }
+  { value: 'appointment', label: 'Appointment', icon: '🏥' },
+  { value: 'medication', label: 'Medication', icon: '💊' },
+  { value: 'wearable_device', label: 'Wearable Device', icon: '⌚' }
 ];
 
-// Варианты уведомлений
+// Notification options
 const NOTIFICATION_OPTIONS = [
-  { value: 'OFF', label: 'Нет' },
-  { value: 'PT0M', label: 'В момент' },
-  { value: 'PT1M', label: 'За 1 минуту' },
-  { value: 'PT3M', label: 'За 3 минуты' }
+  { value: 'OFF', label: 'None' },
+  { value: 'PT0M', label: 'At the moment' },
+  { value: 'PT1M', label: '1 minute before' },
+  { value: 'PT3M', label: '3 minutes before' }
 ];
 
-// Пост-уведомления
+// Post-notifications
 const POST_NOTIFICATION_OPTIONS = [
-  { value: 'OFF', label: 'Выкл' },
-  { value: 'PT1M', label: 'Каждую 1 минуту после' },
-  { value: 'PT3M', label: 'Каждые 3 минуты после' }
+  { value: 'OFF', label: 'Off' },
+  { value: 'PT1M', label: 'Every 1 minute after' },
+  { value: 'PT3M', label: 'Every 3 minutes after' }
 ];
 
 export default function Assignments() {
   const [assignments, setAssignments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    type: 'прием препарата',
+    type: 'medication',
     title: '',
     description: '',
     scheduledAt: '',
@@ -60,7 +60,7 @@ export default function Assignments() {
         setAssignments(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Ошибка загрузки назначений:', error);
+      console.error('Error loading assignments:', error);
     }
   };
 
@@ -71,7 +71,7 @@ export default function Assignments() {
         setOccurrences(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Ошибка загрузки событий:', error);
+      console.error('Error loading events:', error);
     }
   };
 
@@ -85,7 +85,7 @@ export default function Assignments() {
       localStorage.setItem('benehab_assignments', JSON.stringify(newAssignments));
       setAssignments(newAssignments);
     } catch (error) {
-      console.error('Ошибка сохранения назначений:', error);
+      console.error('Error saving assignments:', error);
     }
   };
 
@@ -94,7 +94,7 @@ export default function Assignments() {
       localStorage.setItem('benehab_occurrences', JSON.stringify(newOccurrences));
       setOccurrences(newOccurrences);
     } catch (error) {
-      console.error('Ошибка сохранения событий:', error);
+      console.error('Error saving events:', error);
     }
   };
 
@@ -102,7 +102,7 @@ export default function Assignments() {
     e.preventDefault();
     
     if (!formData.title.trim() || !formData.scheduledAt) {
-      alert('Заполните обязательные поля: Название и Дата/Время');
+      alert('Please fill in required fields: Title and Date/Time');
       return;
     }
 
@@ -166,7 +166,7 @@ export default function Assignments() {
 
   const resetForm = () => {
     setFormData({
-      type: 'прием препарата',
+      type: 'medication',
       title: '',
       description: '',
       scheduledAt: '',
@@ -193,11 +193,11 @@ export default function Assignments() {
   };
 
   const deleteAssignment = (id) => {
-    if (confirm('Удалить это назначение?')) {
+    if (confirm('Delete this assignment?')) {
       const newAssignments = assignments.filter(a => a.id !== id);
       saveAssignments(newAssignments);
       
-      // Удаляем связанные occurrences
+      // Remove related occurrences
       const newOccurrences = occurrences.filter(o => o.assignmentId !== id);
       saveOccurrences(newOccurrences);
     }
@@ -224,10 +224,10 @@ export default function Assignments() {
 
   const getStatusLabel = (status) => {
     switch (status) {
-      case 'DONE': return 'Выполнено';
-      case 'NOT_DONE': return 'Не выполнено';
-      case 'PENDING': return 'Ожидает';
-      default: return 'Нет ответа';
+      case 'DONE': return 'Completed';
+      case 'NOT_DONE': return 'Not completed';
+      case 'PENDING': return 'Pending';
+      default: return 'No response';
     }
   };
 
@@ -247,7 +247,7 @@ export default function Assignments() {
         alert('❌ ' + result.error);
       }
     } catch (error) {
-      alert('❌ Ошибка: ' + error.message);
+      alert('❌ Error: ' + error.message);
     } finally {
       setPushLoading(false);
     }
@@ -267,7 +267,7 @@ export default function Assignments() {
   };
 
   const handleUnsubscribe = async () => {
-    if (confirm('Отписаться от push-уведомлений?')) {
+    if (confirm('Unsubscribe from push notifications?')) {
       try {
         const result = await unsubscribeFromPushNotifications();
         if (result.success) {
@@ -277,7 +277,7 @@ export default function Assignments() {
           alert('❌ ' + result.error);
         }
       } catch (error) {
-        alert('❌ Ошибка: ' + error.message);
+        alert('❌ Error: ' + error.message);
       }
     }
   };
@@ -285,19 +285,19 @@ export default function Assignments() {
   const checkNotifications = async () => {
     try {
       const result = await getPushNotificationStatus();
-      alert('✅ Текущий статус уведомлений:\n' +
-            `Поддержка: ${result.supported ? '✅' : '❌'}\n` +
-            `Разрешение: ${result.permission}\n` +
-            `Подписка: ${result.subscribed ? '✅' : '❌'}`);
+      alert('✅ Current notification status:\n' +
+            `Support: ${result.supported ? '✅' : '❌'}\n` +
+            `Permission: ${result.permission}\n` +
+            `Subscription: ${result.subscribed ? '✅' : '❌'}`);
     } catch (error) {
-      alert('❌ Ошибка при проверке уведомлений: ' + error.message);
+      alert('❌ Error checking notifications: ' + error.message);
     }
   };
 
   return (
     <>
       <Head>
-        <title>Назначения - Benehab</title>
+        <title>Assignments - Benehab</title>
       </Head>
       
       <div className="min-h-screen bg-gray-50">
@@ -311,14 +311,14 @@ export default function Assignments() {
                     <span className="text-white font-bold text-lg">Б</span>
                   </div>
                 </Link>
-                <h1 className="text-xl font-semibold text-gray-900">Назначения</h1>
+                <h1 className="text-xl font-semibold text-gray-900">Assignments</h1>
               </div>
               
               <Link 
                 href="/"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                ← На главную
+                ← Home
               </Link>
             </div>
           </div>
@@ -327,25 +327,25 @@ export default function Assignments() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Push-уведомления */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">🔔 Push-уведомления</h2>
+            <h2 className="text-lg font-semibold mb-4">🔔 Push Notifications</h2>
             
             {pushStatus && (
               <div className="mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center space-x-2">
                     <span className={`w-3 h-3 rounded-full ${pushStatus.supported ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span>Поддержка: {pushStatus.supported ? '✅' : '❌'}</span>
+                    <span>Support: {pushStatus.supported ? '✅' : '❌'}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className={`w-3 h-3 rounded-full ${
                       pushStatus.permission === 'granted' ? 'bg-green-500' : 
                       pushStatus.permission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
                     }`}></span>
-                    <span>Разрешение: {pushStatus.permission}</span>
+                    <span>Permission: {pushStatus.permission}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className={`w-3 h-3 rounded-full ${pushStatus.subscribed ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                    <span>Подписка: {pushStatus.subscribed ? '✅' : '❌'}</span>
+                    <span>Subscription: {pushStatus.subscribed ? '✅' : '❌'}</span>
                   </div>
                 </div>
               </div>
@@ -358,7 +358,7 @@ export default function Assignments() {
                   disabled={pushLoading || !pushStatus?.supported}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  {pushLoading ? '⏳ Настройка...' : '🔔 Включить уведомления'}
+                  {pushLoading ? '⏳ Setting up...' : '🔔 Enable Notifications'}
                 </button>
               ) : (
                 <>
@@ -366,19 +366,19 @@ export default function Assignments() {
                     onClick={handleTestNotification}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
-                    🧪 Тестовое уведомление
+                    🧪 Test Notification
                   </button>
                   <button
                     onClick={checkNotifications}
                     className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
                   >
-                    🔍 Проверить уведомления
+                    🔍 Check Notifications
                   </button>
                   <button
                     onClick={handleUnsubscribe}
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                   >
-                    🔕 Отключить уведомления
+                    🔕 Disable Notifications
                   </button>
                 </>
               )}
@@ -387,7 +387,7 @@ export default function Assignments() {
             {pushStatus?.permission === 'denied' && (
               <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-yellow-800 text-sm">
-                  ⚠️ Разрешение на уведомления отклонено. Включите их в настройках браузера.
+                  ⚠️ Notification permission denied. Enable them in browser settings.
                 </p>
               </div>
             )}
@@ -399,7 +399,7 @@ export default function Assignments() {
               onClick={() => setShowForm(true)}
               className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              ➕ Добавить назначение
+              ➕ Add Assignment
             </button>
           </div>
 
@@ -407,7 +407,7 @@ export default function Assignments() {
           {showForm && (
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
               <h2 className="text-lg font-semibold mb-4">
-                {editingId ? 'Редактировать назначение' : 'Новое назначение'}
+                {editingId ? 'Edit Assignment' : 'New Assignment'}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -415,7 +415,7 @@ export default function Assignments() {
                   {/* Тип */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Тип *
+                      Type *
                     </label>
                     <select
                       value={formData.type}
@@ -434,13 +434,13 @@ export default function Assignments() {
                   {/* Название */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Название *
+                      Title *
                     </label>
                     <input
                       type="text"
                       value={formData.title}
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      placeholder="Например: Ибупрофен 200 мг"
+                      placeholder="e.g.: Ibuprofen 200mg"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     />
@@ -450,12 +450,12 @@ export default function Assignments() {
                 {/* Описание */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Описание
+                    Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Дополнительная информация о назначении..."
+                    placeholder="Additional information about the assignment..."
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
@@ -464,7 +464,7 @@ export default function Assignments() {
                 {/* Дата/Время */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Дата и время *
+                    Date and Time *
                   </label>
                   <input
                     type="datetime-local"
@@ -479,7 +479,7 @@ export default function Assignments() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Уведомление 1
+                      Notification 1
                     </label>
                     <select
                       value={formData.notif1}
@@ -496,7 +496,7 @@ export default function Assignments() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Уведомление 2
+                      Notification 2
                     </label>
                     <select
                       value={formData.notif2}
@@ -513,7 +513,7 @@ export default function Assignments() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Пост-уведомления
+                      Post-notifications
                     </label>
                     <select
                       value={formData.postInterval}
@@ -535,7 +535,7 @@ export default function Assignments() {
                     type="submit"
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    {editingId ? 'Сохранить' : 'Добавить'}
+                    {editingId ? 'Save' : 'Add'}
                   </button>
                   
                   <button
@@ -543,7 +543,7 @@ export default function Assignments() {
                     onClick={resetForm}
                     className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                   >
-                    Отмена
+                    Cancel
                   </button>
                   
                   {!editingId && (
@@ -563,7 +563,7 @@ export default function Assignments() {
                       }}
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
-                      Добавить ещё
+                      Add Another
                     </button>
                   )}
                 </div>
@@ -574,19 +574,19 @@ export default function Assignments() {
           {/* Список назначений */}
           {assignments.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-              <h2 className="text-lg font-semibold mb-4">Ваши назначения</h2>
+              <h2 className="text-lg font-semibold mb-4">Your Assignments</h2>
               
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4">Тип</th>
-                      <th className="text-left py-3 px-4">Название</th>
-                      <th className="text-left py-3 px-4">Время</th>
-                      <th className="text-left py-3 px-4">Увед.1</th>
-                      <th className="text-left py-3 px-4">Увед.2</th>
-                      <th className="text-left py-3 px-4">Пост</th>
-                      <th className="text-left py-3 px-4">Действия</th>
+                      <th className="text-left py-3 px-4">Type</th>
+                      <th className="text-left py-3 px-4">Title</th>
+                      <th className="text-left py-3 px-4">Time</th>
+                      <th className="text-left py-3 px-4">Notif.1</th>
+                      <th className="text-left py-3 px-4">Notif.2</th>
+                      <th className="text-left py-3 px-4">Post</th>
+                      <th className="text-left py-3 px-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -644,16 +644,16 @@ export default function Assignments() {
           {/* Статистика выполнения */}
           {occurrences.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-lg font-semibold mb-4">Статистика выполнения</h2>
+              <h2 className="text-lg font-semibold mb-4">Completion Statistics</h2>
               
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4">Назначение</th>
-                      <th className="text-left py-3 px-4">Время (план)</th>
-                      <th className="text-left py-3 px-4">Статус</th>
-                      <th className="text-left py-3 px-4">Последнее уведомление</th>
+                      <th className="text-left py-3 px-4">Assignment</th>
+                      <th className="text-left py-3 px-4">Time (planned)</th>
+                      <th className="text-left py-3 px-4">Status</th>
+                      <th className="text-left py-3 px-4">Last Notification</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -667,7 +667,7 @@ export default function Assignments() {
                                 <div className="font-medium">{assignment.title}</div>
                                 <div className="text-sm text-gray-500">{assignment.type}</div>
                               </div>
-                            ) : 'Неизвестно'
+                            ) : 'Unknown'
                             }
                           </td>
                           <td className="py-3 px-4">{formatDateTime(occurrence.scheduledAt)}</td>
@@ -678,7 +678,7 @@ export default function Assignments() {
                           <td className="py-3 px-4">
                             {occurrence.lastNotifiedAt ? 
                               formatDateTime(occurrence.lastNotifiedAt) : 
-                              'Не уведомляли'
+                              'Not notified'
                             }
                           </td>
                         </tr>
@@ -696,15 +696,15 @@ export default function Assignments() {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-gray-400 text-2xl">📋</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Нет назначений</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Assignments</h3>
               <p className="text-gray-600 mb-4">
-                Создайте первое назначение, чтобы начать получать напоминания
+                Create your first assignment to start receiving reminders
               </p>
               <button
                 onClick={() => setShowForm(true)}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Создать назначение
+                Create Assignment
               </button>
             </div>
           )}

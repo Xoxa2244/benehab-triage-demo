@@ -1,146 +1,146 @@
 {
   "sensitive": {
-    "name": "Сенситивный",
-    "short_desc": "Ранимость, высокая чувствительность, склонность к соматическим жалобам и усталости.",
-    "tone": "мягкий, бережный, подтверждающий чувства",
+    "name": "Sensitive",
+    "short_desc": "Vulnerability, high sensitivity, tendency to somatic complaints and fatigue.",
+    "tone": "soft, gentle, validating feelings",
     "do": [
-      "начинать с признания ощущений и тревог",
-      "давать пошаговые, простые инструкции",
-      "предлагать поддерживающие практики (сон, вода, дыхание)"
+      "start by acknowledging sensations and anxieties",
+      "give step-by-step, simple instructions",
+      "suggest supportive practices (sleep, water, breathing)"
     ],
     "avoid": [
-      "жёстких формулировок и давления",
-      "обесценивания жалоб"
+      "harsh formulations and pressure",
+      "devaluing complaints"
     ],
-    "motivators": ["забота", "безопасность", "поддержка"],
-    "red_flags": ["накатывающая усталость", "усиление соматовегетативных жалоб"]
+    "motivators": ["care", "safety", "support"],
+    "red_flags": ["overwhelming fatigue", "increased somatovegetative complaints"]
   },
   "dysthymic": {
-    "name": "Дистимический",
-    "short_desc": "Склонность к пониженному фону настроения, самокритике, чувству вины.",
-    "tone": "поддерживающий, структурирующий",
+    "name": "Dysthymic",
+    "short_desc": "Tendency to low mood background, self-criticism, guilt feelings.",
+    "tone": "supportive, structuring",
     "do": [
-      "давать маленькие достижимые шаги",
-      "подчеркивать прогресс и усилия",
-      "предлагать регулярность и рутину"
+      "give small achievable steps",
+      "emphasize progress and efforts",
+      "suggest regularity and routine"
     ],
     "avoid": [
-      "высокие ожидания сразу",
-      "иронию и сравнения"
+      "high expectations immediately",
+      "irony and comparisons"
     ],
-    "motivators": ["стабильность", "прогнозируемость", "одобрение"],
-    "red_flags": ["усиление безнадёжности", "суицидальные мысли"]
+    "motivators": ["stability", "predictability", "approval"],
+    "red_flags": ["increased hopelessness", "suicidal thoughts"]
   },
   "demonstrative": {
-    "name": "Демонстративный",
-    "short_desc": "Потребность в признании, стремление производить впечатление.",
-    "tone": "партнёрский, признающий вклад",
+    "name": "Demonstrative",
+    "short_desc": "Need for recognition, desire to make an impression.",
+    "tone": "partnership, acknowledging contribution",
     "do": [
-      "давать пространство для 'отчитаться' об успехах",
-      "предлагать социально видимые цели ('держать план')",
-      "использовать формулировки признания"
+      "give space to 'report' on successes",
+      "suggest socially visible goals ('keep the plan')",
+      "use recognition formulations"
     ],
     "avoid": [
-      "игнор обратной связи",
-      "сведение к 'выдумке'"
+      "ignoring feedback",
+      "reducing to 'invention'"
     ],
-    "motivators": ["социальное одобрение", "роль лидера", "видимый результат"],
-    "red_flags": ["накопление невыполненных обещаний"]
+    "motivators": ["social approval", "leadership role", "visible result"],
+    "red_flags": ["accumulation of unfulfilled promises"]
   },
   "excitable": {
-    "name": "Возбудимый",
-    "short_desc": "Импульсивность, вспышки раздражения, тяга к немедленным действиям.",
-    "tone": "чёткий, без лишних деталей",
+    "name": "Excitable",
+    "short_desc": "Impulsiveness, outbursts of irritation, craving for immediate action.",
+    "tone": "clear, without unnecessary details",
     "do": [
-      "давать краткие инструкции",
-      "фиксировать ближайшие шаги с сроком",
-      "встраивать разрядку/движение"
+      "give brief instructions",
+      "fix immediate steps with deadline",
+      "build in release/movement"
     ],
     "avoid": [
-      "много текста и теории",
-      "долгие ожидания ответа"
+      "lots of text and theory",
+      "long waits for response"
     ],
-    "motivators": ["динамика", "контроль через действие"],
-    "red_flags": ["рост агрессии", "срыв на близких"]
+    "motivators": ["dynamics", "control through action"],
+    "red_flags": ["increased aggression", "breakdown on loved ones"]
   },
   "cyclothymic": {
-    "name": "Циклотимический",
-    "short_desc": "Чередование подъёмов и спадов, вариативность активности и настроения.",
-    "tone": "ровный, нормализующий перепады",
+    "name": "Cyclothymic",
+    "short_desc": "Alternation of ups and downs, variability of activity and mood.",
+    "tone": "even, normalizing fluctuations",
     "do": [
-      "план 'на хорошее' и 'на спад'",
-      "напоминания и авто‑шаги на период спада",
-      "встроить гибкость в режим"
+      "plan for 'good' and 'down' periods",
+      "reminders and auto-steps for down period",
+      "build flexibility into the routine"
     ],
     "avoid": [
-      "жёсткое расписание без вариантов",
-      "оценочные суждения"
+      "rigid schedule without options",
+      "evaluative judgments"
     ],
-    "motivators": ["гибкость", "осознанность ритмов"],
-    "red_flags": ["затяжной спад", "длительная апатия"]
+    "motivators": ["flexibility", "awareness of rhythms"],
+    "red_flags": ["prolonged downturn", "long-term apathy"]
   },
   "stuck": {
-    "name": "Застревающий",
-    "short_desc": "Упорство, длительное переживание обид, принципиальность.",
-    "tone": "уважительный, фактологичный",
+    "name": "Stuck",
+    "short_desc": "Persistence, long experience of grievances, principledness.",
+    "tone": "respectful, factual",
     "do": [
-      "признавать усилия и сопротивление",
-      "переводить в конструктивные рамки ('что под контролем')",
-      "чёткие критерии результатов"
+      "acknowledge efforts and resistance",
+      "translate into constructive frameworks ('what's under control')",
+      "clear criteria for results"
     ],
     "avoid": [
-      "обесценивание устойчивости",
-      "резкую смену планов"
+      "devaluing persistence",
+      "sudden plan changes"
     ],
-    "motivators": ["справедливость", "завершение", "консистентность"],
-    "red_flags": ["обострение конфликтов", "чрезмерная ригидность"]
+    "motivators": ["justice", "completion", "consistency"],
+    "red_flags": ["escalation of conflicts", "excessive rigidity"]
   },
   "pedantic": {
-    "name": "Педантичный",
-    "short_desc": "Осторожность, ориентация на порядок, склонность сомневаться.",
-    "tone": "структурный, по шагам",
+    "name": "Pedantic",
+    "short_desc": "Caution, orientation to order, tendency to doubt.",
+    "tone": "structural, step by step",
     "do": [
-      "чек‑листы и контрольные точки",
-      "прояснение рисков/выгод",
-      "чёткие правила и гигиена"
+      "checklists and control points",
+      "clarify risks/benefits",
+      "clear rules and hygiene"
     ],
     "avoid": [
-      "неопределённость",
-      "спешка без объяснений"
+      "uncertainty",
+      "rush without explanations"
     ],
-    "motivators": ["предсказуемость", "чистота протоколов"],
-    "red_flags": ["парализация выбором", "расширенная тревога"]
+    "motivators": ["predictability", "clean protocols"],
+    "red_flags": ["paralysis by choice", "expanded anxiety"]
   },
   "anxious": {
-    "name": "Тревожный/избегающий",
-    "short_desc": "Стремление к уединению, ограничение контактов, внутреннее напряжение.",
-    "tone": "спокойный, безопасный, без давления",
+    "name": "Anxious/Avoidant",
+    "short_desc": "Desire for solitude, limiting contacts, internal tension.",
+    "tone": "calm, safe, without pressure",
     "do": [
-      "сначала снижать тревогу (дыхание/окна толерантности)",
-      "микро‑шаги, меньше контактов одновременно",
-      "подтверждение права на паузу"
+      "first reduce anxiety (breathing/windows of tolerance)",
+      "micro-steps, fewer contacts at once",
+      "confirmation of right to pause"
     ],
     "avoid": [
-      "социальное давление",
-      "многолюдные/жёсткие форматы"
+      "social pressure",
+      "crowded/rigid formats"
     ],
-    "motivators": ["безопасность", "контроль контактов"],
-    "red_flags": ["изоляция", "панические симптомы"]
+    "motivators": ["safety", "contact control"],
+    "red_flags": ["isolation", "panic symptoms"]
   },
   "hyperthymic": {
-    "name": "Гипертимный",
-    "short_desc": "Повышенный фон настроения, активность, тяга к новизне и контактам.",
-    "tone": "энергичный, с ориентиром на цель",
+    "name": "Hyperthymic",
+    "short_desc": "Elevated mood background, activity, craving for novelty and contacts.",
+    "tone": "energetic, goal-oriented",
     "do": [
-      "целеполагание с видимой пользой",
-      "вариативные задания и трекер прогресса",
-      "опора на социальную поддержку"
+      "goal setting with visible benefit",
+      "varied tasks and progress tracker",
+      "rely on social support"
     ],
     "avoid": [
-      "монотонные задания без смысла",
-      "длинные паузы"
+      "monotonous tasks without meaning",
+      "long pauses"
     ],
-    "motivators": ["новизна", "движение", "люди"],
-    "red_flags": ["переутомление", "распыление внимания"]
+    "motivators": ["novelty", "movement", "people"],
+    "red_flags": ["overwork", "attention dispersion"]
   }
 }

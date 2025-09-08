@@ -10,13 +10,13 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Проверяем, что мы в браузере
+    // Check if we're in the browser
     if (typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
     
-    // Проверяем наличие демографических данных
+    // Check for demographic data
     const savedData = localStorage.getItem('benehab_demographics');
     if (savedData) {
       try {
@@ -28,7 +28,7 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
           }
         }
       } catch (e) {
-        console.error('Ошибка загрузки демографических данных:', e);
+        console.error('Error loading demographic data:', e);
       }
     }
     setIsLoading(false);
@@ -55,13 +55,13 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Загружаем...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // Если демографические данные не заполнены, показываем предупреждение
+  // If demographic data is not filled, show warning
   if (!demographics) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -71,12 +71,12 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
           </div>
           
           <h2 className="text-xl font-semibold text-gray-900 mb-3">
-            Сначала расскажите о себе
+            Tell us about yourself first
           </h2>
           
           <p className="text-gray-600 mb-6">
-            Для начала работы с системой необходимо заполнить базовую информацию о себе. 
-            Это поможет Татьяне, вашему персональному агенту, лучше понять вас и адаптировать стиль общения.
+            To start working with the system, you need to fill in basic information about yourself. 
+            This will help Tatiana, your personal agent, better understand you and adapt her communication style.
           </p>
           
           <button
@@ -84,11 +84,11 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center"
           >
             <UserIcon className="h-5 w-5 mr-2" />
-            Заполнить данные
+            Fill in Data
           </button>
         </div>
 
-        {/* Форма демографических данных */}
+        {/* Demographic data form */}
         <DemographicsForm
           isOpen={showForm}
           onClose={closeForm}
@@ -98,12 +98,12 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
     );
   }
 
-  // Если данные заполнены, показываем основной контент
+  // If data is filled, show main content
   return (
     <>
       {children}
       
-      {/* Форма для редактирования (если понадобится) */}
+      {/* Form for editing (if needed) */}
       <DemographicsForm
         isOpen={showForm}
         onClose={closeForm}

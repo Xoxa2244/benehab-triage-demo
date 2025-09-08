@@ -1,156 +1,156 @@
 {
   "sensitive": {
-    "patient_profile": "Повышенной чувствительностью, утомляемостью, озабоченностью своим состоянием, раздражительностью. Ипохондричны",
-    "communication_for_patient": "Вы хорошо чувствуете даже слабые сигналы вашего организма. Вы можете быстро уставать  и от этого становиться раздражительным.",
+    "patient_profile": "Increased sensitivity, fatigue, preoccupation with their condition, irritability. Hypochondriacal",
+    "communication_for_patient": "You feel even weak signals from your body well. You may get tired quickly and become irritable from this.",
     "do": [
-      "1. Структурированная и дозированная информация. С регулярной сверкой с пациентом готов ли он продолжать или уже устал. \"Хотите об этом узнать больше?\"",
-      "2. Постоянная поддержка \"Я вижу, что вы устали. Давайте вместе подумаеи как вам восстановиться.\" \"я вижу что это тревожит вас, я помогу вам разобраться ...\"",
-      "3. Хвалите даже за самые маленькие достижения",
-      "4. Фокусируйте на плане лечения, наступлении эффекта \"План на эту неделю следующий. Наблюдайте за: [изменения симптомов].",
-      "5. Мотивируйте через фразы  \"выполнение плана и реокмендаций поможет избавиться от страданий/поможет увеличить количество сил\""
+      "1. Structured and dosed information. With regular check with the patient if they are ready to continue or already tired. \"Would you like to learn more about this?\"",
+      "2. Constant support \"I see that you are tired. Let's think together how you can recover.\" \"I see this worries you, I will help you figure it out...\"",
+      "3. Praise even for the smallest achievements",
+      "4. Focus on the treatment plan, onset of effect \"The plan for this week is as follows. Observe: [symptom changes].",
+      "5. Motivate through phrases \"following the plan and recommendations will help get rid of suffering/help increase the amount of strength\""
     ],
     "avoid": [
-      "Не перегружать информацией и действиями (не более 2х действий после встречи)",
-      "Избегайте резких и категоричных и критичных высказываний, которые могут усилить раздражение.",
-      "Не обесценивать симптомы и переживания пациента даже если они преувеличены.",
-      "не запугивать и не давить"
+      "Do not overload with information and actions (no more than 2 actions after the meeting)",
+      "Avoid sharp and categorical and critical statements that may increase irritation.",
+      "Do not devalue the patient's symptoms and experiences even if they are exaggerated.",
+      "do not intimidate and do not pressure"
     ],
-    "tone_hint": "спокойный, медленный, поддерживающий"
+    "tone_hint": "calm, slow, supportive"
   },
   "dysthymic": {
-    "patient_profile": "Подавленным настроением, сниженным уровнем побуждений, ограничением интересов, пессимистической оценкой перспектив, повышенной требовательностью к себе, недооценкой своей значимости",
-    "communication_for_patient": "Вы достаточно ответсвенны и можете предъявлять к себе повышенные требования. И это может негативно сказываться на вашем настроении.",
+    "patient_profile": "Depressed mood, reduced level of motivation, limited interests, pessimistic assessment of prospects, increased demands on themselves, underestimation of their significance",
+    "communication_for_patient": "You are quite responsible and may have increased demands on yourself. And this can negatively affect your mood.",
     "do": [
-      "1. Информация должна быть очень простой и дозированной.",
-      "2. Показать заинтересованность в том чтобы понять, что происходит с человеком.\"вы говорите, что вам сложно уснуть, расскажите что вас беспокоит.\"  \"Расскажите, когда это началось\" , \"как вы это переживаете?\"",
-      "3. Отмечать и позитивно подкреплять любые даже самые маленькие сдвиги у пациента. \"Очень здорово, что вы регулярно посещаете наши встречи, это помогает отслеживать динамику ваших показателей и лучше подбирать лечение \"",
-      "4. Фокусировка на маленких шагах, которые делает пациент",
-      "5. Мотивировать через подсвечивание рисков неполучения лечения и преимущсетва от следования рекомендациям врача. \"Эта процедура очень важна для вас, потому что..\""
+      "1. Information should be very simple and dosed.",
+      "2. Show interest in understanding what is happening with the person. \"you say it's hard for you to fall asleep, tell me what's bothering you.\" \"Tell me when this started\", \"how do you experience this?\"",
+      "3. Note and positively reinforce any even the smallest shifts in the patient. \"It's great that you regularly attend our meetings, this helps track the dynamics of your indicators and better select treatment\"",
+      "4. Focus on small steps that the patient takes",
+      "5. Motivate through highlighting risks of not receiving treatment and benefits from following doctor's recommendations. \"This procedure is very important for you because...\""
     ],
     "avoid": [
-      "Не пытаться доказать пациенту, что он не прав.",
-      "избегать излишнего подбадривания"
+      "Do not try to prove to the patient that they are wrong.",
+      "avoid excessive encouragement"
     ],
-    "tone_hint": "спокойный, мягкий, поддерживающий"
+    "tone_hint": "calm, soft, supportive"
   },
   "demonstrative": {
-    "patient_profile": "Артистичны, харизматичны, характеризуются быстрой сменой настроения, эмоциональны",
-    "communication_for_patient": "Вы яркая и харизматичная личность, при этом вы можете быть достаточно чувствительны.  Вы можете быть склонны к быстрой смене настроения",
+    "patient_profile": "Artistic, charismatic, characterized by rapid mood changes, emotional",
+    "communication_for_patient": "You are a bright and charismatic personality, while you can be quite sensitive. You may be prone to rapid mood changes",
     "do": [
-      "1. Дозированная информация,",
-      "2. Больше акцент на границы взаимодействия: как часто и когда можно писать медсестре, сколько длится встреча, для чего эти встречи и тд",
-      "3. Проявляйте умеренный интерес: с одной стороны давайте пациенту возможность высказаться, с другой стороны, важно такую коммуникацию компенсировать объективностью данных, результатами анализов и обследований. \"Давайте зафиксируем ваши жалобы, а потом обсудим, какие исследования необходимо провести\", \"Давайте вместе сопоставим жалобы и уже проведенные исследования и решим, что еще нужно сделать\"",
-      "4. Подчеркивайте даже не значительные успехи, хвалите, опираясь на факты и наблюдения",
-      "5. Перенапрвляйте попытки контролировать действия медперсонала в контроль своей жизни: режим дня, правильное питание, подходящая физ нагрузка. \"Я вижу, что вам непросто переносить неопределнность, я здесь чтобы вам помочь, но вы также можете себе помочь: например, следить за сном и физ нагрузкой\""
+      "1. Dosed information,",
+      "2. More emphasis on interaction boundaries: how often and when you can write to the nurse, how long the meeting lasts, what these meetings are for, etc",
+      "3. Show moderate interest: on one hand give the patient the opportunity to speak out, on the other hand, it's important to compensate such communication with objectivity of data, results of tests and examinations. \"Let's record your complaints, and then discuss what examinations need to be done\", \"Let's compare complaints and already conducted examinations and decide what else needs to be done\"",
+      "4. Emphasize even insignificant successes, praise based on facts and observations",
+      "5. Redirect attempts to control medical staff actions to control of their own life: daily routine, proper nutrition, suitable physical activity. \"I see that it's not easy for you to bear uncertainty, I'm here to help you, but you can also help yourself: for example, monitor sleep and physical activity\""
     ],
     "avoid": [
-      "избегать споров и обесценивания",
-      "игнорирование жалоб",
-      "избыточный интерес и избыточное количество комплиментов"
+      "avoid arguments and devaluation",
+      "ignoring complaints",
+      "excessive interest and excessive number of compliments"
     ],
-    "tone_hint": "спокойный, мягкий, поддерживающий"
+    "tone_hint": "calm, soft, supportive"
   },
   "excitable": {
-    "patient_profile": "Активны, гипервозбуимы, вспыльчивы, часто игнорируют общепринятые правила и нормы поведения, склонностью нарушать порядок, пренебрегать последствиями своих действий - невысокая степень ответсвенности",
-    "communication_for_patient": "Вы активны, способны быстро принимать решения, при этом эмоции могут вас захватывать, и выходть в форме раздражения на окружающих",
+    "patient_profile": "Active, hyperexcitable, quick-tempered, often ignore generally accepted rules and norms of behavior, tendency to violate order, neglect consequences of their actions - low degree of responsibility",
+    "communication_for_patient": "You are active, able to make quick decisions, while emotions can capture you and come out in the form of irritation towards others",
     "do": [
-      "1. Не перегружать информацией. Действуйте последовательно и предсказуемо. \"Хотите об этом узнать больше?\"",
-      "2. Четко формулировать мысль без воды в случае проявления раздражения и агрессии: объяснять , что происходит с человеком \"я понимаю, что вы хотели бы немедленно получить удовлетворяющий ответ, и сильно раздражаетесь, когда этого не получаете, но в лчении важна последовательность шагов и дозированность\"",
-      "3. Возвращать ответсвенность и приглашать в совместное участие в лечении \"Я хочу вам помочь улучшить самочувсвтие/приблизиться к выздоровлению, и я могу это сделать быстрее, когда мы работаем сообща\"",
-      "4. Фокусируйте на плане лечения, наступлении эффекта \"План на эту неделю следующий. Наблюдайте за: [изменения симптомов].\""
+      "1. Do not overload with information. Act consistently and predictably. \"Would you like to learn more about this?\"",
+      "2. Clearly formulate thoughts without water in case of irritation and aggression: explain what is happening with the person \"I understand that you would like to immediately get a satisfying answer, and get very irritated when you don't get it, but in treatment it's important to have consistency of steps and dosing\"",
+      "3. Return responsibility and invite to joint participation in treatment \"I want to help you improve your well-being/get closer to recovery, and I can do this faster when we work together\"",
+      "4. Focus on the treatment plan, onset of effect \"The plan for this week is as follows. Observe: [symptom changes].\""
     ],
     "avoid": [
-      "Избегайте резких и категоричных и критичных высказываний, которые могут усилить раздражение.",
-      "Не стыдить",
-      "не угрожать и не принуждать"
+      "Avoid sharp and categorical and critical statements that may increase irritation.",
+      "Do not shame",
+      "do not threaten and do not force"
     ],
-    "tone_hint": "стредний темп речи, энергичный, устойчивый"
+    "tone_hint": "medium speech pace, energetic, stable"
   },
   "cyclothymic": {
-    "patient_profile": "Смена настроения от подъема (гипертимность) до легкой депрессии \n Непоследовательны, придирчивы у окружению , подавленность ( в состоянии депрессии) , в гипертимности : завышенная самооценка , несвязанная отрывистая речь, легкомыслие , склонность к эпотажу, . То все в гору, то валится из рук. Изменяется манера общения",
-    "communication_for_patient": "Вы можете чувствовать себя то довольно бодро, то подавлено. Вам бывает сложно управлять своей жизнью из-за перемен в настроении и самочувствии",
+    "patient_profile": "Mood changes from upswing (hyperthymia) to mild depression \n Inconsistent, picky about environment, depression (in depressed state), in hyperthymia: inflated self-esteem, incoherent abrupt speech, frivolity, tendency to scandal, . Either everything goes uphill, or everything falls out of hands. Communication manner changes",
+    "communication_for_patient": "You may feel either quite cheerful or depressed. It can be difficult for you to manage your life due to changes in mood and well-being",
     "do": [
-      "в фазе подъема:",
-      "1.  Предлагайте пациенту почитать про способы лечения и течение заболевания. Использования достоверные источники информации о болезни.",
-      "2.  Признавайте важность жить полной жизнью и еще большей важности заниматься здоровьем, чтобы сохранить активность. \"Я понимаю, что для вас ценно жить полной жизнью, но это сложно, игнорируя свое здоровье. \"",
-      "3. Хвалите за выполнение рекомендаций.",
-      "4. Активно подсвечивайте риски не выполнения рекомендаций",
-      "5. Активно вовлейкайте в процесс лечения: \"Давайте вместе посмотрим, результаты исследований\"",
-      "в фазе спада:",
-      "1. Информация должна быть очень простой и дозированной.",
-      "2. Показать заинтересованность в том чтобы понять, что происходит с человеком.\"вы говорите, что вам сложно уснуть, расскажите что вас беспокоит.\"",
-      "3. Отмечать и позитивно подкреплять любые даже самые маленькие сдвиги у пациента. \"Очень здорово, что вы регулярно посещаете наши встречи, это помогает отслеживать динамику ваших показателей и лучше подбирать лечение \"",
-      "4. Фокусировка на маленких шагах, которые делает пациент",
-      "5. Постоянная поддержка вместо активной мотивации"
+      "in upswing phase:",
+      "1. Suggest the patient read about treatment methods and disease course. Use reliable sources of information about the disease.",
+      "2. Acknowledge the importance of living a full life and even greater importance of taking care of health to maintain activity. \"I understand that it's valuable for you to live a full life, but it's difficult to do this while ignoring your health.\"",
+      "3. Praise for following recommendations.",
+      "4. Actively highlight risks of not following recommendations",
+      "5. Actively involve in the treatment process: \"Let's look together at the examination results\"",
+      "in down phase:",
+      "1. Information should be very simple and dosed.",
+      "2. Show interest in understanding what is happening with the person. \"you say it's hard for you to fall asleep, tell me what's bothering you.\"",
+      "3. Note and positively reinforce any even the smallest shifts in the patient. \"It's great that you regularly attend our meetings, this helps track the dynamics of your indicators and better select treatment\"",
+      "4. Focus on small steps that the patient takes",
+      "5. Constant support instead of active motivation"
     ],
     "avoid": [
-      "В фазе подъема – слишком жесткой регламентации деятельности, в фазе спада – принуждения и критики"
+      "In upswing phase - too rigid regulation of activity, in down phase - coercion and criticism"
     ],
-    "tone_hint": "в фазе подъема: спокойный , устойчивый\nв фазе спада: мягкий, поддерживающий"
+    "tone_hint": "in upswing phase: calm, stable\nin down phase: soft, supportive"
   },
   "stuck": {
-    "patient_profile": "Продолжительно переживают негативные эмоции, имеют низкую адаптацию к изменениям. Чувствительны к успехам других и собственным неудачам. Часто застревают в чувстве зависти со знаком -. Имеют завышенные требования к себе и другим. В случае успеха также бывают захвачены чувствами - становятся заносчивыми. Упорны",
-    "communication_for_patient": "Вы способны упорно идти к своей цели. При этом вы можете довольно долго проживать обиду и неудачи",
+    "patient_profile": "Prolonged experience of negative emotions, low adaptation to changes. Sensitive to others' successes and their own failures. Often get stuck in feelings of envy with a minus sign. Have inflated demands on themselves and others. In case of success they are also captured by feelings - become arrogant. Persistent",
+    "communication_for_patient": "You are able to persistently go towards your goal. At the same time, you may experience resentment and failures for quite a long time",
     "do": [
-      "1. Принятие того, что пациент чувствует и помощь в осознании \"Вам сложно проживать {отсутсвие динамики в лечении/_____}, возможно, вы злитесь и негодуете, но я здесь с вами и готова помочь разобраться, какие шаги сдлеать дальше\"",
-      "2. Если пациент выражает недоверие \"Возможно, вам сложно доверять мне, но я здесь чтобы помочь и готова ответить на ваши вопросы\"",
-      "3. Открытый диалог с называнием чувств и принятие того, что человек чувствует c последущим приглашением в контакт (давайте я отвечу на ваши вопросы/ расскажу процедурк/ вместе решим, что делать дальше и тд) - ключевой аспект выстраивания коммуникации с данным типом.",
-      "4. Отмечать реальными фактами без преувеличения то, что у пациента получилось хорошо."
+      "1. Acceptance of what the patient feels and help in awareness \"It's difficult for you to experience {lack of dynamics in treatment/_____}, perhaps you are angry and indignant, but I am here with you and ready to help figure out what steps to take next\"",
+      "2. If the patient expresses distrust \"Perhaps it's difficult for you to trust me, but I am here to help and ready to answer your questions\"",
+      "3. Open dialogue with naming feelings and acceptance of what the person feels with subsequent invitation to contact (let me answer your questions/ tell you the procedure/ together decide what to do next, etc) - key aspect of building communication with this type.",
+      "4. Note with real facts without exaggeration what the patient did well."
     ],
     "avoid": [
-      "Избегайте резких и категоричных и критичных высказываний,",
-      "Не стыдить",
-      "Не давать советов"
+      "Avoid sharp and categorical and critical statements,",
+      "Do not shame",
+      "Do not give advice"
     ],
-    "tone_hint": "энергичный, устойчивый, настойчивый"
+    "tone_hint": "energetic, stable, persistent"
   },
   "pedantic": {
-    "patient_profile": "Неуверенностью в своих возможностях, сложности в принятии решения, стремлением \"подстелить везде соломку\". Похожи на застревающий тип, но вместо негативных чувств уходят в скурпулезное выполнение разных дел. Живут довольно в высокм напряжении и склонны к выгоранию. Гиперответственны и надежны",
-    "communication_for_patient": "Вы умеете быть человеком, на которого можно положиться, При этом Вам может быть сложно и напряженно в ситуациях неопределнности, что может вызывать затруднения в принятии решений.",
+    "patient_profile": "Uncertainty in their capabilities, difficulties in making decisions, desire to \"spread straw everywhere\". Similar to stuck type, but instead of negative feelings they go into scrupulous performance of various tasks. Live in quite high tension and prone to burnout. Hyperresponsible and reliable",
+    "communication_for_patient": "You know how to be a person you can rely on, At the same time, it may be difficult and tense for you in situations of uncertainty, which can cause difficulties in making decisions.",
     "do": [
-      "1. Информация должна быть полной и достоверной, с научной базой",
-      "2. Последовательность и предсказуемость действий со стороны медперсонала. Регулряная проверка безопаности \"Понятно ли вам то, что я говорю\", \"комфортно ли вам сейчас на встрече?\" \"Что я могу сделать для того чтобы было комфортнее?\"",
-      "3. Замечать его основательное отношение . Я вижу как вы внимательны к вашем уздоровью и выполнению реокмендаций. Это здорово!\"",
-      "3. Уважать склонность к порядку. Терпение в случае придирок и принятие к сведению обратной связи пациента."
+      "1. Information should be complete and reliable, with scientific basis",
+      "2. Consistency and predictability of actions from medical staff. Regular safety check \"Is what I'm saying clear to you\", \"are you comfortable at the meeting now?\" \"What can I do to make it more comfortable?\"",
+      "3. Notice their thorough attitude. I see how attentive you are to your health and following recommendations. That's great!\"",
+      "3. Respect the tendency to order. Patience in case of nitpicking and taking patient feedback into account."
     ],
     "avoid": [
-      "Избегайте непровереннной информации",
-      "Не запугивайте",
-      "Избегайте нарушение порядка"
+      "Avoid unverified information",
+      "Do not intimidate",
+      "Avoid violating order"
     ],
-    "tone_hint": "спокойный, медленный, поддерживающий"
+    "tone_hint": "calm, slow, supportive"
   },
   "withdrawn": {
-    "patient_profile": "Затруднениями в понимании окружающих и выражении своих чувств, интроверты, иногда выглядят как чудаки, очень много фантазируют внутри себя, обладают высоким интеллектом",
-    "communication_for_patient": "Вы склонны к уединению. Вам может быть сложно понимать чувства других, а также затруднительно выражать свои",
+    "patient_profile": "Difficulties in understanding others and expressing their feelings, introverts, sometimes look like eccentrics, fantasize a lot inside themselves, have high intelligence",
+    "communication_for_patient": "You tend to solitude. It may be difficult for you to understand others' feelings, and also difficult to express your own",
     "do": [
-      "1. Возможно лучший канал коммуникации для таких пациентов - это переписка",
-      "2. Весь спектр активного слушания - повторение, резюмирование, задавание открытых вопросох, кивок и тд",
-      "3. Говорить коротко и ясно.",
-      "4. Оперировать фактами и достоверно информацией в коммуникации",
-      "5. Активность коммуникации наращивать постпенно, так как такие пациенты довольно долго выстраивают безопасность"
+      "1. Perhaps the best communication channel for such patients is correspondence",
+      "2. Full spectrum of active listening - repetition, summarizing, asking open questions, nodding, etc",
+      "3. Speak briefly and clearly.",
+      "4. Operate with facts and reliable information in communication",
+      "5. Gradually build up communication activity, as such patients take quite a long time to build safety"
     ],
     "avoid": [
-      "избегать напористости, критики, сильного подбадривания, активного сближения"
+      "avoid assertiveness, criticism, strong encouragement, active rapprochement"
     ],
-    "tone_hint": "спокойный, устойчивый"
+    "tone_hint": "calm, stable"
   },
   "hyperthymic": {
-    "patient_profile": "Приподнятым настроением, оптимизмом, разнообразием интересов, большим количеством планов, переоценкой своих возможностей, повышенной отвлекаемостью, широкими и поверхностными контактами. Низкий самоконтроль",
-    "communication_for_patient": "У вас часто хорошее настроение и вы на строены на активную работу, но вы можете переоценивать свои возможности",
+    "patient_profile": "Elevated mood, optimism, variety of interests, many plans, overestimation of their capabilities, increased distractibility, wide and superficial contacts. Low self-control",
+    "communication_for_patient": "You often have a good mood and are tuned to active work, but you may overestimate your capabilities",
     "do": [
-      "1. помогайте такому пациенту держать фокус на том что важно обсудить на данной встрече \"я замечаю, что вам есть чем поделиться. Это здорово, что вы так активны в отношении своего здоровья. Сегодня нам важно обсудить ____. Что вы здесь наблюдаете у себя?\" \"как , то что вы говорите, относится к вашим симптомах/жалобам\" \"Давайте обсудим план сегодняшней встречи\"",
-      "2. Резюмируйте то, что говорит пациент",
-      "3. Подчеркивайте сильные стороны пациента. Хвалите за успехи",
-      "4. Концентрируйтесь на позитивных аспектах лечения и выздоровления",
-      "5. Основные принципы: открытый диалог при этом структурированный",
-      "поддержка позитивного настроя",
-      "заземление через обозначение чувств \"Похоже вы злитесь/ исптываете азарт\"",
-      "6. Поощрение ответственности и приглашение к участию в процессе лечения"
+      "1. help such a patient keep focus on what is important to discuss at this meeting \"I notice that you have something to share. It's great that you are so active about your health. Today it's important for us to discuss ____. What do you observe here in yourself?\" \"how does what you say relate to your symptoms/complaints\" \"Let's discuss the plan for today's meeting\"",
+      "2. Summarize what the patient says",
+      "3. Emphasize the patient's strengths. Praise for successes",
+      "4. Concentrate on positive aspects of treatment and recovery",
+      "5. Main principles: open dialogue while structured",
+      "support positive mood",
+      "grounding through naming feelings \"It seems you are angry/ experiencing excitement\"",
+      "6. Encourage responsibility and invite to participate in the treatment process"
     ],
     "avoid": [
-      "не принуждать, не давить, не требовать"
+      "do not force, do not pressure, do not demand"
     ],
-    "tone_hint": "спокойный, устойчивый"
+    "tone_hint": "calm, stable"
   }
 }

@@ -1,42 +1,42 @@
 id,text,scale,reverse
-1,У меня тяжёлое заболевание,severity,false
-2,Часто чувствую слабость,severity,false
-3,Болезнь помогает избегать обязанностей,secondary_gain,false
-4,Стараюсь не показывать, что я болею,hide_resist,false
-5,Я должен упорно трудиться,work_escape,false
-6,Моё будущее кажется печальным,low_selfesteem,false
-7,Я верю в Бога,low_selfesteem,true
-8,Верю в эффективность гомеопатии/остеопатии,alt_med,false
-9,Я воздерживаюсь от алкоголя,addictions,true
-10,Я не курю,addictions,true
-11,Надеюсь, что организм сам справится,ignore,false
-12,Почти всегда тревожусь,anxiety,false
-13,Болезнь ограничивает мою жизнь,severity,false
-14,Мне легче получить поддержку, когда я болею,secondary_gain,false
-15,Скрываю симптомы от близких,hide_resist,false
-16,Работа помогает мне забыть о болезни,work_escape,false
-17,Я часто виню себя в болезни,low_selfesteem,false
-18,Молитва помогает мне справиться,low_selfesteem,true
-19,Предпочитаю народные средства,alt_med,false
-20,Я полностью отказался от вредных привычек,addictions,true
-21,Не хожу к врачам, пока не станет совсем плохо,ignore,false
-22,Постоянно беспокоюсь о своём здоровье,anxiety,false
-23,Болезнь делает меня беспомощным,severity,false
-24,Благодаря болезни я могу отдыхать,secondary_gain,false
-25,Не рассказываю о диагнозе знакомым,hide_resist,false
-26,Спорт отвлекает меня от проблем со здоровьем,work_escape,false
-27,Я не заслуживаю выздоровления,low_selfesteem,false
-28,Вера даёт мне силы,low_selfesteem,true
-29,Доверяю только натуральным препаратам,alt_med,false
-30,Я веду здоровый образ жизни,addictions,true
-31,Лечение не нужно, всё пройдёт само,ignore,false
-32,Часто просыпаюсь от кошмаров о болезни,anxiety,false
-33,Болезнь разрушает мои планы,severity,false
-34,Близкие больше внимания уделяют мне,secondary_gain,false
-35,Стыжусь своей болезни,hide_resist,false
-36,Карьера важнее здоровья,work_escape,false
-37,Я сам виноват в своих проблемах,low_selfesteem,false
-38,Духовность помогает мне выздороветь,low_selfesteem,true
-39,Официальная медицина неэффективна,alt_med,false
-40,Я контролирую все свои привычки,addictions,true
-41,Не стоит тратить время на лечение,ignore,false
+1,I have a serious illness,severity,false
+2,I often feel weak,severity,false
+3,Illness helps me avoid responsibilities,secondary_gain,false
+4,I try not to show that I'm sick,hide_resist,false
+5,I must work hard,work_escape,false
+6,My future seems bleak,low_selfesteem,false
+7,I believe in God,low_selfesteem,true
+8,I believe in the effectiveness of homeopathy/osteopathy,alt_med,false
+9,I abstain from alcohol,addictions,true
+10,I don't smoke,addictions,true
+11,I hope the body will cope on its own,ignore,false
+12,I'm almost always anxious,anxiety,false
+13,Illness limits my life,severity,false
+14,It's easier for me to get support when I'm sick,secondary_gain,false
+15,I hide symptoms from loved ones,hide_resist,false
+16,Work helps me forget about illness,work_escape,false
+17,I often blame myself for the illness,low_selfesteem,false
+18,Prayer helps me cope,low_selfesteem,true
+19,I prefer folk remedies,alt_med,false
+20,I have completely given up bad habits,addictions,true
+21,I don't go to doctors until it gets really bad,ignore,false
+22,I constantly worry about my health,anxiety,false
+23,Illness makes me helpless,severity,false
+24,Thanks to illness I can rest,secondary_gain,false
+25,I don't tell acquaintances about my diagnosis,hide_resist,false
+26,Sports distract me from health problems,work_escape,false
+27,I don't deserve to recover,low_selfesteem,false
+28,Faith gives me strength,low_selfesteem,true
+29,I trust only natural remedies,alt_med,false
+30,I lead a healthy lifestyle,addictions,true
+31,Treatment is not needed, everything will pass on its own,ignore,false
+32,I often wake up from nightmares about illness,anxiety,false
+33,Illness destroys my plans,severity,false
+34,Loved ones pay more attention to me,secondary_gain,false
+35,I'm ashamed of my illness,hide_resist,false
+36,Career is more important than health,work_escape,false
+37,I'm to blame for my own problems,low_selfesteem,false
+38,Spirituality helps me recover,low_selfesteem,true
+39,Official medicine is ineffective,alt_med,false
+40,I control all my habits,addictions,true
+41,It's not worth spending time on treatment,ignore,false

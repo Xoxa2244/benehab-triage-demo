@@ -16,58 +16,58 @@ export default function Home() {
   const [activeAssignments, setActiveAssignments] = useState([]);
 
   useEffect(() => {
-    // Проверяем, что мы в браузере
+    // Check if we're in the browser
     if (typeof window === 'undefined') return;
     
-    // Загружаем демографические данные при загрузке страницы
+    // Load demographic data on page load
     const savedData = localStorage.getItem('benehab_demographics');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         setDemographics(parsed);
       } catch (e) {
-        console.error('Ошибка загрузки демографических данных:', e);
+        console.error('Error loading demographic data:', e);
       }
     }
 
-    // Проверяем завершенные опросы
+    // Check completed surveys
     setCompletedSurveys({
       attitude: !!localStorage.getItem('benehab_attitude_profile'),
       typology: !!localStorage.getItem('benehab_typology_profile'),
       values: !!localStorage.getItem('benehab_values_profile')
     });
 
-    // Загружаем активные назначения
+    // Load active assignments
     loadActiveAssignments();
 
-    // Добавляем приветственное сообщение от Татьяны
+    // Add welcome message from Tatiana
     const welcomeMessage = {
       id: Date.now(),
       type: 'tatiana',
-      text: `Привет! Я Татьяна, ваш персональный агент по здоровью. 👋
+      text: `Hello! I'm Tatiana, your personal health assistant. 👋
 
-Я здесь, чтобы помочь вам с:
-• Записью к врачу
-• Информацией о препаратах  
-• Анализом симптомов
-• Общими вопросами о здоровье
-• Просто пообщаться и поддержать
+I'm here to help you with:
+• Doctor appointments
+• Medication information  
+• Symptom analysis
+• General health questions
+• Just to chat and provide support
 
-Выберите типовой вопрос выше или напишите свой в чате!`,
+Choose a quick question above or write your own in the chat!`,
       timestamp: new Date()
     };
 
     setChatMessages([welcomeMessage]);
   }, []);
 
-  // Загрузка активных назначений
+  // Load active assignments
   const loadActiveAssignments = () => {
     try {
       const assignments = localStorage.getItem('benehab_assignments');
       if (assignments) {
         const parsed = JSON.parse(assignments);
         const active = parsed.filter(assignment => {
-          // Проверяем, есть ли активные вхождения
+          // Check if there are active occurrences
           const occurrences = localStorage.getItem('benehab_occurrences');
           if (occurrences) {
             const parsedOccurrences = JSON.parse(occurrences);
@@ -81,28 +81,28 @@ export default function Home() {
         setActiveAssignments(active);
       }
     } catch (error) {
-      console.error('Ошибка загрузки назначений:', error);
+      console.error('Error loading assignments:', error);
     }
   };
 
-  // Проверка и предложение помощи с назначениями
+  // Check and offer help with assignments
   useEffect(() => {
     if (activeAssignments.length > 0 && chatMessages.length === 1) {
-      // Добавляем предложение помощи с назначениями
+      // Add assignment help suggestion
       const assignmentHelpMessage = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: `Я вижу, что у вас есть активные назначения! 📋
+        text: `I see you have active assignments! 📋
 
-У вас ${activeAssignments.length} назначение(й), которые требуют внимания. Хотите, чтобы я помогла вам с ними?
+You have ${activeAssignments.length} assignment(s) that need attention. Would you like me to help you with them?
 
-Вы можете:
-• Посмотреть детали назначений
-• Получить напоминания
-• Обсудить сложности с выполнением
-• Запланировать новые встречи
+You can:
+• View assignment details
+• Get reminders
+• Discuss difficulties with completion
+• Schedule new appointments
 
-Просто скажите "помоги с назначениями" или выберите соответствующий вопрос выше!`,
+Just say "help with assignments" or choose the corresponding question above!`,
         timestamp: new Date()
       };
 
@@ -110,27 +110,27 @@ export default function Home() {
     }
   }, [activeAssignments, chatMessages.length]);
 
-  // Слушатель сообщений от Service Worker
+  // Service Worker message listener
   useEffect(() => {
     const handleServiceWorkerMessage = (event) => {
       if (event.data && event.data.type === 'OCCURRENCE_ACTION') {
-        // Обновляем назначения после действия пользователя
+        // Update assignments after user action
         loadActiveAssignments();
         
-        // Добавляем сообщение от Татьяны
+        // Add message from Tatiana
         let responseText = '';
         switch (event.data.action) {
           case 'done':
-            responseText = 'Отлично! Я рада, что вы выполнили назначение. 🎉 Хотите обсудить что-то еще или нужна помощь с другими назначениями?';
+            responseText = 'Great! I\'m glad you completed the assignment. 🎉 Would you like to discuss something else or need help with other assignments?';
             break;
           case 'not_done':
-            responseText = 'Понимаю, что не получилось выполнить назначение. Давайте разберемся, что помешало и как можно адаптировать план. 🤔';
+            responseText = 'I understand that you couldn\'t complete the assignment. Let\'s figure out what prevented it and how we can adapt the plan. 🤔';
             break;
           case 'mute_current':
-            responseText = 'Хорошо, я отключила текущие напоминания для этого назначения. Но помните, что важно не забывать о здоровье! 💪';
+            responseText = 'Okay, I\'ve disabled current reminders for this assignment. But remember, it\'s important not to forget about your health! 💪';
             break;
           default:
-            responseText = 'Спасибо за обратную связь! Есть ли что-то еще, с чем я могу помочь?';
+            responseText = 'Thank you for the feedback! Is there anything else I can help you with?';
         }
         
         const responseMessage = {
@@ -144,10 +144,10 @@ export default function Home() {
       }
     };
 
-    // Добавляем слушатель
+    // Add listener
     navigator.serviceWorker?.addEventListener('message', handleServiceWorkerMessage);
     
-    // Очистка
+    // Cleanup
     return () => {
       navigator.serviceWorker?.removeEventListener('message', handleServiceWorkerMessage);
     };
@@ -162,28 +162,28 @@ export default function Home() {
     
     switch (questionType) {
       case 'doctor':
-        question = 'Хочу записаться к врачу';
+        question = 'I want to book a doctor appointment';
         break;
       case 'medicine':
-        question = 'Хочу узнать про препарат';
+        question = 'I want to know about medication';
         break;
       case 'symptoms':
-        question = 'У меня есть симптомы';
+        question = 'I have symptoms';
         break;
       case 'general':
-        question = 'Просто хочу поговорить';
+        question = 'Just want to chat';
         break;
       case 'assignments':
-        question = 'Помоги с назначениями';
+        question = 'Help with assignments';
         break;
       case 'reminders':
-        question = 'Настрой напоминания';
+        question = 'Set up reminders';
         break;
       default:
         return;
     }
 
-    // Добавляем вопрос пользователя
+    // Add user question
     const userMessage = {
       id: Date.now(),
       type: 'user',
@@ -195,16 +195,16 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      // Загружаем профиль пользователя для персонализации
+      // Load user profile for personalization
       const attitudeProfile = localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null;
       const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
       const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
-      // Загружаем активные назначения для контекста
+      // Load active assignments for context
       const assignments = localStorage.getItem('benehab_assignments') ? JSON.parse(localStorage.getItem('benehab_assignments')) : [];
       const occurrences = localStorage.getItem('benehab_occurrences') ? JSON.parse(localStorage.getItem('benehab_occurrences')) : [];
 
-      // Отладочная информация
+      // Debug information
       console.log('🚨 === QUICK QUESTION PROFILE DEBUG === 🚨');
       console.log('Attitude profile:', attitudeProfile);
       console.log('Accentuation profile:', accentuationProfile);
@@ -212,17 +212,17 @@ export default function Home() {
       console.log('Active assignments:', activeAssignments);
       console.log('🚨 === END QUICK QUESTION DEBUG === 🚨');
       
-      // Дополнительная проверка - показываем в UI
+      // Additional check - show in UI
       if (attitudeProfile || accentuationProfile || valuesProfile) {
-        console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
+        console.log('✅ PROFILE FOUND! Tatiana will personalize responses');
       } else {
-        console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
+        console.log('❌ PROFILE NOT FOUND! Tatiana will give general responses');
       }
 
-      // Получаем базовый промпт из localStorage
+      // Get base prompt from localStorage
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
-      // Отправляем запрос к OpenAI API с профилем и контекстом назначений
+      // Send request to OpenAI API with profile and assignment context
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -254,7 +254,7 @@ export default function Home() {
       const tatianaResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: data.response || 'Извините, произошла ошибка. Попробуйте еще раз.',
+        text: data.response || 'Sorry, an error occurred. Please try again.',
         timestamp: new Date()
       };
 
@@ -262,11 +262,11 @@ export default function Home() {
     } catch (error) {
       console.error('Error sending quick question:', error);
       
-      // Fallback ответ в случае ошибки
+      // Fallback response in case of error
       const fallbackResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: 'Извините, у меня временные проблемы с подключением. Попробуйте еще раз через минуту.',
+        text: 'Sorry, I\'m having temporary connection issues. Please try again in a minute.',
         timestamp: new Date()
       };
 
@@ -292,16 +292,16 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      // Загружаем профиль пользователя для персонализации
+      // Load user profile for personalization
       const attitudeProfile = localStorage.getItem('benehab_attitude_profile') ? JSON.parse(localStorage.getItem('benehab_attitude_profile')) : null;
       const accentuationProfile = localStorage.getItem('benehab_typology_profile') ? JSON.parse(localStorage.getItem('benehab_typology_profile')) : null;
       const valuesProfile = localStorage.getItem('benehab_values_profile') ? JSON.parse(localStorage.getItem('benehab_values_profile')) : null;
 
-      // Загружаем активные назначения для контекста
+      // Load active assignments for context
       const assignments = localStorage.getItem('benehab_assignments') ? JSON.parse(localStorage.getItem('benehab_assignments')) : [];
       const occurrences = localStorage.getItem('benehab_occurrences') ? JSON.parse(localStorage.getItem('benehab_occurrences')) : [];
 
-      // Отладочная информация
+      // Debug information
       console.log('🚨 === SEND MESSAGE PROFILE DEBUG === 🚨');
       console.log('Attitude profile:', attitudeProfile);
       console.log('Accentuation profile:', accentuationProfile);
@@ -309,17 +309,17 @@ export default function Home() {
       console.log('Active assignments:', activeAssignments);
       console.log('🚨 === END SEND MESSAGE DEBUG === 🚨');
       
-      // Дополнительная проверка - показываем в UI
+      // Additional check - show in UI
       if (attitudeProfile || accentuationProfile || valuesProfile) {
-        console.log('✅ ПРОФИЛЬ НАЙДЕН! Татьяна будет персонализировать ответы');
+        console.log('✅ PROFILE FOUND! Tatiana will personalize responses');
       } else {
-        console.log('❌ ПРОФИЛЬ НЕ НАЙДЕН! Татьяна будет давать общие ответы');
+        console.log('❌ PROFILE NOT FOUND! Tatiana will give general responses');
       }
 
-      // Получаем базовый промпт из localStorage
+      // Get base prompt from localStorage
       const basePrompt = localStorage.getItem('benehab_base_prompt') || '';
       
-      // Отправляем запрос к OpenAI API с профилем и контекстом назначений
+      // Send request to OpenAI API with profile and assignment context
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -351,7 +351,7 @@ export default function Home() {
       const tatianaResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: data.response || 'Извините, произошла ошибка. Попробуйте еще раз.',
+        text: data.response || 'Sorry, an error occurred. Please try again.',
         timestamp: new Date()
       };
 
@@ -359,11 +359,11 @@ export default function Home() {
     } catch (error) {
       console.error('Error sending message:', error);
       
-      // Fallback ответ в случае ошибки
+      // Fallback response in case of error
       const fallbackResponse = {
         id: Date.now() + 1,
         type: 'tatiana',
-        text: 'Извините, у меня временные проблемы с подключением. Попробуйте еще раз через минуту.',
+        text: 'Sorry, I\'m having temporary connection issues. Please try again in a minute.',
         timestamp: new Date()
       };
 
@@ -376,24 +376,24 @@ export default function Home() {
   return (
     <DemographicsCheck onDemographicsComplete={handleDemographicsComplete}>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-white font-bold text-lg">Б</span>
+                  <span className="text-white font-bold text-lg">B</span>
                 </div>
-                <h1 className="text-xl font-semibold text-gray-900">Benehab - Персональный помощник</h1>
+                <h1 className="text-xl font-semibold text-gray-900">Benehab - Personal Assistant</h1>
               </div>
               
-              {/* Информация о пользователе */}
+              {/* User information */}
               {demographics && (
                 <div className="flex items-center space-x-3">
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-900">{demographics.name}</p>
                     <p className="text-xs text-gray-500">
-                      {demographics.age} лет, {demographics.gender === 'male' ? 'М' : 'Ж'}
+                      {demographics.age} years old, {demographics.gender === 'male' ? 'M' : 'F'}
                     </p>
                   </div>
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -408,7 +408,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Приветствие */}
+          {/* Welcome */}
           {demographics && (
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
               <div className="flex items-center space-x-4">
@@ -419,22 +419,22 @@ export default function Home() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    Добро пожаловать, {demographics.name}! 👋
+                    Welcome, {demographics.name}! 👋
                   </h2>
                   <p className="text-gray-600">
-                    Я Татьяна, ваш персональный агент. Давайте вместе пройдем профилирование, 
-                    чтобы я могла лучше понять вас и адаптировать стиль общения под ваши индивидуальные особенности.
+                    I'm Tatiana, your personal agent. Let's go through profiling together 
+                    so I can better understand you and adapt my communication style to your individual characteristics.
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Профилирование */}
+          {/* Profiling */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Профилирование</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Profiling</h2>
             <p className="text-gray-600 mb-4">
-              Пройдите опросы, чтобы Татьяна могла лучше понять вас и адаптировать стиль общения
+              Complete surveys so Tatiana can better understand you and adapt her communication style
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <button
@@ -444,8 +444,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
                   <span className="text-blue-600 text-xl">🏥</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Отношение к болезни</h3>
-                <p className="text-sm text-gray-600">Первый опрос</p>
+                <h3 className="font-medium text-gray-900 mb-1">Attitude to Illness</h3>
+                <p className="text-sm text-gray-600">First survey</p>
               </button>
 
               <button
@@ -455,8 +455,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
                   <span className="text-green-600 text-xl">🧠</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Психотип</h3>
-                <p className="text-sm text-gray-600">Второй опрос</p>
+                <h3 className="font-medium text-gray-900 mb-1">Psychotype</h3>
+                <p className="text-sm text-gray-600">Second survey</p>
               </button>
 
               <button
@@ -466,8 +466,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
                   <span className="text-purple-600 text-xl">💎</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Ценности</h3>
-                <p className="text-sm text-gray-600">Третий опрос</p>
+                <h3 className="font-medium text-gray-900 mb-1">Values</h3>
+                <p className="text-sm text-gray-600">Third survey</p>
               </button>
 
               <button
@@ -477,8 +477,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
                   <span className="text-orange-600 text-xl">🔍</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Отладка</h3>
-                <p className="text-sm text-gray-600">Промптов</p>
+                <h3 className="font-medium text-gray-900 mb-1">Debug</h3>
+                <p className="text-sm text-gray-600">Prompts</p>
               </button>
 
               <button
@@ -488,28 +488,28 @@ export default function Home() {
                 <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-indigo-200 transition-colors">
                   <span className="text-indigo-600 text-xl">📋</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Назначения</h3>
-                <p className="text-sm text-gray-600">Управление</p>
+                <h3 className="font-medium text-gray-900 mb-1">Assignments</h3>
+                <p className="text-sm text-gray-600">Management</p>
               </button>
             </div>
           </div>
 
-          {/* Прогресс профилирования */}
+          {/* Profiling Progress */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Прогресс профилирования</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Profiling Progress</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <span className="text-blue-600 text-sm font-medium">1</span>
                   </div>
-                  <span className="text-gray-700">Отношение к болезни</span>
+                  <span className="text-gray-700">Attitude to Illness</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   {completedSurveys.attitude ? (
-                    <span className="text-green-600 text-sm">✓ Завершено</span>
+                    <span className="text-green-600 text-sm">✓ Completed</span>
                   ) : (
-                    <span className="text-gray-400 text-sm">Не начато</span>
+                    <span className="text-gray-400 text-sm">Not started</span>
                   )}
                 </div>
               </div>
@@ -519,13 +519,13 @@ export default function Home() {
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 text-sm font-medium">2</span>
                   </div>
-                  <span className="text-gray-700">Психотип</span>
+                  <span className="text-gray-700">Psychotype</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   {completedSurveys.typology ? (
-                    <span className="text-green-600 text-sm">✓ Завершено</span>
+                    <span className="text-green-600 text-sm">✓ Completed</span>
                   ) : (
-                    <span className="text-gray-400 text-sm">Не начато</span>
+                    <span className="text-gray-400 text-sm">Not started</span>
                   )}
                 </div>
               </div>
@@ -535,19 +535,19 @@ export default function Home() {
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
                     <span className="text-green-600 text-sm font-medium">3</span>
                   </div>
-                  <span className="text-gray-700">Ценности</span>
+                  <span className="text-gray-700">Values</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   {completedSurveys.values ? (
-                    <span className="text-green-600 text-sm">✓ Завершено</span>
+                    <span className="text-green-600 text-sm">✓ Completed</span>
                   ) : (
-                    <span className="text-gray-400 text-sm">Не начато</span>
+                    <span className="text-gray-400 text-sm">Not started</span>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Кнопка для настройки базового промпта */}
+            {/* Button for base prompt configuration */}
             {completedSurveys.attitude && 
              completedSurveys.typology && 
              completedSurveys.values && (
@@ -557,17 +557,17 @@ export default function Home() {
                   className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
                 >
                   <span className="mr-2">⚙️</span>
-                  Настроить базовый промпт
+                  Configure Base Prompt
                 </button>
               </div>
             )}
           </div>
 
-          {/* Быстрые вопросы */}
+          {/* Quick Questions */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Быстрые вопросы</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Questions</h2>
             <p className="text-gray-600 mb-4">
-              Выберите типовой вопрос или напишите свой в чате ниже
+              Choose a quick question or write your own in the chat below
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <button
@@ -577,8 +577,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
                   <span className="text-blue-600 text-xl">👨‍⚕️</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Записаться к врачу</h3>
-                <p className="text-sm text-gray-600">Помощь с записью</p>
+                <h3 className="font-medium text-gray-900 mb-1">Book Doctor Appointment</h3>
+                <p className="text-sm text-gray-600">Help with booking</p>
               </button>
 
               <button
@@ -588,8 +588,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
                   <span className="text-green-600 text-xl">💊</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Узнать про препарат</h3>
-                <p className="text-sm text-gray-600">Информация о лекарствах</p>
+                <h3 className="font-medium text-gray-900 mb-1">Learn About Medication</h3>
+                <p className="text-sm text-gray-600">Medication information</p>
               </button>
 
               <button
@@ -599,8 +599,8 @@ export default function Home() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
                   <span className="text-purple-600 text-xl">🤒</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">У меня симптомы</h3>
-                <p className="text-sm text-gray-600">Рассказать о проблеме</p>
+                <h3 className="font-medium text-gray-900 mb-1">I Have Symptoms</h3>
+                <p className="text-sm text-gray-600">Tell about the problem</p>
               </button>
 
               <button
@@ -610,25 +610,25 @@ export default function Home() {
                 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
                   <span className="text-orange-600 text-xl">💬</span>
                 </div>
-                <h3 className="font-medium text-gray-900 mb-1">Просто поговорить</h3>
-                <p className="text-sm text-gray-600">Общение и поддержка</p>
+                <h3 className="font-medium text-gray-900 mb-1">Just Chat</h3>
+                <p className="text-sm text-gray-600">Communication and support</p>
               </button>
             </div>
           </div>
 
-          {/* Чат с Татьяной */}
+          {/* Chat with Tatiana */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Общение с Татьяной</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Chat with Tatiana</h2>
             
-            {/* История сообщений */}
+            {/* Message history */}
             <div className="mb-4 max-h-96 overflow-y-auto space-y-3">
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
                     <span className="text-white text-2xl">💬</span>
                   </div>
-                  <p>Начните общение с Татьяной!</p>
-                  <p className="text-sm">Напишите сообщение ниже</p>
+                  <p>Start chatting with Tatiana!</p>
+                  <p className="text-sm">Write a message below</p>
                 </div>
               ) : (
                 chatMessages.map((msg) => (
@@ -652,7 +652,7 @@ export default function Home() {
                 ))
               )}
               
-              {/* Индикатор печатания */}
+              {/* Typing indicator */}
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
@@ -662,21 +662,21 @@ export default function Home() {
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
-                      <span className="text-sm">Татьяна печатает...</span>
+                      <span className="text-sm">Tatiana is typing...</span>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Поле ввода */}
+            {/* Input field */}
             <div className="flex space-x-2">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Напишите сообщение..."
+                placeholder="Write a message..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button
@@ -684,20 +684,20 @@ export default function Home() {
                 disabled={!inputMessage.trim()}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Отправить
+                Send
               </button>
             </div>
           </div>
 
-          {/* Админ панель */}
+          {/* Admin Panel */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Администрирование</h2>
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Administration</h2>
             <button
               onClick={() => window.location.href = '/admin'}
               className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
               <span className="mr-2">⚙️</span>
-              Админ панель
+              Admin Panel
             </button>
           </div>
         </div>
