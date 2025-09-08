@@ -282,43 +282,21 @@ export default function TypologySurvey() {
                   
                   {/* Answer options */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {[
-                      { id: 1, label: 'Strongly Agree', color: 'green' },
-                      { id: 2, label: 'Agree', color: 'blue' },
-                      { id: 3, label: 'Neutral', color: 'yellow' },
-                      { id: 4, label: 'Disagree', color: 'orange' },
-                      { id: 5, label: 'Strongly Disagree', color: 'red' }
-                    ].map((option) => {
-                      const isSelected = answers[item.id]?.includes(option.id) || false;
+                    {item.options.map((option) => {
+                      const isSelected = answers[item.id]?.includes(option.option_id) || false;
                       return (
                         <button
-                          key={option.id}
-                          onClick={() => handleAnswer(item.id, option.id)}
+                          key={option.option_id}
+                          onClick={() => handleAnswer(item.id, option.option_id)}
                           className={`
-                            px-6 py-4 rounded-2xl font-medium transition-all duration-300 transform
+                            px-6 py-4 rounded-2xl font-medium transition-all duration-300 transform text-left
                             ${isSelected
-                              ? option.color === 'green'
-                                ? 'bg-green-500 text-white shadow-lg scale-105'
-                                : option.color === 'blue'
-                                ? 'bg-blue-500 text-white shadow-lg scale-105'
-                                : option.color === 'yellow'
-                                ? 'bg-yellow-500 text-white shadow-lg scale-105'
-                                : option.color === 'orange'
-                                ? 'bg-orange-500 text-white shadow-lg scale-105'
-                                : 'bg-red-500 text-white shadow-lg scale-105'
-                              : option.color === 'green'
-                              ? 'bg-green-50 text-green-700 border-2 border-green-200 hover:bg-green-100 hover:scale-105'
-                              : option.color === 'blue'
-                              ? 'bg-blue-50 text-blue-700 border-2 border-blue-200 hover:bg-blue-100 hover:scale-105'
-                              : option.color === 'yellow'
-                              ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-200 hover:bg-yellow-100 hover:scale-105'
-                              : option.color === 'orange'
-                              ? 'bg-orange-50 text-orange-700 border-2 border-orange-200 hover:bg-orange-100 hover:scale-105'
-                              : 'bg-red-50 text-red-700 border-2 border-red-200 hover:bg-red-100 hover:scale-105'
+                              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105'
+                              : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-700 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:scale-105'
                             }
                           `}
                         >
-                          {option.label}
+                          {option.option_text}
                         </button>
                       );
                     })}
