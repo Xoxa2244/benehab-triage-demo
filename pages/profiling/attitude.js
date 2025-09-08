@@ -201,11 +201,36 @@ export default function AttitudeSurvey() {
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-8 mb-6 shadow-lg text-white">
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Health Attitude Survey</h1>
-              <p className="text-emerald-100 text-lg">
-                Discover your attitude towards health and illness
-              </p>
+            <div className="flex items-center space-x-6">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">Health Attitude Survey</h1>
+                <p className="text-emerald-100 text-lg">
+                  Discover your attitude towards health and illness
+                </p>
+              </div>
+              {/* Progress circle */}
+              <div className="relative w-20 h-20">
+                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    className="text-emerald-200"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="text-white"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    strokeDasharray={`${progress}, 100`}
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">{Math.round(progress)}%</span>
+                </div>
+              </div>
             </div>
             <Link 
               href="/" 
@@ -398,14 +423,7 @@ export default function AttitudeSurvey() {
               ) : (
                 <button
                   onClick={goToNextPage}
-                  disabled={!canGoToNextPage()}
-                  className={`
-                    px-8 py-3 rounded-xl font-medium transition-all duration-300 transform
-                    ${canGoToNextPage()
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }
-                  `}
+                  className="px-8 py-3 rounded-xl font-medium transition-all duration-300 transform bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105"
                 >
                   Next Page →
                 </button>

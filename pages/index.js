@@ -187,6 +187,11 @@ Let's start by completing your profiling surveys so I can better understand you 
     return colors[color] || 'hover:from-gray-600 hover:to-gray-700';
   };
 
+  const getProfileProgress = () => {
+    const completedCount = Object.values(completedSurveys).filter(Boolean).length;
+    return Math.round((completedCount / 3) * 100);
+  };
+
   if (!demographics) {
     return <DemographicsCheck onComplete={setDemographics} />;
   }
@@ -199,14 +204,47 @@ Let's start by completing your profiling surveys so I can better understand you 
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
               <span className="text-xl font-bold">{demographics.name?.charAt(0) || 'U'}</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div>
+                <h2 className="text-xl font-semibold">Welcome, {demographics.name || 'User'}!</h2>
+                <p className="text-emerald-100 text-sm">
+                  {demographics.age} years old • {demographics.gender}
+                </p>
+              </div>
+              {/* Profile Progress Indicator */}
+              <div className="flex items-center space-x-3">
+                <div className="relative w-12 h-12">
+                  <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      className="text-emerald-200"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      className="text-white"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray={`${getProfileProgress()}, 100`}
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">{getProfileProgress()}%</span>
+                  </div>
                 </div>
-            <div>
-              <h2 className="text-xl font-semibold">Welcome, {demographics.name || 'User'}!</h2>
-              <p className="text-emerald-100 text-sm">
-                {demographics.age} years old • {demographics.gender}
-                    </p>
-                  </div>
-                  </div>
+                <div className="text-right">
+                  <p className="text-emerald-100 text-xs font-medium">Profile Data</p>
+                  <p className="text-white text-xs">
+                    {Object.values(completedSurveys).filter(Boolean).length}/3 surveys
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
           
           {/* Burger Menu */}
           <div className="relative">
