@@ -275,49 +275,47 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
 
         {/* Survey Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {surveyData.map((survey) => (
             <Link key={survey.id} href={survey.link}>
               <div className={`
-                bg-white rounded-3xl p-6 shadow-lg border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl h-80 flex flex-col
+                rounded-3xl p-5 shadow-lg border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl h-56 flex flex-col relative overflow-hidden
                 ${survey.completed 
-                  ? 'border-green-300 bg-gradient-to-br from-green-50 to-white' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-green-300 bg-gradient-to-br from-green-50 via-green-25 to-white' 
+                  : survey.color === 'emerald'
+                  ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 via-emerald-25 to-white'
+                  : survey.color === 'blue'
+                  ? 'border-blue-200 bg-gradient-to-br from-blue-50 via-blue-25 to-white'
+                  : 'border-purple-200 bg-gradient-to-br from-purple-50 via-purple-25 to-white'
                 }
               `}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`
-                    w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg
-                    ${survey.completed 
-                      ? 'bg-gradient-to-r from-green-500 to-green-600' 
-                      : `bg-gradient-to-r ${getSurveyColor(survey.color)}`
-                    }
-                  `}>
-                    {survey.completed ? '✓' : survey.id.charAt(0).toUpperCase()}
+                {/* Completion indicator */}
+                {survey.completed && (
+                  <div className="absolute top-4 right-4 flex items-center text-green-600">
+                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm font-medium">Completed</span>
                   </div>
-                  {survey.completed && (
-                    <div className="flex items-center text-green-600">
-                      <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-sm font-medium">Completed</span>
-                </div>
-                  )}
-                </div>
+                )}
                 
                 <div className="flex-1 flex flex-col">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
                     {survey.title}
                   </h3>
-                  <p className="text-gray-600 mb-6 flex-1 leading-relaxed">
+                  <p className="text-gray-600 mb-4 flex-1 leading-relaxed text-sm">
                     {survey.description}
                   </p>
                   
                   <div className={`
-                    px-4 py-3 rounded-xl font-medium text-center transition-all duration-300 mt-auto
+                    px-4 py-2.5 rounded-xl font-medium text-center transition-all duration-300 mt-auto text-sm
                     ${survey.completed
                       ? 'bg-green-100 text-green-700'
-                      : `bg-gradient-to-r ${getSurveyColor(survey.color)} ${getSurveyHoverColor(survey.color)} text-white`
+                      : survey.color === 'emerald'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700'
+                      : survey.color === 'blue'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'
+                      : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700'
                     }
                   `}>
                     {survey.completed ? 'View Results' : 'Start Survey'}
@@ -344,7 +342,7 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
 
           {/* Chat Messages */}
-          <div className="h-96 overflow-y-auto p-6 space-y-4">
+          <div className="h-[28rem] overflow-y-auto p-6 space-y-4">
             {chatMessages.map((message) => (
               <div
                 key={message.id}
