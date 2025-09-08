@@ -60,6 +60,23 @@ Let's start by completing your profiling surveys so I can better understand you 
     setChatMessages([welcomeMessage]);
   }, []);
 
+  // Handle click outside menu to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMenuOpen && !event.target.closest('.menu-container')) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
   const loadActiveAssignments = () => {
     try {
       const assignments = JSON.parse(localStorage.getItem('benehab_assignments') || '[]');
@@ -192,6 +209,51 @@ Let's start by completing your profiling surveys so I can better understand you 
     return Math.round((completedCount / 3) * 100);
   };
 
+  const getSurveyProgress = (surveyId) => {
+    if (typeof window === 'undefined') return 0;
+    
+    try {
+      let progress = 0;
+      switch (surveyId) {
+        case 'attitude':
+          const attitudeAnswers = JSON.parse(localStorage.getItem('benehab_attitude_answers') || '[]');
+          const attitudeAnswered = attitudeAnswers.filter(a => a !== null).length;
+          progress = Math.round((attitudeAnswered / 41) * 100);
+          break;
+        case 'typology':
+          const typologyAnswers = JSON.parse(localStorage.getItem('benehab_typology_answers') || '{}');
+          const typologyAnswered = Object.keys(typologyAnswers).length;
+          // Assuming 9 questions for typology
+          progress = Math.round((typologyAnswered / 9) * 100);
+          break;
+        case 'values':
+          const valuesAnswers = JSON.parse(localStorage.getItem('benehab_values_answers') || '{}');
+          const valuesAnswered = Object.keys(valuesAnswers).length;
+          // Assuming 15 concepts for values
+          progress = Math.round((valuesAnswered / 15) * 100);
+          break;
+      }
+      return Math.min(progress, 100);
+    } catch (error) {
+      console.error('Error calculating survey progress:', error);
+      return 0;
+    }
+  };
+
+  const getProgressColor = (progress) => {
+    if (progress < 25) return 'text-red-500';
+    if (progress < 50) return 'text-orange-500';
+    if (progress < 75) return 'text-yellow-500';
+    return 'text-green-500';
+  };
+
+  const getProgressBgColor = (progress) => {
+    if (progress < 25) return 'text-red-200';
+    if (progress < 50) return 'text-orange-200';
+    if (progress < 75) return 'text-yellow-200';
+    return 'text-green-200';
+  };
+
   if (!demographics) {
     return <DemographicsCheck onComplete={setDemographics} />;
   }
@@ -247,7 +309,7 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
           
           {/* Burger Menu */}
-          <div className="relative">
+          <div className="relative menu-container">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300"
@@ -327,15 +389,44 @@ Let's start by completing your profiling surveys so I can better understand you 
                   : 'border-purple-200 bg-gradient-to-br from-purple-50 via-purple-25 to-white'
                 }
               `}>
-                {/* Completion indicator */}
-                {survey.completed && (
-                  <div className="absolute top-4 right-4 flex items-center text-green-600">
-                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm font-medium">Completed</span>
-                  </div>
-                )}
+                {/* Progress indicator */}
+                <div className="absolute top-4 right-4">
+                  {survey.completed ? (
+                    <div className="flex items-center text-green-600">
+                      <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm font-medium">Completed</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <div className="relative w-8 h-8">
+                        <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
+                          <path
+                            className={getProgressBgColor(getSurveyProgress(survey.id))}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                          <path
+                            className={getProgressColor(getSurveyProgress(survey.id))}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            fill="none"
+                            strokeDasharray={`${getSurveyProgress(survey.id)}, 100`}
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className={`font-bold text-xs ${getProgressColor(getSurveyProgress(survey.id))}`}>
+                            {getSurveyProgress(survey.id)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 <div className="flex-1 flex flex-col">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
