@@ -1,18 +1,16 @@
-
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 export default function AttitudeSurvey() {
   const router = useRouter();
-  const [currentBatch, setCurrentBatch] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [answers, setAnswers] = useState(Array(41).fill(null));
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [progress, setProgress] = useState(0);
 
-  const BATCH_SIZE = 8;
+  const itemsPerPage = 5;
 
   useEffect(() => {
     loadItems();
@@ -55,7 +53,39 @@ export default function AttitudeSurvey() {
 
   const updateProgress = () => {
     const answered = answers.filter(a => a !== null).length;
-    setProgress((answered / 41) * 100);
+    setProgress(Math.min((answered / 41) * 100, 100));
+  };
+
+  // Pagination functions
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  
+  const goToNextPage = () => {
+    if (currentPage < totalPages && canGoToNextPage()) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  const canGoToNextPage = () => {
+    if (currentPage >= totalPages) return false;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+    const pageItems = items.slice(startIndex, endIndex);
+    return pageItems.every(item => answers[item.id - 1] !== null);
+  };
+  
+  const canGoToPreviousPage = () => {
+    return currentPage > 1;
+  };
+  
+  const isLastPage = () => {
+    return currentPage === totalPages;
   };
 
   const handleAnswer = (questionIndex, value) => {
@@ -63,18 +93,6 @@ export default function AttitudeSurvey() {
     newAnswers[questionIndex] = value;
     setAnswers(newAnswers);
     saveProgress();
-  };
-
-  const nextBatch = () => {
-    if (currentBatch < Math.ceil(41 / BATCH_SIZE) - 1) {
-      setCurrentBatch(currentBatch + 1);
-    }
-  };
-
-  const prevBatch = () => {
-    if (currentBatch > 0) {
-      setCurrentBatch(currentBatch - 1);
-    }
   };
 
   const canSubmit = answers.filter(a => a !== null).length === 41;
@@ -86,39 +104,25 @@ export default function AttitudeSurvey() {
     try {
       const response = await fetch('/api/profiling/attitude/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answers })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ answers }),
       });
 
       if (response.ok) {
         const result = await response.json();
+        localStorage.setItem('benehab_attitude_profile', JSON.stringify(result.profile));
         
-        // Debug information
-        console.log('🚨 === ATTITUDE SURVEY DEBUG === 🚨');
-        console.log('API Response:', result);
-        console.log('Profile structure:', Object.keys(result.profile || {}));
-        if (result.profile && result.profile.levels) {
-          console.log('Levels found:', Object.keys(result.profile.levels));
-          console.log('Levels values:', result.profile.levels);
-        }
-        if (result.profile && result.profile.risk_tags) {
-          console.log('Risk tags:', result.profile.risk_tags);
-        }
-        if (result.profile && result.profile.comm_flags) {
-          console.log('Communication flags:', result.profile.comm_flags);
-        }
-        console.log('🚨 === END ATTITUDE DEBUG === 🚨');
+        // Generate PIB
+        await generatePIB();
         
-        // Save profile
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('benehab_attitude_profile', JSON.stringify(result.profile));
-          console.log('✅ Profile saved to localStorage');
-        }
-
-        // Navigate to results page
+        // Redirect to results page
         router.push('/profiling/attitude-results');
       } else {
-        throw new Error('Submission error');
+        const errorText = await response.text();
+        console.error('Error submitting answers:', response.status, errorText);
+        alert(`Submission error: ${response.status}`);
       }
     } catch (error) {
       console.error('Error submitting survey:', error);
@@ -128,9 +132,29 @@ export default function AttitudeSurvey() {
     }
   };
 
-  const startIndex = currentBatch * BATCH_SIZE;
-  const endIndex = Math.min(startIndex + BATCH_SIZE, 41);
-  const currentItems = items.slice(startIndex, endIndex);
+  const generatePIB = async () => {
+    try {
+      const response = await fetch('/api/profiling/pib', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          demographics: JSON.parse(localStorage.getItem('benehab_demographics') || '{}'),
+          attitude_profile: JSON.parse(localStorage.getItem('benehab_attitude_profile') || '{}'),
+          typology_profile: JSON.parse(localStorage.getItem('benehab_typology_profile') || '{}'),
+          values_profile: JSON.parse(localStorage.getItem('benehab_values_profile') || '{}')
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
+      }
+    } catch (error) {
+      console.error('Error generating PIB:', error);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -145,130 +169,224 @@ export default function AttitudeSurvey() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-6xl mx-auto p-4">
         {/* Header */}
-        <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Survey: Health Attitude</h1>
-            <Link href="/" className="text-emerald-600 hover:text-emerald-700">
-              Back to Chat
+        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-8 mb-6 shadow-lg text-white">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Health Attitude Survey</h1>
+              <p className="text-emerald-100 text-lg">
+                Discover your attitude towards health and illness
+              </p>
+            </div>
+            <Link 
+              href="/" 
+              className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-2xl transition-all duration-300 font-medium"
+            >
+              ← Back to Chat
             </Link>
           </div>
           
-          <div className="mb-4">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Progress: {Math.round(progress)}%</span>
-              <span>{answers.filter(a => a !== null).length} of 41</span>
+          <div className="mb-6">
+            <div className="flex justify-between text-emerald-100 mb-3">
+              <span className="font-medium">Overall Progress: {Math.round(progress)}%</span>
+              <span className="font-medium">Page {currentPage} of {totalPages}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-white bg-opacity-20 rounded-full h-3">
               <div 
-                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
+                className="bg-white h-3 rounded-full transition-all duration-500 shadow-lg"
+                style={{ width: `${Math.min(progress, 100)}%` }}
               ></div>
             </div>
           </div>
 
-          <p className="text-gray-700">
-            Read each statement and choose how much it applies to you:
-            <br />
-            <strong>0</strong> — does not apply at all, <strong>1</strong> — partially applies, <strong>2</strong> — fully applies
-          </p>
-        </div>
-
-        {/* Questions */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
-          <div className="space-y-6">
-            {currentItems.map((item, index) => {
-              const questionIndex = startIndex + index;
-              const questionNumber = questionIndex + 1;
-              
-              return (
-                <div key={questionIndex} className="border-b border-gray-100 pb-4 last:border-b-0">
-                  <p className="text-gray-900 mb-3">
-                    <span className="font-medium text-emerald-600">{questionNumber}.</span> {item.text}
-                  </p>
-                  
-                  <div className="flex gap-4">
-                    {[0, 1, 2].map(value => (
-                      <label key={value} className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`question-${questionIndex}`}
-                          value={value}
-                          checked={answers[questionIndex] === value}
-                          onChange={() => handleAnswer(questionIndex, value)}
-                          className="sr-only"
-                        />
-                        <div className={`
-                          w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-medium
-                          ${answers[questionIndex] === value 
-                            ? 'border-emerald-600 bg-emerald-600 text-white' 
-                            : 'border-gray-300 text-gray-400 hover:border-emerald-400'
-                          }
-                        `}>
-                          {value}
-                        </div>
-                        <span className="ml-2 text-sm text-gray-600">
-                          {value === 0 ? 'Does not apply' : value === 1 ? 'Partially' : 'Fully'}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="text-center">
+            <p className="text-xl text-emerald-100">
+              Read each statement and indicate how much it applies to you
+            </p>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={prevBatch}
-              disabled={currentBatch === 0}
-              className={`
-                px-6 py-2 rounded-xl border transition-colors
-                ${currentBatch === 0 
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed' 
-                  : 'border-gray-300 text-gray-700 hover:border-emerald-400 hover:text-emerald-600'
-                }
-              `}
-            >
-              ← Back
-            </button>
-
-            <div className="text-sm text-gray-500">
-              Page {currentBatch + 1} of {Math.ceil(41 / BATCH_SIZE)}
+        {/* Questions */}
+        <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg border border-gray-100">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Health Attitude Questions
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Choose the option that best describes your situation
+            </p>
+          </div>
+          
+          {/* Page indicator */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
+              <span className="text-sm font-medium text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
             </div>
-
-            {currentBatch < Math.ceil(41 / BATCH_SIZE) - 1 ? (
+          </div>
+          
+          <div className="space-y-6">
+            {currentItems.map((item, index) => (
+              <div key={item.id} className="group relative">
+                <div className={`
+                  bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
+                  ${answers[item.id - 1] !== null 
+                    ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                  }
+                `}>
+                  {/* Question number and text */}
+                  <div className="mb-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl font-bold text-lg">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-lg text-gray-900 leading-relaxed">{item.text}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Answer options */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                      { value: 0, label: 'Does not apply', color: 'red' },
+                      { value: 1, label: 'Partially applies', color: 'yellow' },
+                      { value: 2, label: 'Fully applies', color: 'green' }
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleAnswer(item.id - 1, option.value)}
+                        className={`
+                          px-6 py-4 rounded-2xl font-medium transition-all duration-300 transform
+                          ${answers[item.id - 1] === option.value
+                            ? option.value === 0 
+                              ? 'bg-red-500 text-white shadow-lg scale-105'
+                              : option.value === 1
+                              ? 'bg-yellow-500 text-white shadow-lg scale-105'
+                              : 'bg-green-500 text-white shadow-lg scale-105'
+                            : option.value === 0
+                            ? 'bg-red-50 text-red-700 border-2 border-red-200 hover:bg-red-100 hover:scale-105'
+                            : option.value === 1
+                            ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-200 hover:bg-yellow-100 hover:scale-105'
+                            : 'bg-green-50 text-green-700 border-2 border-green-200 hover:bg-green-100 hover:scale-105'
+                          }
+                        `}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Selection indicator */}
+                  {answers[item.id - 1] !== null && (
+                    <div className="mt-4 text-center">
+                      <div className={`
+                        inline-flex items-center px-4 py-2 rounded-full text-sm font-medium
+                        ${answers[item.id - 1] === 0 
+                          ? 'bg-red-100 text-red-700'
+                          : answers[item.id - 1] === 1
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-green-100 text-green-700'
+                        }
+                      `}>
+                        <div className={`
+                          w-3 h-3 rounded-full mr-2
+                          ${answers[item.id - 1] === 0 
+                            ? 'bg-red-500'
+                            : answers[item.id - 1] === 1
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                          }
+                        `}></div>
+                        {answers[item.id - 1] === 0 ? 'Does not apply' : 
+                         answers[item.id - 1] === 1 ? 'Partially applies' : 'Fully applies'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Progress and navigation */}
+          <div className="flex flex-col items-center space-y-6 mt-8">
+            {/* Progress bar */}
+            <div className="w-full max-w-md">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progress: {answers.filter(a => a !== null).length} of 41</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(progress, 100)}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            {/* Navigation buttons */}
+            <div className="flex items-center space-x-4">
               <button
-                onClick={nextBatch}
-                className="px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors"
-              >
-                Next →
-              </button>
-            ) : (
-              <button
-                onClick={submitSurvey}
-                disabled={!canSubmit || loading}
+                onClick={goToPreviousPage}
+                disabled={!canGoToPreviousPage()}
                 className={`
-                  px-6 py-2 rounded-xl transition-colors
-                  ${canSubmit && !loading
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  px-6 py-3 rounded-xl font-medium transition-all duration-300
+                  ${!canGoToPreviousPage()
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
                   }
                 `}
               >
-                {loading ? 'Submitting...' : 'Complete Survey'}
+                ← Previous
               </button>
-            )}
+              
+              {isLastPage() ? (
+                <button
+                  onClick={submitSurvey}
+                  disabled={!canSubmit || loading}
+                  className={`
+                    px-8 py-3 rounded-xl font-medium transition-all duration-300 transform
+                    ${canSubmit && !loading
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg hover:scale-105'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  {loading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Completing...
+                    </div>
+                  ) : (
+                    'Complete Survey'
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={goToNextPage}
+                  disabled={!canGoToNextPage()}
+                  className={`
+                    px-8 py-3 rounded-xl font-medium transition-all duration-300 transform
+                    ${canGoToNextPage()
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  Next Page →
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Hint */}
         <div className="text-center text-sm text-gray-500 mt-4">
-          Your answers are automatically saved. You can return to this survey later.
+          Your answers are automatically saved. After completion, you will be able to communicate with Tatiana in a personalized mode.
         </div>
       </div>
     </div>
