@@ -271,7 +271,7 @@ Let's start by completing your profiling surveys so I can better understand you 
             <p className="text-xl text-emerald-100 max-w-3xl mx-auto leading-relaxed">
               I'm Tatiana, your personal agent. Let's go through profiling together so I can better understand you and adapt my communication style to your individual characteristics.
             </p>
-          </div>
+            </div>
           </div>
 
         {/* Survey Cards */}
@@ -279,7 +279,7 @@ Let's start by completing your profiling surveys so I can better understand you 
           {surveyData.map((survey) => (
             <Link key={survey.id} href={survey.link}>
               <div className={`
-                bg-white rounded-3xl p-6 shadow-lg border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl
+                bg-white rounded-3xl p-6 shadow-lg border-2 transition-all duration-300 transform hover:scale-105 hover:shadow-xl h-80 flex flex-col
                 ${survey.completed 
                   ? 'border-green-300 bg-gradient-to-br from-green-50 to-white' 
                   : 'border-gray-200 hover:border-gray-300'
@@ -305,21 +305,23 @@ Let's start by completing your profiling surveys so I can better understand you 
                   )}
                 </div>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {survey.title}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {survey.description}
-                </p>
-                
-                <div className={`
-                  px-4 py-2 rounded-xl font-medium text-center transition-all duration-300
-                  ${survey.completed
-                    ? 'bg-green-100 text-green-700'
-                    : `bg-gradient-to-r ${getSurveyColor(survey.color)} ${getSurveyHoverColor(survey.color)} text-white`
-                  }
-                `}>
-                  {survey.completed ? 'View Results' : 'Start Survey'}
+                <div className="flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    {survey.title}
+                  </h3>
+                  <p className="text-gray-600 mb-6 flex-1 leading-relaxed">
+                    {survey.description}
+                  </p>
+                  
+                  <div className={`
+                    px-4 py-3 rounded-xl font-medium text-center transition-all duration-300 mt-auto
+                    ${survey.completed
+                      ? 'bg-green-100 text-green-700'
+                      : `bg-gradient-to-r ${getSurveyColor(survey.color)} ${getSurveyHoverColor(survey.color)} text-white`
+                    }
+                  `}>
+                    {survey.completed ? 'View Results' : 'Start Survey'}
+                  </div>
                 </div>
               </div>
             </Link>
@@ -372,7 +374,7 @@ Let's start by completing your profiling surveys so I can better understand you 
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                         <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
+                    </div>
                   </div>
                 </div>
               )}
