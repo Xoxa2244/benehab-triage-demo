@@ -28,7 +28,7 @@ export default function CommunicationInstructions() {
         try {
           profilesData.attitude = JSON.parse(attitudeProfile);
         } catch (error) {
-          console.error('Ошибка парсинга attitude профиля:', error);
+          console.error('Error parsing attitude profile:', error);
         }
       }
       
@@ -36,7 +36,7 @@ export default function CommunicationInstructions() {
         try {
           profilesData.typology = JSON.parse(typologyProfile);
         } catch (error) {
-          console.error('Ошибка парсинга typology профиля:', error);
+          console.error('Error parsing typology profile:', error);
         }
       }
       
@@ -44,7 +44,7 @@ export default function CommunicationInstructions() {
         try {
           profilesData.values = JSON.parse(valuesProfile);
         } catch (error) {
-          console.error('Ошибка парсинга values профиля:', error);
+          console.error('Error parsing values profile:', error);
         }
       }
       
@@ -52,13 +52,13 @@ export default function CommunicationInstructions() {
         try {
           profilesData.pib = JSON.parse(pib);
         } catch (error) {
-          console.error('Ошибка парсинга PIB:', error);
+          console.error('Error parsing PIB:', error);
         }
       }
 
       setProfiles(profilesData);
       
-      // Генерируем инструкции
+      // Generate instructions
       if (profilesData.attitude || profilesData.typology) {
         const commInstructions = getCommunicationInstructions(
           profilesData.attitude, 
@@ -75,7 +75,7 @@ export default function CommunicationInstructions() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p>Загружаем инструкции...</p>
+          <p>Loading instructions...</p>
         </div>
       </div>
     );
@@ -85,10 +85,10 @@ export default function CommunicationInstructions() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Инструкции не найдены</h1>
-          <p className="text-gray-600 mb-6">Пожалуйста, пройдите все опросы для получения персонализированных инструкций</p>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Instructions Not Found</h1>
+          <p className="text-gray-600 mb-6">Please complete all surveys to get personalized instructions</p>
           <Link href="/" className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700">
-            Вернуться к чату
+            Back to Chat
           </Link>
         </div>
       </div>
@@ -98,43 +98,43 @@ export default function CommunicationInstructions() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-4">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Инструкции по общению с пациентом</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Patient Communication Instructions</h1>
             <Link href="/" className="text-emerald-600 hover:text-emerald-700">
-              Вернуться к чату
+              Back to Chat
             </Link>
           </div>
           
           <p className="text-gray-700">
-            Персонализированные рекомендации по коммуникации на основе психологического профилирования пациента
+            Personalized communication recommendations based on patient psychological profiling
           </p>
         </div>
 
-        {/* Общие принципы коммуникации */}
+        {/* General communication principles */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Общие принципы коммуникации</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">General Communication Principles</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Тон и подход */}
+            {/* Tone and approach */}
             <div className="space-y-4">
-              <h3 className="font-medium text-gray-900">Тон и подход</h3>
+              <h3 className="font-medium text-gray-900">Tone and Approach</h3>
               <div className="bg-emerald-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                  <span className="font-medium">Тон: {instructions.general.tone}</span>
+                  <span className="font-medium">Tone: {instructions.general.tone}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <span className="font-medium">Подход: {instructions.general.approach}</span>
+                  <span className="font-medium">Approach: {instructions.general.approach}</span>
                 </div>
               </div>
             </div>
 
-            {/* Ключевые принципы */}
+            {/* Key principles */}
             <div className="space-y-4">
-              <h3 className="font-medium text-gray-900">Ключевые принципы</h3>
+              <h3 className="font-medium text-gray-900">Key Principles</h3>
               <div className="bg-blue-50 rounded-lg p-4">
                 <div className="text-sm text-blue-800">
                   {instructions.general.key_points.slice(0, 3).map((point, index) => (
@@ -145,7 +145,7 @@ export default function CommunicationInstructions() {
                   ))}
                   {instructions.general.key_points.length > 3 && (
                     <div className="text-xs text-blue-600 mt-2">
-                      И еще {instructions.general.key_points.length - 3} принципов...
+                      And {instructions.general.key_points.length - 3} more principles...
                     </div>
                   )}
                 </div>
@@ -154,21 +154,21 @@ export default function CommunicationInstructions() {
           </div>
         </div>
 
-        {/* Профиль отношения к болезни */}
+        {/* Health attitude profile */}
         {instructions.attitude && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Профиль отношения к болезни</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Health Attitude Profile</h2>
             
             <div className="space-y-6">
-              {/* Основная информация */}
+              {/* Main information */}
               <div className="bg-yellow-50 rounded-lg p-4">
                 <h3 className="font-medium text-yellow-900 mb-2">{instructions.attitude.name}</h3>
                 <p className="text-sm text-yellow-800 mb-3">{instructions.attitude.description}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Сложности в коммуникации */}
+                  {/* Communication challenges */}
                   <div>
-                    <h4 className="font-medium text-yellow-900 text-sm mb-2">Сложности в коммуникации:</h4>
+                    <h4 className="font-medium text-yellow-900 text-sm mb-2">Communication Challenges:</h4>
                     <ul className="text-xs text-yellow-700 space-y-1">
                       {instructions.attitude.communication_challenges.map((challenge, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -179,9 +179,9 @@ export default function CommunicationInstructions() {
                     </ul>
                   </div>
 
-                  {/* Положительный сценарий */}
+                  {/* Positive scenario */}
                   <div>
-                    <h4 className="font-medium text-yellow-900 text-sm mb-2">Рекомендуемые действия:</h4>
+                    <h4 className="font-medium text-yellow-900 text-sm mb-2">Recommended Actions:</h4>
                     <ul className="text-xs text-yellow-700 space-y-1">
                       {instructions.attitude.positive_scenario.slice(0, 3).map((action, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -191,7 +191,7 @@ export default function CommunicationInstructions() {
                       ))}
                       {instructions.attitude.positive_scenario.length > 3 && (
                         <li className="text-xs text-yellow-600 mt-1">
-                          И еще {instructions.attitude.positive_scenario.length - 3} действий...
+                          And {instructions.attitude.positive_scenario.length - 3} more actions...
                         </li>
                       )}
                     </ul>
@@ -199,10 +199,10 @@ export default function CommunicationInstructions() {
                 </div>
               </div>
 
-              {/* Что избегать */}
+              {/* What to avoid */}
               {instructions.attitude.negative_scenario && instructions.attitude.negative_scenario.length > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-medium text-red-900 text-sm mb-2">Чего избегать:</h4>
+                  <h4 className="font-medium text-red-900 text-sm mb-2">What to Avoid:</h4>
                   <ul className="text-xs text-red-700 space-y-1">
                     {instructions.attitude.negative_scenario.map((avoid, index) => (
                       <li key={index} className="flex items-start gap-2">
@@ -214,19 +214,19 @@ export default function CommunicationInstructions() {
                 </div>
               )}
 
-              {/* Экстремальные действия */}
+              {/* Extreme actions */}
               {instructions.attitude.extreme_actions && (
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <h4 className="font-medium text-orange-900 text-sm mb-2">Особые случаи:</h4>
+                  <h4 className="font-medium text-orange-900 text-sm mb-2">Special Cases:</h4>
                   <div className="text-xs text-orange-700 space-y-2">
                     {instructions.attitude.extreme_actions.low && (
                       <div>
-                        <span className="font-medium">Низкие значения:</span> {instructions.attitude.extreme_actions.low}
+                        <span className="font-medium">Low values:</span> {instructions.attitude.extreme_actions.low}
                       </div>
                     )}
                     {instructions.attitude.extreme_actions.high && (
                       <div>
-                        <span className="font-medium">Высокие значения:</span> {instructions.attitude.extreme_actions.high}
+                        <span className="font-medium">High values:</span> {instructions.attitude.extreme_actions.high}
                       </div>
                     )}
                   </div>
@@ -236,13 +236,13 @@ export default function CommunicationInstructions() {
           </div>
         )}
 
-        {/* Типологический профиль */}
+        {/* Typological profile */}
         {instructions.typology && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Типологический профиль</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Typological Profile</h2>
             
             <div className="space-y-6">
-              {/* Основная информация */}
+              {/* Main information */}
               <div className="bg-purple-50 rounded-lg p-4">
                 <h3 className="font-medium text-purple-900 mb-2">{instructions.typology.name}</h3>
                 <p className="text-sm text-purple-800 mb-3">{instructions.typology.description}</p>
@@ -253,19 +253,19 @@ export default function CommunicationInstructions() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-purple-900 text-sm mb-2">Тип голоса:</h4>
+                    <h4 className="font-medium text-purple-900 text-sm mb-2">Voice Type:</h4>
                     <p className="text-xs text-purple-700">{instructions.typology.voice_type}</p>
                   </div>
                   <div>
-                    <h4 className="font-medium text-purple-900 text-sm mb-2">Частота взаимодействия:</h4>
+                    <h4 className="font-medium text-purple-900 text-sm mb-2">Interaction Frequency:</h4>
                     <p className="text-xs text-purple-700">{instructions.typology.interaction_frequency}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Рекомендуемые действия */}
+              {/* Recommended actions */}
               <div className="bg-green-50 rounded-lg p-4">
-                <h4 className="font-medium text-green-900 text-sm mb-2">Рекомендуемые действия:</h4>
+                <h4 className="font-medium text-green-900 text-sm mb-2">Recommended Actions:</h4>
                 <ul className="text-xs text-green-700 space-y-1">
                   {instructions.typology.positive_communication.map((action, index) => (
                     <li key={index} className="flex items-start gap-2">
@@ -276,10 +276,10 @@ export default function CommunicationInstructions() {
                 </ul>
               </div>
 
-              {/* Что избегать */}
+              {/* What to avoid */}
               {instructions.typology.negative_communication && instructions.typology.negative_communication.length > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-medium text-red-900 text-sm mb-2">Чего избегать:</h4>
+                  <h4 className="font-medium text-red-900 text-sm mb-2">What to Avoid:</h4>
                   <ul className="text-xs text-red-700 space-y-1">
                     {instructions.typology.negative_communication.map((avoid, index) => (
                       <li key={index} className="flex items-start gap-2">
@@ -294,15 +294,15 @@ export default function CommunicationInstructions() {
           </div>
         )}
 
-        {/* Ценностный профиль */}
+        {/* Values profile */}
         {profiles.values && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Ценностный профиль</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Values Profile</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Индексы ценностей */}
+              {/* Value indices */}
               <div>
-                <h3 className="font-medium text-gray-900 mb-3">Индексы ценностей</h3>
+                <h3 className="font-medium text-gray-900 mb-3">Value Indices</h3>
                 <div className="space-y-3">
                   {Object.entries(profiles.values.value_indices || {}).map(([key, value]) => (
                     <div key={key} className="bg-gray-50 rounded-lg p-3">
@@ -326,24 +326,24 @@ export default function CommunicationInstructions() {
                 </div>
               </div>
 
-              {/* Рекомендации по коммуникации */}
+              {/* Communication recommendations */}
               <div>
-                <h3 className="font-medium text-gray-900 mb-3">Рекомендации для общения</h3>
+                <h3 className="font-medium text-gray-900 mb-3">Communication Recommendations</h3>
                 <div className="space-y-3">
                   {profiles.values.communication_guidelines?.communication_style && (
                     <div className="bg-blue-50 rounded-lg p-3">
-                      <h4 className="font-medium text-blue-900 text-sm mb-1">Стиль коммуникации:</h4>
+                      <h4 className="font-medium text-blue-900 text-sm mb-1">Communication Style:</h4>
                       <p className="text-xs text-blue-700">
-                        {profiles.values.communication_guidelines.communication_style === 'optimistic' && 'Оптимистичный и ободряющий'}
-                        {profiles.values.communication_guidelines.communication_style === 'supportive' && 'Поддерживающий и спокойный'}
-                        {profiles.values.communication_guidelines.communication_style === 'balanced' && 'Сбалансированный и нейтральный'}
+                        {profiles.values.communication_guidelines.communication_style === 'optimistic' && 'Optimistic and encouraging'}
+                        {profiles.values.communication_guidelines.communication_style === 'supportive' && 'Supportive and calm'}
+                        {profiles.values.communication_guidelines.communication_style === 'balanced' && 'Balanced and neutral'}
                       </p>
                     </div>
                   )}
 
                   {profiles.values.communication_guidelines?.motivators && (
                     <div className="bg-green-50 rounded-lg p-3">
-                      <h4 className="font-medium text-green-900 text-sm mb-1">Мотиваторы:</h4>
+                      <h4 className="font-medium text-green-900 text-sm mb-1">Motivators:</h4>
                       <div className="flex flex-wrap gap-1">
                         {profiles.values.communication_guidelines.motivators.map((motivator, index) => (
                           <span key={index} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
@@ -356,7 +356,7 @@ export default function CommunicationInstructions() {
 
                   {profiles.values.communication_guidelines?.avoid_topics && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                      <h4 className="font-medium text-red-900 text-sm mb-1">Избегать тем:</h4>
+                      <h4 className="font-medium text-red-900 text-sm mb-1">Avoid Topics:</h4>
                       <div className="flex flex-wrap gap-1">
                         {profiles.values.communication_guidelines.avoid_topics.map((topic, index) => (
                           <span key={index} className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
@@ -372,38 +372,38 @@ export default function CommunicationInstructions() {
           </div>
         )}
 
-        {/* PIB профиль */}
+        {/* PIB profile */}
         {profiles.pib && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">План коммуникации (PIB)</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Communication Plan (PIB)</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Тон коммуникации */}
+              {/* Communication tone */}
               <div className="bg-indigo-50 rounded-lg p-4">
-                <h3 className="font-medium text-indigo-900 mb-2">Тон коммуникации</h3>
+                <h3 className="font-medium text-indigo-900 mb-2">Communication Tone</h3>
                 <p className="text-sm text-indigo-700">
-                  {profiles.pib.communication_plan?.tone === 'calm_supportive' && 'Спокойный и поддерживающий'}
-                  {profiles.pib.communication_plan?.tone === 'energetic_motivational' && 'Энергичный и мотивирующий'}
-                  {profiles.pib.communication_plan?.tone === 'professional_detailed' && 'Профессиональный и детальный'}
-                  {profiles.pib.communication_plan?.tone === 'gentle_empathetic' && 'Нежный и эмпатичный'}
-                  {!profiles.pib.communication_plan?.tone && 'Стандартный'}
+                  {profiles.pib.communication_plan?.tone === 'calm_supportive' && 'Calm and supportive'}
+                  {profiles.pib.communication_plan?.tone === 'energetic_motivational' && 'Energetic and motivational'}
+                  {profiles.pib.communication_plan?.tone === 'professional_detailed' && 'Professional and detailed'}
+                  {profiles.pib.communication_plan?.tone === 'gentle_empathetic' && 'Gentle and empathetic'}
+                  {!profiles.pib.communication_plan?.tone && 'Standard'}
                 </p>
               </div>
 
-              {/* Длительность сессии */}
+              {/* Session duration */}
               <div className="bg-teal-50 rounded-lg p-4">
-                <h3 className="font-medium text-teal-900 mb-2">Длительность сессии</h3>
+                <h3 className="font-medium text-teal-900 mb-2">Session Duration</h3>
                 <p className="text-sm text-teal-700">
-                  {profiles.pib.communication_plan?.session_length === 'short' && 'Короткая (5-10 мин)'}
-                  {profiles.pib.communication_plan?.session_length === 'medium' && 'Средняя (15-20 мин)'}
-                  {profiles.pib.communication_plan?.session_length === 'long' && 'Длительная (25-30 мин)'}
-                  {!profiles.pib.communication_plan?.session_length && 'Стандартная'}
+                  {profiles.pib.communication_plan?.session_length === 'short' && 'Short (5-10 min)'}
+                  {profiles.pib.communication_plan?.session_length === 'medium' && 'Medium (15-20 min)'}
+                  {profiles.pib.communication_plan?.session_length === 'long' && 'Long (25-30 min)'}
+                  {!profiles.pib.communication_plan?.session_length && 'Standard'}
                 </p>
               </div>
 
-              {/* Что избегать */}
+              {/* What to avoid */}
               <div className="bg-amber-50 rounded-lg p-4">
-                <h3 className="font-medium text-amber-900 mb-2">Избегать</h3>
+                <h3 className="font-medium text-amber-900 mb-2">Avoid</h3>
                 {profiles.pib.communication_plan?.avoid && profiles.pib.communication_plan.avoid.length > 0 ? (
                   <div className="space-y-1">
                     {profiles.pib.communication_plan.avoid.map((item, index) => (
@@ -414,26 +414,26 @@ export default function CommunicationInstructions() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-amber-700">Особых ограничений нет</p>
+                  <p className="text-sm text-amber-700">No special restrictions</p>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Кнопки действий */}
+        {/* Action buttons */}
         <div className="flex justify-center gap-4">
           <Link href="/" className="px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors">
-            Начать общение с Татьяной
+            Start Chatting with Tatiana
           </Link>
           <Link href="/profiling/values" className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:border-emerald-400 hover:text-emerald-600 transition-colors">
-            Пройти опросы заново
+            Retake Surveys
           </Link>
         </div>
 
-        {/* Подсказка */}
+        {/* Hint */}
         <div className="text-center text-sm text-gray-500 mt-6">
-          Эти инструкции помогут Татьяне общаться с вами максимально комфортно и эффективно
+          These instructions will help Tatiana communicate with you as comfortably and effectively as possible
         </div>
       </div>
     </div>

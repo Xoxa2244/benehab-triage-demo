@@ -1,4 +1,4 @@
-// pages/api/chat-simple.js - Простая версия для диагностики
+// pages/api/chat-simple.js - Simple version for diagnostics
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -11,31 +11,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('Получено сообщение:', message);
+    console.log('Received message:', message);
 
-    // Простой ответ без OpenAI для тестирования
-    const simpleResponse = `Привет! Я Татьяна, ваш помощник по здоровью. 👋
+    // Simple response without OpenAI for testing
+    const simpleResponse = `Hello! I am Tatiana, your health assistant. 👋
 
-Вы написали: "${message}"
+You wrote: "${message}"
 
-К сожалению, у меня временные проблемы с подключением к AI-сервису. Но я здесь и готова помочь!
+Unfortunately, I have temporary problems connecting to the AI service. But I am here and ready to help!
 
-Что вас беспокоит? Могу дать общие советы по здоровью или помочь с назначениями.`;
+What is bothering you? I can give general health advice or help with assignments.`;
 
     res.status(200).json({
       response: simpleResponse,
       success: true,
       timestamp: new Date().toISOString(),
-      note: 'Это простая версия Татьяны для диагностики'
+      note: 'This is a simple version of Tatiana for diagnostics'
     });
 
   } catch (error) {
-    console.error('Ошибка в простом API чата:', error);
+    console.error('Error in simple chat API:', error);
     
     res.status(500).json({ 
-      error: 'Ошибка обработки сообщения',
+      error: 'Message processing error',
       details: error.message,
-      fallback: 'Извините, произошла ошибка. Попробуйте еще раз.'
+      fallback: 'Sorry, an error occurred. Please try again.'
     });
   }
 }

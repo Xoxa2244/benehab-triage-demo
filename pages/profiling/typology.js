@@ -28,13 +28,13 @@ export default function TypologySurvey() {
       
       if (data.success) {
         setItems(data.questions || []);
-        console.log('✅ Вопросы загружены успешно:', data.questions?.length);
+        console.log('✅ Questions loaded successfully:', data.questions?.length);
       } else {
-        console.error('❌ API вернул ошибку:', data.error);
+        console.error('❌ API returned error:', data.error);
         setItems([]);
       }
     } catch (error) {
-      console.error('❌ Ошибка загрузки вопросов:', error);
+      console.error('❌ Error loading questions:', error);
       setItems([]);
     }
   };
@@ -47,7 +47,7 @@ export default function TypologySurvey() {
           const parsed = JSON.parse(saved);
           setAnswers(parsed);
         } catch (error) {
-          console.error('Ошибка загрузки прогресса:', error);
+          console.error('Error loading progress:', error);
         }
       }
     }
@@ -70,7 +70,7 @@ export default function TypologySurvey() {
   const handleOptionSelect = (questionId, optionId, ptype) => {
     const currentAnswers = answers[questionId] || [];
     
-    // Если опция уже выбрана, убираем её
+    // If option is already selected, remove it
     if (currentAnswers.some(ans => ans.optionId === optionId)) {
       const newAnswers = currentAnswers.filter(ans => ans.optionId !== optionId);
       setAnswers(prev => ({
@@ -78,12 +78,12 @@ export default function TypologySurvey() {
         [questionId]: newAnswers
       }));
     } else {
-      // Если выбрано уже 3 опции, не добавляем
+      // If 3 options are already selected, do not add
       if (currentAnswers.length >= 3) {
         return;
       }
       
-      // Добавляем новую опцию
+      // Add new option
       const newAnswers = [...currentAnswers, { optionId, ptype }];
       setAnswers(prev => ({
         ...prev,
@@ -132,7 +132,7 @@ export default function TypologySurvey() {
   const submitSurvey = async () => {
     if (!canGoNext()) return;
 
-    console.log('🚀 Отправляем опрос...', { answers });
+    console.log('🚀 Submitting survey...', { answers });
     setLoading(true);
     
     try {
@@ -144,29 +144,29 @@ export default function TypologySurvey() {
         body: JSON.stringify({ answers }),
       });
 
-      console.log('📡 Ответ API:', { status: response.status, ok: response.ok });
+      console.log('📡 API Response:', { status: response.status, ok: response.ok });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Результат API:', result);
+        console.log('✅ API Result:', result);
         
         localStorage.setItem('benehab_typology_profile', JSON.stringify(result.profile));
         
-        // Генерируем PIB
-        console.log('🔄 Генерируем PIB...');
+        // Generate PIB
+        console.log('🔄 Generating PIB...');
         await generatePIB();
         
-        // Перенаправляем на страницу результатов
-        console.log('🔄 Перенаправляем на результаты...');
+        // Navigate to results page
+        console.log('🔄 Navigating to results...');
         router.push('/profiling/typology-results');
       } else {
         const errorText = await response.text();
-        console.error('❌ Ошибка отправки ответов:', response.status, errorText);
-        alert(`Ошибка отправки: ${response.status}`);
+        console.error('❌ Error submitting answers:', response.status, errorText);
+        alert(`Submission error: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Ошибка отправки ответов:', error);
-      alert(`Ошибка: ${error.message}`);
+      console.error('❌ Error submitting answers:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -191,7 +191,7 @@ export default function TypologySurvey() {
         localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
       }
     } catch (error) {
-      console.error('Ошибка генерации PIB:', error);
+      console.error('Error generating PIB:', error);
     }
   };
 
@@ -200,7 +200,7 @@ export default function TypologySurvey() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p>Загружаем вопросы...</p>
+          <p>Loading questions...</p>
         </div>
       </div>
     );
@@ -211,19 +211,19 @@ export default function TypologySurvey() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-4">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Опрос: Стиль общения</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Survey: Communication Style</h1>
             <Link href="/" className="text-emerald-600 hover:text-emerald-700">
-              Вернуться к чату
+              Back to Chat
             </Link>
           </div>
           
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Прогресс: {Math.round(progress)}%</span>
-              <span>Вопрос {currentQuestion + 1} из {items.length}</span>
+              <span>Progress: {Math.round(progress)}%</span>
+              <span>Question {currentQuestion + 1} of {items.length}</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -234,12 +234,12 @@ export default function TypologySurvey() {
           </div>
 
           <p className="text-gray-700">
-            Отметьте от 1 до 3 утверждений, которые относятся к вам. Нет "правильных" или "неправильных" ответов — 
-            это просто про ваш стиль общения и восприятия информации.
+            Mark 1 to 3 statements that apply to you. There are no "right" or "wrong" answers — 
+            this is simply about your communication style and information perception.
           </p>
         </div>
 
-        {/* Текущий вопрос */}
+        {/* Current question */}
         {currentItem && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
@@ -277,12 +277,12 @@ export default function TypologySurvey() {
             </div>
             
             <div className="mt-4 text-sm text-gray-500 text-center">
-              Выбрано: {getSelectedCount(currentItem.id)} из 3
+              Selected: {getSelectedCount(currentItem.id)} of 3
             </div>
           </div>
         )}
 
-        {/* Навигация */}
+        {/* Navigation */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center">
             <button
@@ -296,7 +296,7 @@ export default function TypologySurvey() {
                 }
               `}
             >
-              ← Назад
+              ← Back
             </button>
 
             {currentQuestion < items.length - 1 ? (
@@ -311,7 +311,7 @@ export default function TypologySurvey() {
                   }
                 `}
               >
-                Далее →
+                Next →
               </button>
             ) : (
               <button
@@ -325,15 +325,15 @@ export default function TypologySurvey() {
                   }
                 `}
               >
-                {loading ? 'Завершаем...' : 'Завершить опрос'}
+                {loading ? 'Completing...' : 'Complete Survey'}
               </button>
             )}
           </div>
         </div>
 
-        {/* Подсказка */}
+        {/* Hint */}
         <div className="text-center text-sm text-gray-500 mt-4">
-          Ваши ответы автоматически сохраняются. После завершения вы сможете общаться с Татьяной в персонализированном режиме.
+          Your answers are automatically saved. After completion, you will be able to communicate with Tatiana in a personalized mode.
         </div>
       </div>
     </div>

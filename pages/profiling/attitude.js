@@ -29,7 +29,7 @@ export default function AttitudeSurvey() {
       const data = await response.json();
       setItems(data.items || []);
     } catch (error) {
-      console.error('Ошибка загрузки вопросов:', error);
+      console.error('Error loading questions:', error);
     }
   };
 
@@ -41,7 +41,7 @@ export default function AttitudeSurvey() {
           const parsed = JSON.parse(saved);
           setAnswers(parsed);
         } catch (error) {
-          console.error('Ошибка загрузки прогресса:', error);
+          console.error('Error loading progress:', error);
         }
       }
     }
@@ -93,7 +93,7 @@ export default function AttitudeSurvey() {
       if (response.ok) {
         const result = await response.json();
         
-        // Отладочная информация
+        // Debug information
         console.log('🚨 === ATTITUDE SURVEY DEBUG === 🚨');
         console.log('API Response:', result);
         console.log('Profile structure:', Object.keys(result.profile || {}));
@@ -109,20 +109,20 @@ export default function AttitudeSurvey() {
         }
         console.log('🚨 === END ATTITUDE DEBUG === 🚨');
         
-        // Сохраняем профиль
+        // Save profile
         if (typeof window !== 'undefined') {
           localStorage.setItem('benehab_attitude_profile', JSON.stringify(result.profile));
-          console.log('✅ Профиль сохранен в localStorage');
+          console.log('✅ Profile saved to localStorage');
         }
 
-        // Переходим к странице результата
+        // Navigate to results page
         router.push('/profiling/attitude-results');
       } else {
-        throw new Error('Ошибка отправки');
+        throw new Error('Submission error');
       }
     } catch (error) {
-      console.error('Ошибка отправки опроса:', error);
-      alert('Произошла ошибка. Попробуйте еще раз.');
+      console.error('Error submitting survey:', error);
+      alert('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -137,7 +137,7 @@ export default function AttitudeSurvey() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p>Загружаем вопросы...</p>
+          <p>Loading questions...</p>
         </div>
       </div>
     );
@@ -146,19 +146,19 @@ export default function AttitudeSurvey() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-4">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Опрос: Отношение к здоровью</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Survey: Health Attitude</h1>
             <Link href="/" className="text-emerald-600 hover:text-emerald-700">
-              Вернуться к чату
+              Back to Chat
             </Link>
           </div>
           
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Прогресс: {Math.round(progress)}%</span>
-              <span>{answers.filter(a => a !== null).length} из 41</span>
+              <span>Progress: {Math.round(progress)}%</span>
+              <span>{answers.filter(a => a !== null).length} of 41</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -169,13 +169,13 @@ export default function AttitudeSurvey() {
           </div>
 
           <p className="text-gray-700">
-            Прочитайте каждое утверждение и выберите, насколько оно относится к вам:
+            Read each statement and choose how much it applies to you:
             <br />
-            <strong>0</strong> — совсем не относится, <strong>1</strong> — частично относится, <strong>2</strong> — полностью относится
+            <strong>0</strong> — does not apply at all, <strong>1</strong> — partially applies, <strong>2</strong> — fully applies
           </p>
         </div>
 
-        {/* Вопросы */}
+        {/* Questions */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="space-y-6">
             {currentItems.map((item, index) => {
@@ -209,7 +209,7 @@ export default function AttitudeSurvey() {
                           {value}
                         </div>
                         <span className="ml-2 text-sm text-gray-600">
-                          {value === 0 ? 'Не относится' : value === 1 ? 'Частично' : 'Полностью'}
+                          {value === 0 ? 'Does not apply' : value === 1 ? 'Partially' : 'Fully'}
                         </span>
                       </label>
                     ))}
@@ -220,7 +220,7 @@ export default function AttitudeSurvey() {
           </div>
         </div>
 
-        {/* Навигация */}
+        {/* Navigation */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center">
             <button
@@ -234,11 +234,11 @@ export default function AttitudeSurvey() {
                 }
               `}
             >
-              ← Назад
+              ← Back
             </button>
 
             <div className="text-sm text-gray-500">
-              Страница {currentBatch + 1} из {Math.ceil(41 / BATCH_SIZE)}
+              Page {currentBatch + 1} of {Math.ceil(41 / BATCH_SIZE)}
             </div>
 
             {currentBatch < Math.ceil(41 / BATCH_SIZE) - 1 ? (
@@ -246,7 +246,7 @@ export default function AttitudeSurvey() {
                 onClick={nextBatch}
                 className="px-6 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors"
               >
-                Далее →
+                Next →
               </button>
             ) : (
               <button
@@ -260,15 +260,15 @@ export default function AttitudeSurvey() {
                   }
                 `}
               >
-                {loading ? 'Отправляем...' : 'Завершить опрос'}
+                {loading ? 'Submitting...' : 'Complete Survey'}
               </button>
             )}
           </div>
         </div>
 
-        {/* Подсказка */}
+        {/* Hint */}
         <div className="text-center text-sm text-gray-500 mt-4">
-          Ваши ответы автоматически сохраняются. Вы можете вернуться к этому опросу позже.
+          Your answers are automatically saved. You can return to this survey later.
         </div>
       </div>
     </div>

@@ -7,25 +7,25 @@ export default async function handler(req, res) {
   try {
     const { assignmentId } = req.body;
     
-    // В демо-режиме просто возвращаем информацию о проверке
+    // In demo mode, just return check information
     const now = new Date();
     const currentTime = now.toLocaleTimeString('ru-RU');
     
-    console.log(`[${currentTime}] Проверка уведомлений для назначения:`, assignmentId);
+    console.log(`[${currentTime}] Checking notifications for assignment:`, assignmentId);
     
-    // Здесь должна быть логика проверки времени и отправки уведомлений
-    // В реальном приложении это делается через cron-джобу
+    // Here should be logic for checking time and sending notifications
+    // In real application this is done through cron job
     
     res.status(200).json({
-      message: 'Проверка уведомлений выполнена',
+      message: 'Notification check completed',
       timestamp: now.toISOString(),
       currentTime,
       assignmentId,
-      note: 'В демо-режиме уведомления не отправляются автоматически. Используйте кнопку "Тестовое уведомление" на странице назначений.'
+      note: 'In demo mode, notifications are not sent automatically. Use the "Test notification" button on the assignments page.'
     });
     
   } catch (error) {
-    console.error('Ошибка проверки уведомлений:', error);
+    console.error('Notification check error:', error);
     res.status(500).json({ 
       error: 'Internal server error', 
       details: error.message 

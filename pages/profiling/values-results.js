@@ -8,30 +8,30 @@ export default function ValuesResults() {
   const [showTatianaMessage, setShowTatianaMessage] = useState(false);
 
   useEffect(() => {
-    // Проверяем, что мы в браузере
+    // Check that we are in browser
     if (typeof window === 'undefined') return;
     
-    // Загружаем профиль ценностей
+    // Load values profile
     const savedProfile = localStorage.getItem('benehab_values_profile');
     if (savedProfile) {
       try {
         setProfile(JSON.parse(savedProfile));
       } catch (e) {
-        console.error('Ошибка загрузки профиля:', e);
+        console.error('Error loading profile:', e);
       }
     }
 
-    // Загружаем демографические данные
+    // Load demographic data
     const savedDemographics = localStorage.getItem('benehab_demographics');
     if (savedDemographics) {
       try {
         setDemographics(JSON.parse(savedDemographics));
       } catch (e) {
-        console.error('Ошибка загрузки демографических данных:', e);
+        console.error('Error loading demographics:', e);
       }
     }
 
-    // Показываем сообщение от Татьяны через небольшую задержку
+    // Show Tatiana's message after a short delay
     setTimeout(() => {
       setShowTatianaMessage(true);
     }, 1000);
@@ -46,13 +46,13 @@ export default function ValuesResults() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">💎</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Профиль не найден</h1>
-          <p className="text-gray-600 mb-6">Сначала пройдите опрос ценностей</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
+          <p className="text-gray-600 mb-6">Please complete the values survey first</p>
           <Link
             href="/profiling/values"
             className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Пройти опрос
+            Take Survey
           </Link>
         </div>
       </div>
@@ -62,19 +62,19 @@ export default function ValuesResults() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Результаты опроса: Система ценностей
+            Survey Results: Value System
           </h1>
           <p className="text-lg text-gray-600">
-            Анализ вашей психосемантики завершен
+            Your psychosemantic analysis is complete
           </p>
         </div>
 
-        {/* Основные индексы */}
+        {/* Main indices */}
         <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Ключевые показатели</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Indicators</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profile.indices && Object.entries(profile.indices).map(([index, value]) => (
               <div key={index} className="p-4 border border-gray-200 rounded-lg">
@@ -97,19 +97,19 @@ export default function ValuesResults() {
           </div>
         </div>
 
-        {/* Рекомендации */}
+        {/* Recommendations */}
         <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Рекомендации</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recommendations</h2>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                 <span className="text-green-600 text-sm">✓</span>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Персонализация общения</h3>
+                <h3 className="font-medium text-gray-900">Communication Personalization</h3>
                 <p className="text-gray-600">
-                  Татьяна теперь понимает вашу систему ценностей и будет адаптировать стиль общения 
-                  с учетом ваших предпочтений и особенностей восприятия.
+                  Tatiana now understands your value system and will adapt her communication style 
+                  taking into account your preferences and perception characteristics.
                 </p>
               </div>
             </div>
@@ -118,36 +118,36 @@ export default function ValuesResults() {
                 <span className="text-blue-600 text-sm">💡</span>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Завершение профилирования</h3>
+                <h3 className="font-medium text-gray-900">Profiling Completion</h3>
                 <p className="text-gray-600">
-                  Поздравляем! Вы завершили полное психологическое профилирование. 
-                  Теперь у Татьяны есть полная картина вашей личности.
+                  Congratulations! You have completed the full psychological profiling. 
+                  Now Tatiana has a complete picture of your personality.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Навигация */}
+        {/* Navigation */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/communication-instructions"
             className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105"
           >
             <span className="mr-2">📋</span>
-            Посмотреть инструкции по общению
+            View Communication Instructions
           </Link>
           <Link
             href="/"
             className="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             <span className="mr-2">🏠</span>
-            На главную
+            Home
           </Link>
         </div>
       </div>
 
-      {/* Сообщение от Татьяны */}
+      {/* Message from Tatiana */}
       <TatianaMessage
         demographics={demographics}
         surveyType="values"

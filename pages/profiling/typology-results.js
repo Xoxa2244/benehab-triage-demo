@@ -10,30 +10,30 @@ export default function TypologyResults() {
   const [showTatianaMessage, setShowTatianaMessage] = useState(false);
 
   useEffect(() => {
-    // Проверяем, что мы в браузере
+    // Check that we are in browser
     if (typeof window === 'undefined') return;
     
-    // Загружаем профиль психотипа
+    // Load psychotype profile
     const savedProfile = localStorage.getItem('benehab_typology_profile');
     if (savedProfile) {
       try {
         setProfile(JSON.parse(savedProfile));
       } catch (e) {
-        console.error('Ошибка загрузки профиля:', e);
+        console.error('Error loading profile:', e);
       }
     }
 
-    // Загружаем демографические данные
+    // Load demographic data
     const savedDemographics = localStorage.getItem('benehab_demographics');
     if (savedDemographics) {
       try {
         setDemographics(JSON.parse(savedDemographics));
       } catch (e) {
-        console.error('Ошибка загрузки демографических данных:', e);
+        console.error('Error loading demographics:', e);
       }
     }
 
-    // Показываем сообщение от Татьяны через небольшую задержку
+    // Show Tatiana's message after a short delay
     setTimeout(() => {
       setShowTatianaMessage(true);
     }, 1000);
@@ -48,13 +48,13 @@ export default function TypologyResults() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🧠</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Профиль не найден</h1>
-          <p className="text-gray-600 mb-6">Сначала пройдите опрос психотипа</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
+          <p className="text-gray-600 mb-6">Please complete the psychotype survey first</p>
           <Link
             href="/profiling/typology"
             className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            Пройти опрос
+            Take Survey
           </Link>
         </div>
       </div>
@@ -63,32 +63,32 @@ export default function TypologyResults() {
 
   const getTypeName = (type) => {
     const typeNames = {
-      sensitive: 'Сенситивный',
-      dysthymic: 'Дистимический',
-      demonstrative: 'Демонстративный',
-      excitable: 'Возбудимый',
-      cyclothymic: 'Циклотимический',
-      stuck: 'Застревающий',
-      pedantic: 'Педантичный',
-      anxious: 'Тревожный',
-      hyperthymic: 'Гипертимический'
+      sensitive: 'Sensitive',
+      dysthymic: 'Dysthymic',
+      demonstrative: 'Demonstrative',
+      excitable: 'Excitable',
+      cyclothymic: 'Cyclothymic',
+      stuck: 'Stuck',
+      pedantic: 'Pedantic',
+      anxious: 'Anxious',
+      hyperthymic: 'Hyperthymic'
     };
     return typeNames[type] || type;
   };
 
   const getTypeDescription = (type) => {
     const descriptions = {
-      sensitive: 'Ранимость, высокая чувствительность, склонность к соматическим жалобам и усталости.',
-      dysthymic: 'Склонность к самокритике, чувство вины, низкая мотивация.',
-      demonstrative: 'Любовь к вниманию, стремление производить впечатление.',
-      excitable: 'Импульсивность, быстрые действия, эмоциональные вспышки.',
-      cyclothymic: 'Переменчивость настроения и активности.',
-      stuck: 'Упорство, принципиальность, длительность переживаний.',
-      pedantic: 'Осторожность, любовь к порядку, детальность.',
-      anxious: 'Склонность к беспокойству, мнительность.',
-      hyperthymic: 'Энергичность, оптимизм, активность.'
+      sensitive: 'Vulnerability, high sensitivity, tendency to somatic complaints and fatigue.',
+      dysthymic: 'Tendency to self-criticism, guilt feelings, low motivation.',
+      demonstrative: 'Love of attention, desire to make an impression.',
+      excitable: 'Impulsiveness, quick actions, emotional outbursts.',
+      cyclothymic: 'Mood and activity variability.',
+      stuck: 'Persistence, principledness, duration of experiences.',
+      pedantic: 'Caution, love of order, detail-oriented.',
+      anxious: 'Tendency to worry, suspiciousness.',
+      hyperthymic: 'Energy, optimism, activity.'
     };
-    return descriptions[type] || 'Описание типа не найдено.';
+    return descriptions[type] || 'Type description not found.';
   };
 
   const getTypeColor = (type) => {
@@ -109,20 +109,20 @@ export default function TypologyResults() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Результаты опроса: Психотип
+            Survey Results: Psychotype
           </h1>
           <p className="text-lg text-gray-600">
-            Анализ вашего психологического типа завершен
+            Your psychological type analysis is complete
           </p>
         </div>
 
-        {/* Доминирующий тип */}
+        {/* Dominant type */}
         {profile.dominant_type && (
           <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Ваш доминирующий психотип</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Dominant Psychotype</h2>
             <div className={`border rounded-lg p-6 ${getTypeColor(profile.dominant_type)}`}>
               <h3 className="text-2xl font-bold mb-3">
                 {getTypeName(profile.dominant_type)}
@@ -134,10 +134,10 @@ export default function TypologyResults() {
           </div>
         )}
 
-        {/* Все типы с их значениями */}
+        {/* All types with their values */}
         {profile.types && (
           <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Все психотипы</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">All Psychotypes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {Object.entries(profile.types).map(([type, value]) => (
                 <div key={type} className="p-4 border border-gray-200 rounded-lg">
@@ -160,7 +160,7 @@ export default function TypologyResults() {
                     ></div>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {value > 0.6 ? 'Высокий' : value > 0.3 ? 'Средний' : 'Низкий'} уровень
+                    {value > 0.6 ? 'High' : value > 0.3 ? 'Medium' : 'Low'} level
                   </p>
                 </div>
               ))}
@@ -168,19 +168,19 @@ export default function TypologyResults() {
           </div>
         )}
 
-        {/* Рекомендации по общению */}
+        {/* Communication recommendations */}
         <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Рекомендации по общению</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication Recommendations</h2>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
               <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                 <span className="text-green-600 text-sm">✓</span>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Адаптация стиля</h3>
+                <h3 className="font-medium text-gray-900">Style Adaptation</h3>
                 <p className="text-gray-600">
-                  Татьяна будет учитывать особенности вашего психотипа и адаптировать стиль общения 
-                  для максимального комфорта и эффективности.
+                  Tatiana will take into account the characteristics of your psychotype and adapt her communication style 
+                  for maximum comfort and effectiveness.
                 </p>
               </div>
             </div>
@@ -189,43 +189,43 @@ export default function TypologyResults() {
                 <span className="text-blue-600 text-sm">💡</span>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Следующие шаги</h3>
+                <h3 className="font-medium text-gray-900">Next Steps</h3>
                 <p className="text-gray-600">
-                  Продолжите профилирование, пройдя опрос ценностей для получения полной картины 
-                  вашей личности и системы ценностей.
+                  Continue profiling by taking the values survey to get a complete picture 
+                  of your personality and value system.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Навигация */}
+        {/* Navigation */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/profiling/values"
             className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
             <span className="mr-2">💎</span>
-            Следующий опрос: Ценности
+            Next Survey: Values
           </Link>
           <Link
             href="/communication-instructions"
             className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
             <span className="mr-2">📋</span>
-            Инструкции по общению
+            Communication Instructions
           </Link>
           <Link
             href="/"
             className="inline-flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
             <span className="mr-2">🏠</span>
-            На главную
+            Home
           </Link>
         </div>
       </div>
 
-      {/* Сообщение от Татьяны */}
+      {/* Message from Tatiana */}
       <TatianaMessage
         demographics={demographics}
         surveyType="typology"

@@ -1,30 +1,31 @@
-// pages/api/chat.js - Улучшенная версия с проактивностью по назначениям
+// pages/api/chat.js - Enhanced version with assignment proactivity
+// VERCEL UPDATE: 2025-08-29 20:45 - Forced update to fix cache
 import OpenAI from 'openai';
 
-// Инициализируем OpenAI только если есть API ключ
+// Initialize OpenAI only if API key is available
 let openai = null;
 try {
   if (process.env.OPENAI_API_KEY) {
     openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    console.log('✅ OpenAI инициализирован');
+    console.log('✅ OpenAI initialized');
   } else {
-    console.log('⚠️ OPENAI_API_KEY не найден, используем только fallback');
+    console.log('⚠️ OPENAI_API_KEY not found, using only fallback');
   }
 } catch (error) {
-  console.log('⚠️ Ошибка инициализации OpenAI:', error.message);
+  console.log('⚠️ OpenAI initialization error:', error.message);
 }
 
-// Улучшенный fallback с проактивностью по назначениям
+// Enhanced fallback with assignment proactivity
 function getFallbackResponse(message, profile, context) {
   const lowerMessage = message.toLowerCase();
   
-  let response = `Привет! Я Татьяна, ваш помощник по здоровью. 👋\n\n`;
+  let response = `Hello! I am Tatiana, your health assistant. 👋\n\n`;
   
-  // ПРОАКТИВНОСТЬ: Сначала проверяем назначения
+  // PROACTIVITY: First check assignments
   if (context && context.activeAssignments && context.activeAssignments.length > 0) {
-    response += `📋 **ВАЖНО! У вас есть ${context.activeAssignments.length} невыполненное назначение:**\n\n`;
+    response += `📋 **IMPORTANT! You have ${context.activeAssignments.length} uncompleted assignment:**\n\n`;
     
     context.activeAssignments.forEach((assignment, index) => {
       response += `${index + 1}. **${assignment.title}** (${assignment.type})\n`;
@@ -32,72 +33,72 @@ function getFallbackResponse(message, profile, context) {
         response += `   ${assignment.description}\n`;
       }
       if (assignment.dueDate) {
-        response += `   📅 Срок: ${new Date(assignment.dueDate).toLocaleDateString()}\n`;
+        response += `   📅 Due: ${new Date(assignment.dueDate).toLocaleDateString()}\n`;
       }
       response += `\n`;
     });
     
-    response += `💡 **Рекомендую:**\n`;
-    response += `• Выполнить назначения в ближайшее время\n`;
-    response += `• Установить напоминания\n`;
-    response += `• Обсудить сложности, если есть\n\n`;
+    response += `💡 **I recommend:**\n`;
+    response += `• Complete assignments soon\n`;
+    response += `• Set reminders\n`;
+    response += `• Discuss difficulties if any\n\n`;
   }
   
-  // Анализируем сообщение и даем соответствующий ответ
-  if (lowerMessage.includes('привет') || lowerMessage.includes('здравствуй')) {
-    response += `Рада вас видеть! Как ваше самочувствие сегодня?`;
+  // Analyze message and give appropriate response
+  if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+    response += `Glad to see you! How are you feeling today?`;
     
-    // Дополнительная проактивность при приветствии
+    // Additional proactivity on greeting
     if (context && context.activeAssignments && context.activeAssignments.length > 0) {
-      response += `\n\nКстати, я вижу ваши назначения выше. Хотите, чтобы я помогла с их выполнением?`;
+      response += `\n\nBy the way, I see your assignments above. Would you like me to help with their completion?`;
     }
-  } else if (lowerMessage.includes('врач') || lowerMessage.includes('запись')) {
-    response += `Хотите записаться к врачу? У нас есть свободные слоты: 13:00, 15:00, 17:00. Какое время вам удобно?`;
-  } else if (lowerMessage.includes('препарат') || lowerMessage.includes('лекарство') || lowerMessage.includes('таблетка')) {
-    response += `О препаратах могу дать общую информацию (показания, противопоказания, побочные эффекты), но дозировки определяет только врач. Что именно вас интересует?`;
-  } else if (lowerMessage.includes('симптом') || lowerMessage.includes('болит') || lowerMessage.includes('плохо')) {
-    response += `Понимаю, что вас что-то беспокоит. Расскажите подробнее - когда началось, что именно болит, есть ли другие симптомы?`;
-  } else if (lowerMessage.includes('назначение') || lowerMessage.includes('помощь') || lowerMessage.includes('задача') || lowerMessage.includes('напомни') || lowerMessage.includes('что назначили')) {
-    response += `Конечно, помогу с назначениями! `;
+  } else if (lowerMessage.includes('doctor') || lowerMessage.includes('appointment')) {
+    response += `Would you like to make an appointment with a doctor? We have available slots: 13:00, 15:00, 17:00. What time is convenient for you?`;
+  } else if (lowerMessage.includes('medication') || lowerMessage.includes('drug') || lowerMessage.includes('pill')) {
+    response += `I can provide general information about medications (indications, contraindications, side effects), but only a doctor determines dosages. What specifically interests you?`;
+  } else if (lowerMessage.includes('symptom') || lowerMessage.includes('pain') || lowerMessage.includes('bad')) {
+    response += `I understand something is bothering you. Tell me more - when did it start, what exactly hurts, are there other symptoms?`;
+  } else if (lowerMessage.includes('assignment') || lowerMessage.includes('help') || lowerMessage.includes('task') || lowerMessage.includes('remind') || lowerMessage.includes('what was assigned') || lowerMessage.includes('what specifically')) {
+    response += `Of course, I will help with assignments! `;
     
     if (context && context.activeAssignments && context.activeAssignments.length > 0) {
-      response += `У вас есть ${context.activeAssignments.length} активное назначение. Давайте разберем каждое:\n\n`;
+      response += `You have ${context.activeAssignments.length} active assignment. Let's analyze each one:\n\n`;
       
       context.activeAssignments.forEach((assignment, index) => {
         response += `**${assignment.title}** (${assignment.type})\n`;
         if (assignment.description) {
           response += `${assignment.description}\n`;
         }
-        response += `Что именно нужно сделать? Есть ли сложности?\n\n`;
+        response += `What exactly needs to be done? Are there any difficulties?\n\n`;
       });
       
-      // Дополнительная помощь
-      response += `💡 **Что могу предложить:**\n`;
-      response += `• Помочь с планированием времени\n`;
-      response += `• Обсудить сложности выполнения\n`;
-      response += `• Настроить напоминания\n`;
-      response += `• Адаптировать план под ваши возможности\n\n`;
+      // Additional help
+      response += `💡 **What I can offer:**\n`;
+      response += `• Help with time planning\n`;
+      response += `• Discuss completion difficulties\n`;
+      response += `• Set up reminders\n`;
+      response += `• Adapt plan to your capabilities\n\n`;
       
-      response += `С каким назначением нужна помощь в первую очередь?`;
+      response += `Which assignment needs help first?`;
     } else {
-      response += `Сейчас у вас нет активных назначений. Хотите создать новое?`;
+      response += `You currently have no active assignments. Would you like to create a new one?`;
     }
   } else {
-    response += `Интересный вопрос! Расскажите подробнее, что вас интересует.`;
+    response += `Interesting question! Tell me more about what interests you.`;
   }
   
-  // Добавляем информацию о профиле если есть
+  // Add profile information if available
   if (profile && profile.demographics) {
-    response += `\n\n👤 **О вас:** ${profile.demographics.age} лет, ${profile.demographics.gender === 'male' ? 'мужчина' : 'женщина'}. `;
+    response += `\n\n👤 **About you:** ${profile.demographics.age} years old, ${profile.demographics.gender === 'male' ? 'male' : 'female'}. `;
     
     if (profile.demographics.age < 30) {
-      response += `В вашем возрасте важно заботиться о здоровье для будущего! 💪`;
+      response += `At your age, it is important to take care of your health for the future! 💪`;
     } else if (profile.demographics.age > 60) {
-      response += `В вашем возрасте особенно важно регулярно проходить обследования. 🏥`;
+      response += `At your age, it is especially important to have regular check-ups. 🏥`;
     }
   }
   
-  response += `\n\nЯ здесь, чтобы поддержать вас! 💙`;
+  response += `\n\nI am here to support you! 💙`;
   
   return response;
 }
@@ -114,46 +115,46 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    console.log('🎯 УЛУЧШЕННЫЙ API: Получено сообщение:', message);
-    console.log('🎯 УЛУЧШЕННЫЙ API: Профиль:', profile ? 'Есть' : 'Нет');
-    console.log('🎯 УЛУЧШЕННЫЙ API: Контекст назначений:', context ? 'Есть' : 'Нет');
+    console.log('🎯 ENHANCED API: Received message:', message);
+    console.log('🎯 ENHANCED API: Profile:', profile ? 'Yes' : 'No');
+    console.log('🎯 ENHANCED API: Assignment context:', context ? 'Yes' : 'No');
     
     if (context && context.activeAssignments) {
-      console.log('🎯 УЛУЧШЕННЫЙ API: Активные назначения:', context.activeAssignments.length);
+      console.log('🎯 ENHANCED API: Active assignments:', context.activeAssignments.length);
       context.activeAssignments.forEach((assignment, index) => {
         console.log(`   ${index + 1}. ${assignment.title} (${assignment.type})`);
       });
     } else {
-      console.log('🎯 УЛУЧШЕННЫЙ API: Контекст назначений отсутствует или пуст');
+      console.log('🎯 ENHANCED API: Assignment context is missing or empty');
     }
 
-    // Пытаемся использовать OpenAI если доступен
+    // Try to use OpenAI if available
     if (openai) {
       try {
-        console.log('🎯 УЛУЧШЕННЫЙ API: Пытаемся использовать OpenAI...');
+        console.log('🎯 ENHANCED API: Trying to use OpenAI...');
         
         // УЛУЧШЕННЫЙ СИСТЕМНЫЙ ПРОМПТ С НАЗНАЧЕНИЯМИ
-        let systemPrompt = `Ты — "Татьяна", ассистент по здоровью Benehab. Говори тёпло, с эмпатией, адаптируйся под пользователя. Не ставь диагнозы, не назначай лекарства. О препаратах давай только справочную информацию БЕЗ дозировок.
+        let systemPrompt = `You are "Tatiana", a health assistant for Benehab. Speak warmly, with empathy, adapt to the user. Don't make diagnoses or prescribe medications. About medications, provide only reference information WITHOUT dosages.
 
 ОСОБЕННО ВАЖНО - БУДЬ ПРОАКТИВНОЙ ПО НАЗНАЧЕНИЯМ:
-• Если у пользователя есть невыполненные назначения - ОБЯЗАТЕЛЬНО упомяни их
-• Предложи конкретную помощь с каждым назначением
-• Напомни о важности выполнения назначений
-• Спроси о сложностях и помоги их решить
-• Будь настойчивой, но доброжелательной
+• If user has uncompleted assignments - MANDATORY mention them
+• Offer specific help with each assignment
+• Remind about importance of completing assignments
+• Ask about difficulties and help solve them
+• Be persistent but friendly
 
 ТОН ОБЩЕНИЯ:
-• Дружелюбный и поддерживающий
-• Профессиональный, но не формальный
-• Используй эмодзи для теплоты
-• Задавай уточняющие вопросы при необходимости`;
+• Friendly and supportive
+• Professional but not formal
+• Use emojis for warmth
+• Ask clarifying questions when necessary`;
 
-        // Добавляем информацию о назначениях в промпт
+        // Add assignment information to prompt
         if (context && context.activeAssignments && context.activeAssignments.length > 0) {
-          console.log('🎯 УЛУЧШЕННЫЙ API: Добавляю назначения в промпт OpenAI');
+          console.log('🎯 ENHANCED API: Adding assignments to OpenAI prompt');
           
           systemPrompt += `\n\nАКТИВНЫЕ НАЗНАЧЕНИЯ ПОЛЬЗОВАТЕЛЯ (ОБЯЗАТЕЛЬНО УЧТИ):
-У пользователя ${context.activeAssignments.length} невыполненное назначение:`;
+User has ${context.activeAssignments.length} uncompleted assignment:`;
           
           context.activeAssignments.forEach((assignment, index) => {
             systemPrompt += `\n${index + 1}. ${assignment.title} (${assignment.type})`;
@@ -161,20 +162,20 @@ export default async function handler(req, res) {
               systemPrompt += ` - ${assignment.description}`;
             }
             if (assignment.dueDate) {
-              systemPrompt += ` - срок: ${new Date(assignment.dueDate).toLocaleDateString()}`;
+              systemPrompt += ` - due: ${new Date(assignment.dueDate).toLocaleDateString()}`;
             }
           });
           
           systemPrompt += `\n\nИНСТРУКЦИИ ПО НАЗНАЧЕНИЯМ:
-- ОБЯЗАТЕЛЬНО упомяни назначения в ответе
-- Предложи конкретную помощь с каждым
-- Напомни о важности выполнения
-- Спроси о сложностях
-- Будь проактивной и настойчивой`;
+- MANDATORY mention assignments in response
+- Offer specific help with each
+- Remind about importance of completion
+- Ask about difficulties
+- Be proactive and persistent`;
           
-          console.log('🎯 УЛУЧШЕННЫЙ API: Промпт OpenAI обновлен с назначениями');
+          console.log('🎯 ENHANCED API: OpenAI prompt updated with assignments');
         } else {
-          console.log('🎯 УЛУЧШЕННЫЙ API: Назначений нет, промпт OpenAI без назначений');
+          console.log('🎯 ENHANCED API: No assignments, OpenAI prompt without assignments');
         }
         
         const messages = [
@@ -190,46 +191,46 @@ export default async function handler(req, res) {
         });
 
         const aiResponse = completion.choices[0].message.content;
-        console.log('🎯 УЛУЧШЕННЫЙ API: OpenAI ответ получен:', aiResponse.substring(0, 100) + '...');
+        console.log('🎯 ENHANCED API: OpenAI response received:', aiResponse.substring(0, 100) + '...');
 
         res.status(200).json({
           response: aiResponse,
           success: true,
           timestamp: new Date().toISOString(),
-          note: 'AI ответ от OpenAI (УЛУЧШЕННЫЙ API)',
+          note: 'AI response from OpenAI (ENHANCED API)',
           assignments_count: context?.activeAssignments?.length || 0
         });
         return;
         
       } catch (openaiError) {
-        console.log('🎯 УЛУЧШЕННЫЙ API: OpenAI недоступен, используем fallback:', openaiError.message);
+        console.log('🎯 ENHANCED API: OpenAI unavailable, using fallback:', openaiError.message);
       }
     } else {
-      console.log('🎯 УЛУЧШЕННЫЙ API: OpenAI не инициализирован, используем fallback');
+      console.log('🎯 ENHANCED API: OpenAI not initialized, using fallback');
     }
     
-    // Используем улучшенный fallback ответ
-    console.log('🎯 УЛУЧШЕННЫЙ API: Используем fallback ответ');
+    // Use enhanced fallback response
+    console.log('🎯 ENHANCED API: Using fallback response');
     const fallbackResponse = getFallbackResponse(message, profile, context);
     
     res.status(200).json({
       response: fallbackResponse,
       success: true,
       timestamp: new Date().toISOString(),
-      note: 'Улучшенный fallback ответ (УЛУЧШЕННЫЙ API)',
+      note: 'Enhanced fallback response (ENHANCED API)',
       openai_available: !!openai,
       assignments_count: context?.activeAssignments?.length || 0
     });
 
   } catch (error) {
-    console.error('🎯 УЛУЧШЕННЫЙ API: Критическая ошибка:', error);
+    console.error('🎯 ENHANCED API: Critical error:', error);
     
-    // Критический fallback
+    // Critical fallback
     res.status(500).json({ 
-      error: 'Критическая ошибка',
+      error: 'Critical error',
       details: error.message,
-      fallback: 'Извините, у меня технические проблемы. Попробуйте написать еще раз через минуту.',
-      note: 'Критический fallback (УЛУЧШЕННЫЙ API)'
+      fallback: 'Sorry, I have technical problems. Please try writing again in a minute.',
+      note: 'Critical fallback (ENHANCED API)'
     });
   }
 }

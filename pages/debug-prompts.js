@@ -9,7 +9,7 @@ export default function DebugPrompts() {
   const [demographics, setDemographics] = useState(null);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [basePrompt, setBasePrompt] = useState('Базовый промпт не настроен');
+  const [basePrompt, setBasePrompt] = useState('Base prompt not configured');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function DebugPrompts() {
     if (!isClient) return;
     
     try {
-      // Загружаем все данные из localStorage
+      // Load all data from localStorage
       const pib = localStorage.getItem('benehab.pib');
       const attitude = localStorage.getItem('benehab_attitude_profile');
       const typology = localStorage.getItem('benehab_typology_profile');
@@ -36,15 +36,15 @@ export default function DebugPrompts() {
       if (demo) setDemographics(JSON.parse(demo));
       if (base) setBasePrompt(base);
     } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
+      console.error('Error loading data:', error);
     }
   };
 
   const generatePrompt = async () => {
     setLoading(true);
     try {
-      // Отладочная информация на клиенте
-      console.log('🔍 DEBUG: Отправляем данные в API:');
+      // Debug information on client
+      console.log('🔍 DEBUG: Sending data to API:');
       console.log('Attitude Profile:', attitudeProfile);
       console.log('Typology Profile:', typologyProfile);
       console.log('Values Profile:', valuesProfile);
@@ -57,32 +57,32 @@ export default function DebugPrompts() {
         },
         body: JSON.stringify({
           attitude_profile: attitudeProfile,
-          accentuation_profile: typologyProfile, // Используем правильное название
+          accentuation_profile: typologyProfile, // Use correct name
           values_profile: valuesProfile,
           demographics: demographics
         }),
       });
 
       const data = await response.json();
-      console.log('🔍 DEBUG: Ответ от API:', data);
+      console.log('🔍 DEBUG: API Response:', data);
 
       if (data.success) {
         setPibData(data.pib);
-        setGeneratedPrompt(data.prompt || 'Промпт не сгенерирован');
+        setGeneratedPrompt(data.prompt || 'Prompt not generated');
         
-        // Дополнительная отладка
+        // Additional debugging
         if (data.prompt) {
-          console.log('✅ Промпт сгенерирован:', data.prompt);
+          console.log('✅ Prompt generated:', data.prompt);
         } else {
-          console.log('❌ Промпт не сгенерирован');
+          console.log('❌ Prompt not generated');
         }
       } else {
-        console.error('❌ Ошибка API:', data.error);
-        setGeneratedPrompt(`Ошибка: ${data.error}`);
+        console.error('❌ API Error:', data.error);
+        setGeneratedPrompt(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error('❌ Ошибка при генерации промпта:', error);
-      setGeneratedPrompt(`Ошибка: ${error.message}`);
+      console.error('❌ Error generating prompt:', error);
+      setGeneratedPrompt(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -98,23 +98,23 @@ export default function DebugPrompts() {
     setValuesProfile(null);
     setDemographics(null);
     setGeneratedPrompt('');
-    setBasePrompt('Базовый промпт не настроен');
+    setBasePrompt('Base prompt not configured');
   };
 
-  // Не рендерим содержимое до загрузки на клиенте
+  // Don't render content until loaded on client
   if (!isClient) {
     return (
       <>
         <Head>
-          <title>Отладка промптов - Benehab</title>
+          <title>Prompt Debug - Benehab</title>
         </Head>
         <div className="min-h-screen bg-gray-50 p-6">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">
-              🔍 Отладка промптов Benehab
+              🔍 Benehab Prompt Debug
             </h1>
             <div className="text-center py-8">
-              <p>Загрузка...</p>
+              <p>Loading...</p>
             </div>
           </div>
         </div>
@@ -125,79 +125,79 @@ export default function DebugPrompts() {
   return (
     <>
       <Head>
-        <title>Отладка промптов - Benehab</title>
+        <title>Prompt Debug - Benehab</title>
       </Head>
       
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            🔍 Отладка промптов Benehab
+            🔍 Benehab Prompt Debug
           </h1>
 
-          {/* Кнопки управления */}
+          {/* Control buttons */}
           <div className="flex gap-4 mb-6">
             <button
               onClick={loadData}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              🔄 Обновить данные
+              🔄 Refresh Data
             </button>
             <button
               onClick={generatePrompt}
               disabled={loading}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
             >
-              {loading ? '⏳ Генерирую...' : '🚀 Сгенерировать промпт'}
+              {loading ? '⏳ Generating...' : '🚀 Generate Prompt'}
             </button>
             <button
               onClick={clearAllData}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             >
-              🗑️ Очистить все данные
+              🗑️ Clear All Data
             </button>
           </div>
 
-          {/* Статус данных */}
+          {/* Data status */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div className={`p-4 rounded-lg ${attitudeProfile ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
               <h3 className="font-semibold">Attitude Profile</h3>
               <p className={attitudeProfile ? 'text-green-700' : 'text-red-700'}>
-                {attitudeProfile ? '✅ Загружен' : '❌ Отсутствует'}
+                {attitudeProfile ? '✅ Loaded' : '❌ Missing'}
               </p>
             </div>
             
             <div className={`p-4 rounded-lg ${typologyProfile ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
               <h3 className="font-semibold">Typology Profile</h3>
               <p className={typologyProfile ? 'text-green-700' : 'text-red-700'}>
-                {typologyProfile ? '✅ Загружен' : '❌ Отсутствует'}
+                {typologyProfile ? '✅ Loaded' : '❌ Missing'}
               </p>
             </div>
             
             <div className={`p-4 rounded-lg ${valuesProfile ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
               <h3 className="font-semibold">Values Profile</h3>
               <p className={valuesProfile ? 'text-green-700' : 'text-red-700'}>
-                {valuesProfile ? '✅ Загружен' : '❌ Отсутствует'}
+                {valuesProfile ? '✅ Loaded' : '❌ Missing'}
               </p>
             </div>
             
             <div className={`p-4 rounded-lg ${demographics ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
               <h3 className="font-semibold">Demographics</h3>
               <p className={demographics ? 'text-green-700' : 'text-red-700'}>
-                {demographics ? '✅ Загружены' : '❌ Отсутствуют'}
+                {demographics ? '✅ Loaded' : '❌ Missing'}
               </p>
             </div>
             
             <div className={`p-4 rounded-lg ${pibData ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'} border`}>
               <h3 className="font-semibold">PIB</h3>
               <p className={pibData ? 'text-green-700' : 'text-red-700'}>
-                {pibData ? '✅ Сформирован' : '❌ Не сформирован'}
+                {pibData ? '✅ Generated' : '❌ Not Generated'}
               </p>
             </div>
           </div>
 
-          {/* Базовый промпт */}
+          {/* Base prompt */}
           <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-3">⚙️ Базовый промпт Татьяны:</h2>
+            <h2 className="text-xl font-semibold mb-3">⚙️ Tatiana's Base Prompt:</h2>
             <div className="bg-white p-4 rounded-lg border border-gray-300">
               <pre className="whitespace-pre-wrap text-sm text-gray-800 overflow-x-auto">
                 {basePrompt}
@@ -205,10 +205,10 @@ export default function DebugPrompts() {
             </div>
           </div>
 
-          {/* Сгенерированный промпт */}
+          {/* Generated prompt */}
           {generatedPrompt && (
             <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-3">🎯 Сгенерированный промпт:</h2>
+              <h2 className="text-xl font-semibold mb-3">🎯 Generated Prompt:</h2>
               <div className="bg-white p-4 rounded-lg border border-gray-300">
                 <pre className="whitespace-pre-wrap text-sm text-gray-800 overflow-x-auto">
                   {generatedPrompt}
@@ -217,7 +217,7 @@ export default function DebugPrompts() {
             </div>
           )}
 
-          {/* Детали профилей */}
+          {/* Profile details */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Attitude Profile */}
             <div className="bg-white p-6 rounded-lg border border-gray-300">
@@ -227,7 +227,7 @@ export default function DebugPrompts() {
                   {JSON.stringify(attitudeProfile, null, 2)}
                 </pre>
               ) : (
-                <p className="text-gray-500">Данные отсутствуют</p>
+                <p className="text-gray-500">No data available</p>
               )}
             </div>
 
@@ -239,7 +239,7 @@ export default function DebugPrompts() {
                   {JSON.stringify(typologyProfile, null, 2)}
                 </pre>
               ) : (
-                <p className="text-gray-500">Данные отсутствуют</p>
+                <p className="text-gray-500">No data available</p>
               )}
             </div>
 
@@ -251,7 +251,7 @@ export default function DebugPrompts() {
                   {JSON.stringify(valuesProfile, null, 2)}
                 </pre>
               ) : (
-                <p className="text-gray-500">Данные отсутствуют</p>
+                <p className="text-gray-500">No data available</p>
               )}
             </div>
 
@@ -263,7 +263,7 @@ export default function DebugPrompts() {
                   {JSON.stringify(demographics, null, 2)}
                 </pre>
               ) : (
-                <p className="text-gray-500">Данные отсутствуют</p>
+                <p className="text-gray-500">No data available</p>
               )}
             </div>
           </div>
@@ -280,15 +280,15 @@ export default function DebugPrompts() {
             </div>
           )}
 
-          {/* Инструкции */}
+          {/* Instructions */}
           <div className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-300">
-            <h2 className="text-xl font-semibold mb-3 text-blue-900">📖 Инструкции по использованию:</h2>
+            <h2 className="text-xl font-semibold mb-3 text-blue-900">📖 Usage Instructions:</h2>
             <ul className="text-blue-800 space-y-2">
-              <li>• Пройдите опросы на главной странице</li>
-              <li>• Нажмите "Обновить данные" для загрузки результатов</li>
-              <li>• Нажмите "Сгенерировать промпт" для создания промпта ИИ</li>
-              <li>• Используйте "Очистить все данные" для сброса</li>
-              <li>• Эта страница доступна по адресу: <code className="bg-blue-200 px-2 py-1 rounded">/debug-prompts</code></li>
+              <li>• Complete surveys on the main page</li>
+              <li>• Click "Refresh Data" to load results</li>
+              <li>• Click "Generate Prompt" to create AI prompt</li>
+              <li>• Use "Clear All Data" to reset</li>
+              <li>• This page is available at: <code className="bg-blue-200 px-2 py-1 rounded">/debug-prompts</code></li>
             </ul>
           </div>
         </div>

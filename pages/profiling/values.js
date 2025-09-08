@@ -6,25 +6,25 @@ import Link from 'next/link';
 
 export default function ValuesSurvey() {
   const router = useRouter();
-  const [currentStage, setCurrentStage] = useState(1); // 1 - цвета, 2 - ранжирование цветов
+  const [currentStage, setCurrentStage] = useState(1); // 1 - colors, 2 - color ranking
   const [items, setItems] = useState([]);
   const [colorAssociations, setColorAssociations] = useState({});
-  const [colorRankings, setColorRankings] = useState([]); // Ранжирование цветов
+  const [colorRankings, setColorRankings] = useState([]); // Color ranking
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const colors = [
-    { name: 'red', label: 'Красный', class: 'bg-red-500' },
-    { name: 'blue', label: 'Синий', class: 'bg-blue-500' },
-    { name: 'green', label: 'Зеленый', class: 'bg-green-500' },
-    { name: 'yellow', label: 'Желтый', class: 'bg-yellow-400' },
-    { name: 'purple', label: 'Фиолетовый', class: 'bg-purple-500' },
-    { name: 'orange', label: 'Оранжевый', class: 'bg-orange-500' },
-    { name: 'pink', label: 'Розовый', class: 'bg-pink-500' },
-    { name: 'brown', label: 'Коричневый', class: 'bg-yellow-800' },
-    { name: 'gray', label: 'Серый', class: 'bg-gray-500' },
-    { name: 'black', label: 'Черный', class: 'bg-gray-900' },
-    { name: 'white', label: 'Белый', class: 'bg-white border-2 border-gray-300' }
+    { name: 'red', label: 'Red', class: 'bg-red-500' },
+    { name: 'blue', label: 'Blue', class: 'bg-blue-500' },
+    { name: 'green', label: 'Green', class: 'bg-green-500' },
+    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-400' },
+    { name: 'purple', label: 'Purple', class: 'bg-purple-500' },
+    { name: 'orange', label: 'Orange', class: 'bg-orange-500' },
+    { name: 'pink', label: 'Pink', class: 'bg-pink-500' },
+    { name: 'brown', label: 'Brown', class: 'bg-yellow-800' },
+    { name: 'gray', label: 'Gray', class: 'bg-gray-500' },
+    { name: 'black', label: 'Black', class: 'bg-gray-900' },
+    { name: 'white', label: 'White', class: 'bg-white border-2 border-gray-300' }
   ];
 
   useEffect(() => {
@@ -43,13 +43,13 @@ export default function ValuesSurvey() {
       
       if (data.success) {
         setItems(data.items || []);
-        console.log('✅ Понятия загружены успешно:', data.items?.length);
+        console.log('✅ Concepts loaded successfully:', data.items?.length);
       } else {
-        console.error('❌ API вернул ошибку:', data.error);
+        console.error('❌ API returned error:', data.error);
         setItems([]);
       }
     } catch (error) {
-      console.error('❌ Ошибка загрузки понятий:', error);
+      console.error('❌ Error loading concepts:', error);
       setItems([]);
     }
   };
@@ -63,7 +63,7 @@ export default function ValuesSurvey() {
         try {
           setColorAssociations(JSON.parse(savedColors));
         } catch (error) {
-          console.error('Ошибка загрузки цветов:', error);
+          console.error('Error loading colors:', error);
         }
       }
       
@@ -71,7 +71,7 @@ export default function ValuesSurvey() {
         try {
           setColorRankings(JSON.parse(savedColorRankings));
         } catch (error) {
-          console.error('Ошибка загрузки ранжирования цветов:', error);
+          console.error('Error loading color rankings:', error);
         }
       }
     }
@@ -109,13 +109,13 @@ export default function ValuesSurvey() {
   const handleColorRankingChange = (color, newIndex) => {
     let newColorRankings = [...colorRankings];
     
-    // Убираем цвет из текущей позиции
+    // Remove color from current position
     const currentIndex = newColorRankings.indexOf(color);
     if (currentIndex !== -1) {
       newColorRankings.splice(currentIndex, 1);
     }
     
-    // Вставляем на новую позицию
+    // Insert at new position
     newColorRankings.splice(newIndex, 0, color);
     
     setColorRankings(newColorRankings);
@@ -157,19 +157,19 @@ export default function ValuesSurvey() {
         const result = await response.json();
         localStorage.setItem('benehab_values_profile', JSON.stringify(result.profile));
         
-        // Генерируем PIB
+        // Generate PIB
         await generatePIB();
         
-        // Перенаправляем на страницу результатов
+        // Redirect to results page
         router.push('/profiling/values-results');
       } else {
         const errorText = await response.text();
-        console.error('❌ Ошибка отправки ответов:', response.status, errorText);
-        alert(`Ошибка отправки: ${response.status}`);
+        console.error('❌ Error submitting answers:', response.status, errorText);
+        alert(`Submission error: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Ошибка отправки ответов:', error);
-      alert(`Ошибка: ${error.message}`);
+      console.error('❌ Error submitting answers:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -195,7 +195,7 @@ export default function ValuesSurvey() {
         localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
       }
     } catch (error) {
-      console.error('Ошибка генерации PIB:', error);
+      console.error('Error generating PIB:', error);
     }
   };
 
@@ -204,7 +204,7 @@ export default function ValuesSurvey() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-          <p>Загружаем понятия...</p>
+          <p>Loading concepts...</p>
         </div>
       </div>
     );
@@ -213,19 +213,19 @@ export default function ValuesSurvey() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-4">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Ценностная модель</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Values Model</h1>
             <Link href="/" className="text-emerald-600 hover:text-emerald-700">
-              Вернуться к чату
+              Back to Chat
             </Link>
           </div>
           
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Прогресс: {Math.round(progress)}%</span>
-              <span>Этап {currentStage} из 2</span>
+              <span>Progress: {Math.round(progress)}%</span>
+              <span>Stage {currentStage} of 2</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
@@ -237,18 +237,18 @@ export default function ValuesSurvey() {
 
           <p className="text-gray-700">
             {currentStage === 1 
-              ? 'Выберите цвет для каждого понятия, который лучше всего ассоциируется с вашими чувствами.'
-              : 'Расставьте цвета по порядку от самого приятного до самого неприятного.'
+              ? 'Choose a color for each concept that best associates with your feelings.'
+              : 'Arrange colors in order from most pleasant to least pleasant.'
             }
           </p>
         </div>
 
-        {/* Этап 1: Цветовые ассоциации */}
+        {/* Stage 1: Color associations */}
         {currentStage === 1 && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Этап 1: Цветовые ассоциации
-            </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Stage 1: Color Associations
+              </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {items.map((item) => (
@@ -276,7 +276,7 @@ export default function ValuesSurvey() {
                   
                   {colorAssociations[item.concept] && (
                     <div className="mt-2 text-sm text-emerald-600">
-                      ✓ Выбран: {colors.find(c => c.name === colorAssociations[item.concept])?.label}
+                      ✓ Selected: {colors.find(c => c.name === colorAssociations[item.concept])?.label}
                     </div>
                   )}
                 </div>
@@ -285,7 +285,7 @@ export default function ValuesSurvey() {
             
             <div className="mt-6 text-center">
               <div className="text-sm text-gray-600 mb-2">
-                Окрашено: {Object.keys(colorAssociations).length} из {items.length}
+                Colored: {Object.keys(colorAssociations).length} of {items.length}
               </div>
               <button
                 onClick={goToStage2}
@@ -298,21 +298,21 @@ export default function ValuesSurvey() {
                   }
                 `}
               >
-                Перейти к ранжированию →
+                Go to Ranking →
               </button>
             </div>
           </div>
         )}
 
-        {/* Этап 2: Ранжирование цветов */}
+        {/* Stage 2: Color ranking */}
         {currentStage === 2 && (
           <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Этап 2: Ранжирование цветов по привлекательности
-            </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Stage 2: Color Ranking by Attractiveness
+              </h2>
             
             <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-3">От самого приятного к самому неприятному:</h3>
+              <h3 className="font-medium text-gray-900 mb-3">From most pleasant to least pleasant:</h3>
               
               <div className="space-y-2">
                 {colorRankings.map((color, index) => (
@@ -321,7 +321,7 @@ export default function ValuesSurvey() {
                     <div className="w-8 h-8 rounded-full mr-3" style={{ backgroundColor: color }}></div>
                     <span className="flex-1 text-gray-900">{colors.find(c => c.name === color)?.label || color}</span>
                     <span className="text-sm text-gray-500">
-                      {Object.keys(colorAssociations).filter(concept => colorAssociations[concept] === color).length} понятий
+                      {Object.keys(colorAssociations).filter(concept => colorAssociations[concept] === color).length} concepts
                     </span>
                   </div>
                 ))}
@@ -330,14 +330,14 @@ export default function ValuesSurvey() {
               {colorRankings.length < colors.length && (
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800 text-sm">
-                    Выберите цвета из списка ниже, чтобы завершить ранжирование
+                    Choose colors from the list below to complete the ranking
                   </p>
                 </div>
               )}
             </div>
             
             <div className="mb-6">
-              <h3 className="font-medium text-gray-900 mb-3">Доступные цвета:</h3>
+              <h3 className="font-medium text-gray-900 mb-3">Available colors:</h3>
               <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
                 {colors
                   .filter(color => !colorRankings.includes(color.name))
@@ -359,7 +359,7 @@ export default function ValuesSurvey() {
                 onClick={goBackToStage1}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-xl hover:border-emerald-400 hover:text-emerald-600 transition-colors"
               >
-                ← Вернуться к цветам
+                ← Back to Colors
               </button>
               
               <button
@@ -373,15 +373,15 @@ export default function ValuesSurvey() {
                   }
                 `}
               >
-                {loading ? 'Завершаем...' : 'Завершить опрос'}
+                {loading ? 'Completing...' : 'Complete Survey'}
               </button>
             </div>
           </div>
         )}
 
-        {/* Подсказка */}
+        {/* Hint */}
         <div className="text-center text-sm text-gray-500 mt-4">
-          Ваши ответы автоматически сохраняются. После завершения вы сможете общаться с Татьяной в персонализированном режиме.
+          Your answers are automatically saved. After completion, you will be able to communicate with Tatiana in a personalized mode.
         </div>
       </div>
     </div>

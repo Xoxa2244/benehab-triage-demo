@@ -128,7 +128,7 @@ export default function Assignments() {
 
     saveAssignments(newAssignments);
     
-    // Создаем occurrence для нового назначения
+    // Create occurrence for new assignment
     if (!editingId) {
       createOccurrence(newAssignment);
     }
@@ -262,7 +262,7 @@ export default function Assignments() {
         alert('❌ ' + result.error);
       }
     } catch (error) {
-      alert('❌ Ошибка: ' + error.message);
+      alert('❌ Error: ' + error.message);
     }
   };
 
@@ -301,7 +301,7 @@ export default function Assignments() {
       </Head>
       
       <div className="min-h-screen bg-gray-50">
-        {/* Заголовок */}
+        {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -325,7 +325,7 @@ export default function Assignments() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Push-уведомления */}
+          {/* Push notifications */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
             <h2 className="text-lg font-semibold mb-4">🔔 Push Notifications</h2>
             
@@ -393,7 +393,7 @@ export default function Assignments() {
             )}
           </div>
 
-          {/* Кнопка добавления */}
+          {/* Add button */}
           <div className="mb-6">
             <button
               onClick={() => setShowForm(true)}
@@ -403,7 +403,7 @@ export default function Assignments() {
             </button>
           </div>
 
-          {/* Форма добавления/редактирования */}
+          {/* Add/edit form */}
           {showForm && (
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
               <h2 className="text-lg font-semibold mb-4">
@@ -412,7 +412,7 @@ export default function Assignments() {
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Тип */}
+                  {/* Type */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Type *
@@ -431,7 +431,7 @@ export default function Assignments() {
                     </select>
                   </div>
 
-                  {/* Название */}
+                  {/* Title */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Title *
@@ -447,7 +447,7 @@ export default function Assignments() {
                   </div>
                 </div>
 
-                {/* Описание */}
+                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description
@@ -461,7 +461,7 @@ export default function Assignments() {
                   />
                 </div>
 
-                {/* Дата/Время */}
+                {/* Date/Time */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Date and Time *
@@ -475,7 +475,7 @@ export default function Assignments() {
                   />
                 </div>
 
-                {/* Уведомления */}
+                {/* Notifications */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -529,7 +529,7 @@ export default function Assignments() {
                   </div>
                 </div>
 
-                {/* Кнопки */}
+                {/* Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
                     type="submit"
@@ -552,7 +552,7 @@ export default function Assignments() {
                       onClick={() => {
                         handleSubmit({ preventDefault: () => {} });
                         setFormData({
-                          type: 'прием препарата',
+                          type: 'medication intake',
                           title: '',
                           description: '',
                           scheduledAt: '',
@@ -571,7 +571,7 @@ export default function Assignments() {
             </div>
           )}
 
-          {/* Список назначений */}
+          {/* Assignments list */}
           {assignments.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
               <h2 className="text-lg font-semibold mb-4">Your Assignments</h2>
@@ -641,7 +641,7 @@ export default function Assignments() {
             </div>
           )}
 
-          {/* Статистика выполнения */}
+          {/* Completion statistics */}
           {occurrences.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-lg font-semibold mb-4">Completion Statistics</h2>
@@ -690,7 +690,7 @@ export default function Assignments() {
             </div>
           )}
 
-          {/* Пустое состояние */}
+          {/* Empty state */}
           {assignments.length === 0 && (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
