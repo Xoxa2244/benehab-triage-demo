@@ -97,7 +97,7 @@ export default function ValuesSurvey() {
       stageProgress = 50 + (colorRankings.length / colors.length) * 50;
     }
     
-    setProgress(Math.min(stageProgress, 100));
+    setProgress(Math.min(Math.max(stageProgress, 0), 100));
   };
 
   // Pagination functions
@@ -105,7 +105,8 @@ export default function ValuesSurvey() {
   const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   
   const goToNextPage = () => {
-    if (currentPage < totalPages) {
+    console.log('goToNextPage called:', { currentPage, totalPages, canGoToNextPage: canGoToNextPage() });
+    if (currentPage < totalPages && canGoToNextPage()) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -121,7 +122,21 @@ export default function ValuesSurvey() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, items.length);
     const pageItems = items.slice(startIndex, endIndex);
-    return pageItems.every(item => colorAssociations[item.concept]);
+    const allSelected = pageItems.every(item => colorAssociations[item.concept]);
+    console.log('canGoToNextPage:', { 
+      currentPage, 
+      totalPages, 
+      startIndex, 
+      endIndex, 
+      pageItems: pageItems.map(p => p.concept),
+      colorAssociations: Object.keys(colorAssociations),
+      allSelected 
+    });
+    return allSelected;
+  };
+  
+  const canGoToPreviousPage = () => {
+    return currentPage > 1;
   };
 
   const handleColorSelect = (concept, color) => {
@@ -368,7 +383,7 @@ export default function ValuesSurvey() {
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div 
                     className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${(Object.keys(colorAssociations).length / items.length) * 100}%` }}
+                    style={{ width: `${Math.min((Object.keys(colorAssociations).length / items.length) * 100, 100)}%` }}
                   ></div>
                 </div>
               </div>
@@ -377,10 +392,10 @@ export default function ValuesSurvey() {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={goToPreviousPage}
-                  disabled={currentPage === 1}
+                  disabled={!canGoToPreviousPage()}
                   className={`
                     px-6 py-3 rounded-xl font-medium transition-all duration-300
-                    ${currentPage === 1
+                    ${!canGoToPreviousPage()
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
                     }
