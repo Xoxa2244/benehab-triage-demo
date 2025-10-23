@@ -635,70 +635,39 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
         </div>
 
-        {/* Mobile Survey Buttons - Professional Design */}
+        {/* Mobile Survey Buttons - Clean Design */}
         <div className="px-4 py-4 bg-white/60 backdrop-blur-sm border-b border-gray-200/30">
-          <div className="flex justify-center space-x-3">
+          <div className="flex justify-center space-x-2">
             {surveyData.map((survey) => (
               <Link key={survey.id} href={survey.link}>
                 <div className={`
-                  relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg
+                  relative flex items-center justify-center w-24 h-12 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg
                   ${survey.completed
-                    ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-green-200'
+                    ? 'bg-gradient-to-r from-green-500 to-green-600 shadow-green-200'
                     : survey.color === 'emerald'
-                    ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-200 hover:shadow-emerald-300'
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-200 hover:shadow-emerald-300'
                     : survey.color === 'blue'
-                    ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-200 hover:shadow-blue-300'
-                    : 'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-200 hover:shadow-purple-300'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 shadow-blue-200 hover:shadow-blue-300'
+                    : 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-purple-200 hover:shadow-purple-300'
                   }
                 `}>
                   {/* Completion Indicator */}
                   {survey.completed ? (
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
-                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                   ) : (
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
-                      <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
                     </div>
                   )}
-                  
-                  {/* Survey Icon */}
-                  <div className="text-white text-2xl mb-1">
-                    {survey.completed ? '✓' : survey.icon}
-                  </div>
                   
                   {/* Survey Title */}
-                  <span className="text-white text-xs font-semibold text-center leading-tight">
+                  <span className="text-white text-sm font-semibold text-center">
                     {survey.shortTitle}
                   </span>
-                  
-                  {/* Progress Ring */}
-                  {!survey.completed && (
-                    <div className="absolute inset-0 rounded-2xl">
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="45"
-                          stroke="rgba(255,255,255,0.3)"
-                          strokeWidth="3"
-                          fill="none"
-                        />
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="45"
-                          stroke="rgba(255,255,255,0.8)"
-                          strokeWidth="3"
-                          fill="none"
-                          strokeDasharray={`${getSurveyProgress(survey.id) * 2.83}, 283`}
-                          className="transition-all duration-500"
-                        />
-                      </svg>
-                    </div>
-                  )}
                 </div>
               </Link>
             ))}
