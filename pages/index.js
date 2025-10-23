@@ -567,61 +567,137 @@ Let's start by completing your profiling surveys so I can better understand you 
       </div>
 
       {/* Mobile Layout - ChatGPT-inspired design */}
-      <div className="md:hidden flex flex-col h-screen bg-white">
-        {/* Mobile Header - Simplified */}
-        <div className="flex items-center justify-center px-4 py-3 bg-white border-b border-gray-100">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">M</span>
+      <div className="md:hidden flex flex-col h-screen bg-gradient-to-br from-gray-50 to-white">
+        {/* Mobile Header - Professional */}
+        <div className="flex items-center justify-between px-4 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200/50">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">{demographics.name?.charAt(0) || 'U'}</span>
             </div>
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900">May</h1>
-              <div className="flex items-center justify-center space-x-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <div>
+              <h1 className="text-lg font-semibold text-gray-900">{demographics.name || 'User'}</h1>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs text-gray-500">online</span>
               </div>
             </div>
           </div>
+          
+          {/* Burger Menu */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
 
-        {/* Mobile Progress Indicator - Minimal */}
-        <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-600">Profile Progress</span>
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="absolute top-16 right-4 w-64 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 py-2 z-50">
+            <Link href="/assignments" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+              <svg className="w-5 h-5 mr-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Health Assignments
+            </Link>
+            <Link href="/staff-console" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+              <svg className="w-5 h-5 mr-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Staff Console
+            </Link>
+            <Link href="/admin" className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
+              <svg className="w-5 h-5 mr-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Admin Panel
+            </Link>
+          </div>
+        )}
+
+        {/* Mobile Progress Indicator - Beautiful */}
+        <div className="px-4 py-3 bg-gradient-to-r from-gray-50/50 to-white/50 backdrop-blur-sm border-b border-gray-200/30">
+          <div className="flex items-center justify-center space-x-3">
+            <span className="text-sm font-medium text-gray-700">Profile Progress</span>
             <div className="flex items-center space-x-2">
-              <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden">
+              <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className="h-full bg-emerald-500 transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500 ease-out shadow-sm"
                   style={{ width: `${getProfileProgress()}%` }}
                 ></div>
               </div>
-              <span className="text-xs text-gray-600">{getProfileProgress()}%</span>
+              <span className="text-sm font-semibold text-emerald-600">{getProfileProgress()}%</span>
             </div>
           </div>
         </div>
 
-        {/* Mobile Survey Buttons - Compact horizontal row */}
-        <div className="px-4 py-3 bg-white border-b border-gray-100">
-          <div className="flex space-x-2 overflow-x-auto">
+        {/* Mobile Survey Buttons - Professional Design */}
+        <div className="px-4 py-4 bg-white/60 backdrop-blur-sm border-b border-gray-200/30">
+          <div className="flex justify-center space-x-3">
             {surveyData.map((survey) => (
               <Link key={survey.id} href={survey.link}>
                 <div className={`
-                  flex items-center space-x-2 px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200
+                  relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg
                   ${survey.completed
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-green-200'
                     : survey.color === 'emerald'
-                    ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                    ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-200 hover:shadow-emerald-300'
                     : survey.color === 'blue'
-                    ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                    : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                    ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-200 hover:shadow-blue-300'
+                    : 'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-200 hover:shadow-purple-300'
                   }
                 `}>
-                  <span className="text-sm">{survey.icon}</span>
-                  <span>{survey.shortTitle}</span>
-                  {survey.completed && (
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                  {/* Completion Indicator */}
+                  {survey.completed ? (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                      <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                    </div>
+                  )}
+                  
+                  {/* Survey Icon */}
+                  <div className="text-white text-2xl mb-1">
+                    {survey.completed ? '✓' : survey.icon}
+                  </div>
+                  
+                  {/* Survey Title */}
+                  <span className="text-white text-xs font-semibold text-center leading-tight">
+                    {survey.shortTitle}
+                  </span>
+                  
+                  {/* Progress Ring */}
+                  {!survey.completed && (
+                    <div className="absolute inset-0 rounded-2xl">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="3"
+                          fill="none"
+                        />
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          stroke="rgba(255,255,255,0.8)"
+                          strokeWidth="3"
+                          fill="none"
+                          strokeDasharray={`${getSurveyProgress(survey.id) * 2.83}, 283`}
+                          className="transition-all duration-500"
+                        />
+                      </svg>
+                    </div>
                   )}
                 </div>
               </Link>
@@ -629,10 +705,10 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
         </div>
 
-        {/* Mobile Chat Interface - Full Screen */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Chat Interface - Professional */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-gradient-to-b from-white/80 to-gray-50/80">
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
             {chatMessages.map((message) => (
               <div
                 key={message.id}
@@ -640,15 +716,15 @@ Let's start by completing your profiling surveys so I can better understand you 
               >
                 <div
                   className={`
-                    max-w-[85%] px-4 py-3 rounded-2xl
+                    max-w-[85%] px-5 py-4 rounded-3xl shadow-sm
                     ${message.type === 'user'
-                      ? 'bg-emerald-500 text-white rounded-br-md'
-                      : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                      ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-lg'
+                      : 'bg-white/90 backdrop-blur-sm text-gray-900 rounded-bl-lg border border-gray-200/50'
                     }
                   `}
                 >
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.text}</p>
-                  <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-emerald-100' : 'text-gray-500'}`}>
+                  <p className={`text-xs mt-2 ${message.type === 'user' ? 'text-emerald-100' : 'text-gray-500'}`}>
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </p>
                 </div>
@@ -657,7 +733,7 @@ Let's start by completing your profiling surveys so I can better understand you 
             
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-2xl rounded-bl-md">
+                <div className="bg-white/90 backdrop-blur-sm text-gray-900 px-5 py-4 rounded-3xl rounded-bl-lg border border-gray-200/50 shadow-sm">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -669,13 +745,13 @@ Let's start by completing your profiling surveys so I can better understand you 
           </div>
 
           {/* Mobile Quick Questions */}
-          <div className="px-4 py-2 border-t border-gray-100">
-            <div className="flex space-x-2 overflow-x-auto">
+          <div className="px-4 py-3 bg-white/60 backdrop-blur-sm border-t border-gray-200/30">
+            <div className="flex justify-center space-x-2">
               {quickQuestions.slice(0, 3).map((question, index) => (
                 <button
                   key={index}
                   onClick={() => setInputMessage(question)}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded-full transition-colors whitespace-nowrap"
+                  className="px-4 py-2 bg-white/80 hover:bg-white text-gray-700 text-xs rounded-full transition-all duration-200 whitespace-nowrap shadow-sm border border-gray-200/50 hover:shadow-md"
                 >
                   {question}
                 </button>
@@ -683,8 +759,8 @@ Let's start by completing your profiling surveys so I can better understand you 
             </div>
           </div>
 
-          {/* Mobile Chat Input - ChatGPT Style */}
-          <div className="px-4 py-4 bg-white border-t border-gray-200">
+          {/* Mobile Chat Input - Professional */}
+          <div className="px-4 py-4 bg-white/80 backdrop-blur-sm border-t border-gray-200/50">
             <div className="flex items-end space-x-3">
               <div className="flex-1 relative">
                 <textarea
@@ -692,14 +768,14 @@ Let's start by completing your profiling surveys so I can better understand you 
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Message May..."
-                  className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none text-sm"
+                  className="w-full px-5 py-4 pr-14 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-none text-sm shadow-sm"
                   rows={1}
-                  style={{ minHeight: '44px', maxHeight: '120px' }}
+                  style={{ minHeight: '48px', maxHeight: '120px' }}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="absolute right-2 bottom-2 w-8 h-8 bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-300 text-white rounded-full flex items-center justify-center transition-colors"
+                  className="absolute right-3 bottom-3 w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
