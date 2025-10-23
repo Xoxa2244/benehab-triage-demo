@@ -46,7 +46,7 @@ export default function Home() {
     const completedCount = Object.values(completedSurveys).filter(Boolean).length;
     const remainingCount = 3 - completedCount;
     
-    let welcomeText = `Hello ${demographics.name || 'there'}! I'm May, your personal health assistant. 👋\n\nI'm so glad to see you again! It's wonderful to reconnect with you.\n\nI'm here to help you with:\n• Doctor appointments\n• Medication reminders\n• Health questions\n• Personalized support\n\n`;
+    let welcomeText = `Hello ${demographics?.name || 'there'}! I'm May, your personal health assistant. 👋\n\nI'm so glad to see you again! It's wonderful to reconnect with you.\n\nI'm here to help you with:\n• Doctor appointments\n• Medication reminders\n• Health questions\n• Personalized support\n\n`;
     
     if (completedCount === 0) {
       welcomeText += `Let's start by completing your profiling surveys so I can better understand you and provide more personalized assistance.`;
@@ -280,13 +280,13 @@ export default function Home() {
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold">{demographics.name?.charAt(0) || 'U'}</span>
+                <span className="text-xl font-bold">{demographics?.name?.charAt(0) || 'U'}</span>
               </div>
               <div className="flex items-center space-x-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Welcome, {demographics.name || 'User'}!</h2>
+                  <h2 className="text-xl font-semibold">Welcome, {demographics?.name || 'User'}!</h2>
                   <p className="text-emerald-100 text-sm">
-                    {demographics.age} years old • {demographics.gender}
+                    {demographics?.age} years old • {demographics?.gender}
                   </p>
                 </div>
                 {/* Profile Progress Indicator */}
@@ -386,9 +386,9 @@ export default function Home() {
           {/* Welcome Banner */}
           <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-8 mb-6 shadow-lg text-white">
             <div className="text-center">
-              <h1 className="text-4xl font-bold mb-4">
-                Welcome, {demographics.name}! 👋
-              </h1>
+            <h1 className="text-4xl font-bold mb-4">
+              Welcome, {demographics?.name || 'User'}! 👋
+            </h1>
               <p className="text-xl text-emerald-100 max-w-3xl mx-auto leading-relaxed">
                 I'm May, your personal agent. Let's go through profiling together so I can better understand you and adapt my communication style to your individual characteristics.
               </p>
@@ -579,10 +579,10 @@ export default function Home() {
         <div className="flex items-center justify-between px-4 py-4 bg-white/80 backdrop-blur-sm border-b border-gray-200/50">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">{demographics.name?.charAt(0) || 'U'}</span>
+              <span className="text-white font-bold text-lg">{demographics?.name?.charAt(0) || 'U'}</span>
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">{demographics.name || 'User'}</h1>
+              <h1 className="text-lg font-semibold text-gray-900">{demographics?.name || 'User'}</h1>
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs text-gray-500">online</span>
