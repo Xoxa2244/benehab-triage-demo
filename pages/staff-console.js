@@ -3,6 +3,13 @@ import { useState } from 'react';
 export default function StaffConsolePage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    patientInfo: false,
+    medication: false,
+    concerns: false,
+    adherence: false,
+    riskLevel: false
+  });
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
@@ -66,19 +73,26 @@ export default function StaffConsolePage() {
     setTimeout(() => setShowNotificationModal(false), 3000);
   };
 
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Patient Console</h1>
-              <p className="text-gray-600 mt-1">Clinical & Behavioral Overview</p>
+              <h1 className="text-3xl font-bold text-white">Care-Team Console</h1>
+              <p className="text-blue-100 mt-1">Clinical & Behavioral Overview</p>
             </div>
             <button
               onClick={sendNotification}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
             >
               Send Notification
             </button>
@@ -450,25 +464,148 @@ export default function StaffConsolePage() {
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Data Summary</h3>
                 <div className="space-y-3 text-sm">
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-900">Sarah Johnson, 42</div>
-                    <div className="text-gray-600">Type 2 Diabetes</div>
+                  {/* Patient Info */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('patientInfo')}
+                      className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900">Patient Information</div>
+                        <div className="text-gray-600">Sarah Johnson, 42 • Type 2 Diabetes</div>
+                      </div>
+                      <svg className={`w-5 h-5 text-gray-500 transition-transform ${expandedSections.patientInfo ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.patientInfo && (
+                      <div className="px-3 pb-3 border-t border-gray-200">
+                        <div className="pt-3 space-y-2">
+                          <div><span className="font-medium">Full Name:</span> Sarah Elizabeth Johnson</div>
+                          <div><span className="font-medium">DOB:</span> March 15, 1982</div>
+                          <div><span className="font-medium">Gender:</span> Female</div>
+                          <div><span className="font-medium">Primary Diagnosis:</span> Type 2 Diabetes Mellitus (E11.9)</div>
+                          <div><span className="font-medium">Secondary Diagnoses:</span> Hypertension (I10), Obesity (E66.9)</div>
+                          <div><span className="font-medium">Allergies:</span> None known</div>
+                          <div><span className="font-medium">Emergency Contact:</span> John Johnson (Spouse) - (555) 123-4567</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-900">Current Medication</div>
-                    <div className="text-gray-600">Metformin 500mg</div>
+
+                  {/* Current Medication */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('medication')}
+                      className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900">Current Medication</div>
+                        <div className="text-gray-600">Metformin 500mg</div>
+                      </div>
+                      <svg className={`w-5 h-5 text-gray-500 transition-transform ${expandedSections.medication ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.medication && (
+                      <div className="px-3 pb-3 border-t border-gray-200">
+                        <div className="pt-3 space-y-2">
+                          <div><span className="font-medium">Metformin:</span> 500mg twice daily with meals</div>
+                          <div><span className="font-medium">Prescribed:</span> Dr. Smith, January 15, 2024</div>
+                          <div><span className="font-medium">Last Refill:</span> December 20, 2024</div>
+                          <div><span className="font-medium">Days Supply:</span> 30 days</div>
+                          <div><span className="font-medium">Side Effects:</span> Mild gastrointestinal discomfort</div>
+                          <div><span className="font-medium">Compliance:</span> 85% (missed 4 doses this month)</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-900">Key Concerns</div>
-                    <div className="text-gray-600">Fatigue (8/10), Missed visits</div>
+
+                  {/* Key Concerns */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('concerns')}
+                      className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900">Key Concerns</div>
+                        <div className="text-gray-600">Fatigue (8/10), Missed visits</div>
+                      </div>
+                      <svg className={`w-5 h-5 text-gray-500 transition-transform ${expandedSections.concerns ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.concerns && (
+                      <div className="px-3 pb-3 border-t border-gray-200">
+                        <div className="pt-3 space-y-2">
+                          <div><span className="font-medium">Fatigue Level:</span> 8/10 (High concern)</div>
+                          <div><span className="font-medium">Missed Appointments:</span> 2 in last 3 months</div>
+                          <div><span className="font-medium">Blood Sugar Control:</span> HbA1c 8.2% (Target: <7%)</div>
+                          <div><span className="font-medium">Weight Management:</span> +3kg in last 6 months</div>
+                          <div><span className="font-medium">Exercise Compliance:</span> 2/5 days per week</div>
+                          <div><span className="font-medium">Diet Adherence:</span> Moderate (60% compliance)</div>
+                          <div><span className="font-medium">Stress Level:</span> High due to work pressure</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-900">Adherence</div>
-                    <div className="text-gray-600">76% (improving)</div>
+
+                  {/* Adherence */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('adherence')}
+                      className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900">Adherence</div>
+                        <div className="text-gray-600">76% (improving)</div>
+                      </div>
+                      <svg className={`w-5 h-5 text-gray-500 transition-transform ${expandedSections.adherence ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.adherence && (
+                      <div className="px-3 pb-3 border-t border-gray-200">
+                        <div className="pt-3 space-y-2">
+                          <div><span className="font-medium">Medication Adherence:</span> 85% (Metformin)</div>
+                          <div><span className="font-medium">Appointment Attendance:</span> 67% (4/6 appointments)</div>
+                          <div><span className="font-medium">Dietary Guidelines:</span> 60% compliance</div>
+                          <div><span className="font-medium">Exercise Routine:</span> 40% compliance</div>
+                          <div><span className="font-medium">Blood Glucose Monitoring:</span> 70% (daily checks)</div>
+                          <div><span className="font-medium">Overall Trend:</span> Improving (+12% vs last month)</div>
+                          <div><span className="font-medium">Barriers:</span> Time constraints, forgetfulness</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 rounded">
-                    <div className="font-medium text-gray-900">Risk Level</div>
-                    <div className="text-orange-600">Medium dropout risk</div>
+
+                  {/* Risk Level */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('riskLevel')}
+                      className="w-full p-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900">Risk Level</div>
+                        <div className="text-orange-600">Medium dropout risk</div>
+                      </div>
+                      <svg className={`w-5 h-5 text-gray-500 transition-transform ${expandedSections.riskLevel ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {expandedSections.riskLevel && (
+                      <div className="px-3 pb-3 border-t border-gray-200">
+                        <div className="pt-3 space-y-2">
+                          <div><span className="font-medium">Dropout Risk Score:</span> 0.54 (Medium)</div>
+                          <div><span className="font-medium">Risk Factors:</span> Missed appointments, high fatigue</div>
+                          <div><span className="font-medium">Protective Factors:</span> Good medication compliance</div>
+                          <div><span className="font-medium">Engagement Level:</span> Moderate (responds to messages)</div>
+                          <div><span className="font-medium">Support System:</span> Strong (family support)</div>
+                          <div><span className="font-medium">Previous Dropouts:</span> None</div>
+                          <div><span className="font-medium">Intervention Needed:</span> Motivational support</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
