@@ -42,19 +42,26 @@ export default function Home() {
     // Load active assignments
     loadActiveAssignments();
 
-    // Add welcome message from May
+    // Add personalized welcome message from May
+    const completedCount = Object.values(completedSurveys).filter(Boolean).length;
+    const remainingCount = 3 - completedCount;
+    
+    let welcomeText = `Hello ${demographics.name || 'there'}! I'm May, your personal health assistant. 👋\n\nI'm so glad to see you again! It's wonderful to reconnect with you.\n\nI'm here to help you with:\n• Doctor appointments\n• Medication reminders\n• Health questions\n• Personalized support\n\n`;
+    
+    if (completedCount === 0) {
+      welcomeText += `Let's start by completing your profiling surveys so I can better understand you and provide more personalized assistance.`;
+    } else if (completedCount === 1) {
+      welcomeText += `I'm really pleased to see that you've completed one of your profiling surveys! You're making great progress. Let's continue with the remaining surveys so I can get a complete picture of your preferences and provide even better personalized support.`;
+    } else if (completedCount === 2) {
+      welcomeText += `I'm absolutely delighted that you've completed ${completedCount} out of 3 profiling surveys! You're doing fantastic work. Just one more survey to go - your values profile. Once you complete this final survey, I'll have a complete understanding of your preferences and will be able to motivate you much more effectively to stay engaged with your treatment process.`;
+    } else {
+      welcomeText += `Congratulations! You've completed all your profiling surveys. I now have a complete understanding of your preferences and can provide you with the most personalized support possible. I'm excited to help you stay motivated and engaged with your treatment journey!`;
+    }
+    
     const welcomeMessage = {
       id: Date.now(),
       type: 'may',
-      text: `Hello! I'm May, your personal health assistant. 👋
-
-I'm here to help you with:
-• Doctor appointments
-• Medication reminders
-• Health questions
-• Personalized support
-
-Let's start by completing your profiling surveys so I can better understand you and provide more personalized assistance.`,
+      text: welcomeText,
       timestamp: new Date().toISOString()
     };
     setChatMessages([welcomeMessage]);
