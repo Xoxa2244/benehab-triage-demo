@@ -540,7 +540,7 @@ export default function StaffConsolePage() {
                         <div className="pt-3 space-y-2">
                           <div><span className="font-medium">Fatigue Level:</span> 8/10 (High concern)</div>
                           <div><span className="font-medium">Missed Appointments:</span> 2 in last 3 months</div>
-                          <div><span className="font-medium">Blood Sugar Control:</span> HbA1c 8.2% (Target: <7%)</div>
+                          <div><span className="font-medium">Blood Sugar Control:</span> HbA1c 8.2% (Target: &lt;7%)</div>
                           <div><span className="font-medium">Weight Management:</span> +3kg in last 6 months</div>
                           <div><span className="font-medium">Exercise Compliance:</span> 2/5 days per week</div>
                           <div><span className="font-medium">Diet Adherence:</span> Moderate (60% compliance)</div>
