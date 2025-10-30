@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import DemographicsCheck from '../components/DemographicsCheck';
 import Link from 'next/link';
+import { areAllTestsCompleted, isChatCreated, getChatId } from '../lib/profiling/profilingUtils';
+import { initializeChatWithProfiling } from '../lib/profiling/chatInitializer';
 
 export default function Home() {
   const [demographics, setDemographics] = useState(null);
@@ -16,6 +18,12 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const [activeAssignments, setActiveAssignments] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [chatId, setChatId] = useState(null);
+  const [isChatInitializing, setIsChatInitializing] = useState(false);
+  const [allTestsComplete, setAllTestsComplete] = useState(false);
+  const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
+  const [diagnosis, setDiagnosis] = useState('');
+  const [prescriptions, setPrescriptions] = useState('');
 
   useEffect(() => {
     // Check if we're in the browser
@@ -33,27 +41,43 @@ export default function Home() {
     }
 
     // Check completed surveys
-    setCompletedSurveys({
+    const surveys = {
       attitude: !!localStorage.getItem('benehab_attitude_profile'),
       typology: !!localStorage.getItem('benehab_typology_profile'),
       values: !!localStorage.getItem('benehab_values_profile')
-    });
+    };
+    setCompletedSurveys(surveys);
+    
+    // Check if all tests are completed
+    const testsComplete = areAllTestsCompleted();
+    setAllTestsComplete(testsComplete);
+    
+    // Check if chat is already created
+    const existingChatId = getChatId();
+    if (existingChatId) {
+      setChatId(existingChatId);
+    }
 
     // Load active assignments
     loadActiveAssignments();
 
     // Add personalized welcome message from May
-    const completedCount = Object.values(completedSurveys).filter(Boolean).length;
-    const remainingCount = 3 - completedCount;
+    const completedCount = Object.values(surveys).filter(Boolean).length;
     
-    let welcomeText = `Hello ${demographics?.name || 'there'}! I'm May, your personal health assistant. 👋\n\nI'm so glad to see you again! It's wonderful to reconnect with you.\n\nI'm here to help you with:\n• Doctor appointments\n• Medication reminders\n• Health questions\n• Personalized support\n\n`;
+    let welcomeText = `Hello ${demographics?.name || 'there'}! I'm May, your personal health assistant. 👋\n\nI'm so glad to see you again! It's wonderful to reconnect with you.\n\n`;
     
-    if (completedCount === 0) {
-      welcomeText += `Let's start by completing your profiling surveys so I can better understand you and provide more personalized assistance.`;
-    } else if (completedCount === 1) {
-      welcomeText += `I'm really pleased to see that you've completed one of your profiling surveys! You're making great progress. Let's continue with the remaining surveys so I can get a complete picture of your preferences and provide even better personalized support.`;
-    } else if (completedCount === 2) {
-      welcomeText += `I'm absolutely delighted that you've completed ${completedCount} out of 3 profiling surveys! You're doing fantastic work. Just one more survey to go - your values profile. Once you complete this final survey, I'll have a complete understanding of your preferences and will be able to motivate you much more effectively to stay engaged with your treatment process.`;
+    if (!testsComplete) {
+      welcomeText += `I'm here to help you with:\n• Doctor appointments\n• Medication reminders\n• Health questions\n• Personalized support\n\n`;
+      
+      if (completedCount === 0) {
+        welcomeText += `Let's start by completing your profiling surveys so I can better understand you and provide more personalized assistance.`;
+      } else if (completedCount === 1) {
+        welcomeText += `I'm really pleased to see that you've completed one of your profiling surveys! You're making great progress. Let's continue with the remaining surveys so I can get a complete picture of your preferences and provide even better personalized support.`;
+      } else if (completedCount === 2) {
+        welcomeText += `I'm absolutely delighted that you've completed ${completedCount} out of 3 profiling surveys! You're doing fantastic work. Just one more survey to go. Once you complete this final survey, I'll have a complete understanding of your preferences and will be able to motivate you much more effectively to stay engaged with your treatment process.`;
+      }
+      
+      welcomeText += `\n\n⚠️ Chat will be available after completing all 3 profiling surveys.`;
     } else {
       welcomeText += `Congratulations! You've completed all your profiling surveys. I now have a complete understanding of your preferences and can provide you with the most personalized support possible. I'm excited to help you stay motivated and engaged with your treatment journey!`;
     }
@@ -98,8 +122,53 @@ export default function Home() {
     }
   };
 
+  // Show diagnosis modal when all tests are completed
+  useEffect(() => {
+    if (allTestsComplete && !chatId && !isChatInitializing && !showDiagnosisModal) {
+      setShowDiagnosisModal(true);
+    }
+  }, [allTestsComplete, chatId, isChatInitializing, showDiagnosisModal]);
+
+  // Initialize chat with diagnosis and prescriptions
+  const initializeChat = async () => {
+    if (!diagnosis.trim() || !prescriptions.trim()) {
+      alert('Пожалуйста, заполните диагноз и назначения');
+      return;
+    }
+    
+    setIsChatInitializing(true);
+    setShowDiagnosisModal(false);
+    
+    try {
+      const chatData = await initializeChatWithProfiling(diagnosis, prescriptions);
+      setChatId(chatData.chat_id);
+      
+      // Add success message
+      const successMessage = {
+        id: Date.now(),
+        type: 'may',
+        text: '✅ Отлично! Я проанализировала результаты ваших тестов и готова к общению. Теперь я могу адаптировать свой стиль общения специально для вас!',
+        timestamp: new Date().toISOString()
+      };
+      setChatMessages(prev => [...prev, successMessage]);
+      
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+      const errorMessage = {
+        id: Date.now(),
+        type: 'may',
+        text: '❌ Произошла ошибка при инициализации чата. Пожалуйста, обновите страницу.',
+        timestamp: new Date().toISOString()
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+      setShowDiagnosisModal(true); // Show modal again on error
+    } finally {
+      setIsChatInitializing(false);
+    }
+  };
+
   const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !chatId) return;
 
     const userMessage = {
       id: Date.now(),
@@ -113,25 +182,31 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      // Use FastAPI backend endpoint directly
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/chats/${chatId}/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: inputMessage,
-          demographics,
-          completedSurveys,
-          activeAssignments
+          message: inputMessage
         }),
-        });
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
 
       const data = await response.json();
+      
+      // Extract nurse response from the message object
+      const nurseResponse = data.message?.content || 'Sorry, I encountered an error. Please try again.';
       
       const mayMessage = {
         id: Date.now() + 1,
         type: 'may',
-        text: data.response || data.fallback || 'Sorry, I encountered an error. Please try again.',
+        text: nurseResponse,
         timestamp: new Date().toISOString()
       };
 
@@ -273,6 +348,70 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Diagnosis Modal */}
+      {showDiagnosisModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                🏥 Медицинская информация
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Для персонализации общения с медсестрой, пожалуйста, укажите диагноз и назначения врача.
+              </p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Диагноз пациента *
+                  </label>
+                  <input
+                    type="text"
+                    value={diagnosis}
+                    onChange={(e) => setDiagnosis(e.target.value)}
+                    placeholder="Например: ОРВИ, грипп, профилактическое наблюдение..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Назначения врача *
+                  </label>
+                  <textarea
+                    value={prescriptions}
+                    onChange={(e) => setPrescriptions(e.target.value)}
+                    placeholder="Например: Принимать парацетамол 500мг 3 раза в день, обильное питье, постельный режим..."
+                    rows={6}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-6 flex space-x-4">
+                <button
+                  onClick={initializeChat}
+                  disabled={!diagnosis.trim() || !prescriptions.trim() || isChatInitializing}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  {isChatInitializing ? 'Создание чата...' : 'Создать чат'}
+                </button>
+                <button
+                  onClick={() => setShowDiagnosisModal(false)}
+                  disabled={isChatInitializing}
+                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  Отмена
+                </button>
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-4">
+                * Эта информация необходима для корректной работы медсестры и соблюдения медицинских протоколов.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Desktop Layout - Unchanged */}
       <div className="hidden md:block min-h-screen bg-gray-50">
         {/* Profile Header */}
@@ -546,23 +685,41 @@ export default function Home() {
 
             {/* Chat Input */}
             <div className="px-6 py-4 border-t border-gray-200">
-              <div className="flex space-x-4">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your message here..."
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl font-medium hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                >
-                  Send
-                </button>
-              </div>
+              {!allTestsComplete ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-600 text-sm mb-2">
+                    🔒 Chat is locked until you complete all 3 profiling surveys
+                  </p>
+                  <p className="text-gray-500 text-xs">
+                    {Object.values(completedSurveys).filter(Boolean).length}/3 surveys completed
+                  </p>
+                </div>
+              ) : isChatInitializing ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-600 text-sm">
+                    ⏳ Initializing personalized chat...
+                  </p>
+                </div>
+              ) : (
+                <div className="flex space-x-4">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your message here..."
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    disabled={!chatId}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!inputMessage.trim() || isTyping || !chatId}
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl font-medium hover:from-emerald-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    Send
+                  </button>
+                </div>
+              )}
             </div>
             </div>
 
@@ -737,28 +894,46 @@ export default function Home() {
 
           {/* Mobile Chat Input - Professional */}
           <div className="px-4 py-4 bg-white/80 backdrop-blur-sm border-t border-gray-200/50">
-            <div className="flex items-end space-x-3">
-              <div className="flex-1 relative">
-                <textarea
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Message May..."
-                  className="w-full px-5 py-4 pr-14 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-none text-sm shadow-sm"
-                  rows={1}
-                  style={{ minHeight: '48px', maxHeight: '120px' }}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                  className="absolute right-3 bottom-3 w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </button>
+            {!allTestsComplete ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 text-sm mb-2">
+                  🔒 Chat is locked until you complete all 3 profiling surveys
+                </p>
+                <p className="text-gray-500 text-xs">
+                  {Object.values(completedSurveys).filter(Boolean).length}/3 surveys completed
+                </p>
               </div>
-            </div>
+            ) : isChatInitializing ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 text-sm">
+                  ⏳ Initializing personalized chat...
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-end space-x-3">
+                <div className="flex-1 relative">
+                  <textarea
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Message May..."
+                    className="w-full px-5 py-4 pr-14 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 resize-none text-sm shadow-sm"
+                    rows={1}
+                    style={{ minHeight: '48px', maxHeight: '120px' }}
+                    disabled={!chatId}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!inputMessage.trim() || isTyping || !chatId}
+                    className="absolute right-3 bottom-3 w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-400 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

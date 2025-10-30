@@ -1,0 +1,76 @@
+"use strict";
+/*
+ * ATTENTION: An "eval-source-map" devtool has been used.
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+(() => {
+var exports = {};
+exports.id = "pages/api/profiling/attitude/items";
+exports.ids = ["pages/api/profiling/attitude/items"];
+exports.modules = {
+
+/***/ "next/dist/compiled/next-server/pages-api.runtime.dev.js":
+/*!**************************************************************************!*\
+  !*** external "next/dist/compiled/next-server/pages-api.runtime.dev.js" ***!
+  \**************************************************************************/
+/***/ ((module) => {
+
+module.exports = require("next/dist/compiled/next-server/pages-api.runtime.dev.js");
+
+/***/ }),
+
+/***/ "fs":
+/*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+/***/ ((module) => {
+
+module.exports = require("fs");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/***/ ((module) => {
+
+module.exports = require("path");
+
+/***/ }),
+
+/***/ "(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fprofiling%2Fattitude%2Fitems&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cprofiling%5Cattitude%5Citems.js&middlewareConfigBase64=e30%3D!":
+/*!**************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fprofiling%2Fattitude%2Fitems&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cprofiling%5Cattitude%5Citems.js&middlewareConfigBase64=e30%3D! ***!
+  \**************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   config: () => (/* binding */ config),\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__),\n/* harmony export */   routeModule: () => (/* binding */ routeModule)\n/* harmony export */ });\n/* harmony import */ var next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/dist/server/future/route-modules/pages-api/module.compiled */ \"(api)/./node_modules/next/dist/server/future/route-modules/pages-api/module.compiled.js\");\n/* harmony import */ var next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! next/dist/server/future/route-kind */ \"(api)/./node_modules/next/dist/server/future/route-kind.js\");\n/* harmony import */ var next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! next/dist/build/templates/helpers */ \"(api)/./node_modules/next/dist/build/templates/helpers.js\");\n/* harmony import */ var _pages_api_profiling_attitude_items_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages\\api\\profiling\\attitude\\items.js */ \"(api)/./pages/api/profiling/attitude/items.js\");\n\n\n\n// Import the userland code.\n\n// Re-export the handler (should be the default export).\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__.hoist)(_pages_api_profiling_attitude_items_js__WEBPACK_IMPORTED_MODULE_3__, \"default\"));\n// Re-export config.\nconst config = (0,next_dist_build_templates_helpers__WEBPACK_IMPORTED_MODULE_2__.hoist)(_pages_api_profiling_attitude_items_js__WEBPACK_IMPORTED_MODULE_3__, \"config\");\n// Create and export the route module that will be consumed.\nconst routeModule = new next_dist_server_future_route_modules_pages_api_module_compiled__WEBPACK_IMPORTED_MODULE_0__.PagesAPIRouteModule({\n    definition: {\n        kind: next_dist_server_future_route_kind__WEBPACK_IMPORTED_MODULE_1__.RouteKind.PAGES_API,\n        page: \"/api/profiling/attitude/items\",\n        pathname: \"/api/profiling/attitude/items\",\n        // The following aren't used in production.\n        bundlePath: \"\",\n        filename: \"\"\n    },\n    userland: _pages_api_profiling_attitude_items_js__WEBPACK_IMPORTED_MODULE_3__\n});\n\n//# sourceMappingURL=pages-api.js.map//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2J1aWxkL3dlYnBhY2svbG9hZGVycy9uZXh0LXJvdXRlLWxvYWRlci9pbmRleC5qcz9raW5kPVBBR0VTX0FQSSZwYWdlPSUyRmFwaSUyRnByb2ZpbGluZyUyRmF0dGl0dWRlJTJGaXRlbXMmcHJlZmVycmVkUmVnaW9uPSZhYnNvbHV0ZVBhZ2VQYXRoPS4lMkZwYWdlcyU1Q2FwaSU1Q3Byb2ZpbGluZyU1Q2F0dGl0dWRlJTVDaXRlbXMuanMmbWlkZGxld2FyZUNvbmZpZ0Jhc2U2ND1lMzAlM0QhIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7O0FBQXNHO0FBQ3ZDO0FBQ0w7QUFDMUQ7QUFDd0U7QUFDeEU7QUFDQSxpRUFBZSx3RUFBSyxDQUFDLG1FQUFRLFlBQVksRUFBQztBQUMxQztBQUNPLGVBQWUsd0VBQUssQ0FBQyxtRUFBUTtBQUNwQztBQUNPLHdCQUF3QixnSEFBbUI7QUFDbEQ7QUFDQSxjQUFjLHlFQUFTO0FBQ3ZCO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxLQUFLO0FBQ0wsWUFBWTtBQUNaLENBQUM7O0FBRUQiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9iZW5laGFiLXRyaWFnZS1uZXh0Lz83ZjI4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFBhZ2VzQVBJUm91dGVNb2R1bGUgfSBmcm9tIFwibmV4dC9kaXN0L3NlcnZlci9mdXR1cmUvcm91dGUtbW9kdWxlcy9wYWdlcy1hcGkvbW9kdWxlLmNvbXBpbGVkXCI7XG5pbXBvcnQgeyBSb3V0ZUtpbmQgfSBmcm9tIFwibmV4dC9kaXN0L3NlcnZlci9mdXR1cmUvcm91dGUta2luZFwiO1xuaW1wb3J0IHsgaG9pc3QgfSBmcm9tIFwibmV4dC9kaXN0L2J1aWxkL3RlbXBsYXRlcy9oZWxwZXJzXCI7XG4vLyBJbXBvcnQgdGhlIHVzZXJsYW5kIGNvZGUuXG5pbXBvcnQgKiBhcyB1c2VybGFuZCBmcm9tIFwiLi9wYWdlc1xcXFxhcGlcXFxccHJvZmlsaW5nXFxcXGF0dGl0dWRlXFxcXGl0ZW1zLmpzXCI7XG4vLyBSZS1leHBvcnQgdGhlIGhhbmRsZXIgKHNob3VsZCBiZSB0aGUgZGVmYXVsdCBleHBvcnQpLlxuZXhwb3J0IGRlZmF1bHQgaG9pc3QodXNlcmxhbmQsIFwiZGVmYXVsdFwiKTtcbi8vIFJlLWV4cG9ydCBjb25maWcuXG5leHBvcnQgY29uc3QgY29uZmlnID0gaG9pc3QodXNlcmxhbmQsIFwiY29uZmlnXCIpO1xuLy8gQ3JlYXRlIGFuZCBleHBvcnQgdGhlIHJvdXRlIG1vZHVsZSB0aGF0IHdpbGwgYmUgY29uc3VtZWQuXG5leHBvcnQgY29uc3Qgcm91dGVNb2R1bGUgPSBuZXcgUGFnZXNBUElSb3V0ZU1vZHVsZSh7XG4gICAgZGVmaW5pdGlvbjoge1xuICAgICAgICBraW5kOiBSb3V0ZUtpbmQuUEFHRVNfQVBJLFxuICAgICAgICBwYWdlOiBcIi9hcGkvcHJvZmlsaW5nL2F0dGl0dWRlL2l0ZW1zXCIsXG4gICAgICAgIHBhdGhuYW1lOiBcIi9hcGkvcHJvZmlsaW5nL2F0dGl0dWRlL2l0ZW1zXCIsXG4gICAgICAgIC8vIFRoZSBmb2xsb3dpbmcgYXJlbid0IHVzZWQgaW4gcHJvZHVjdGlvbi5cbiAgICAgICAgYnVuZGxlUGF0aDogXCJcIixcbiAgICAgICAgZmlsZW5hbWU6IFwiXCJcbiAgICB9LFxuICAgIHVzZXJsYW5kXG59KTtcblxuLy8jIHNvdXJjZU1hcHBpbmdVUkw9cGFnZXMtYXBpLmpzLm1hcCJdLCJuYW1lcyI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fprofiling%2Fattitude%2Fitems&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cprofiling%5Cattitude%5Citems.js&middlewareConfigBase64=e30%3D!\n");
+
+/***/ }),
+
+/***/ "(api)/./pages/api/profiling/attitude/items.js":
+/*!***********************************************!*\
+  !*** ./pages/api/profiling/attitude/items.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ handler)\n/* harmony export */ });\n/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! fs */ \"fs\");\n/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! path */ \"path\");\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);\n// pages/api/profiling/attitude/items.js\n\n\nasync function handler(req, res) {\n    if (req.method !== \"GET\") {\n        return res.status(405).json({\n            error: \"Method not allowed\"\n        });\n    }\n    try {\n        // Читаем CSV файл с вопросами\n        const csvPath = path__WEBPACK_IMPORTED_MODULE_1___default().join(process.cwd(), \"data\", \"attitude_items.csv\");\n        const csvContent = fs__WEBPACK_IMPORTED_MODULE_0___default().readFileSync(csvPath, \"utf-8\");\n        // Парсим CSV\n        const lines = csvContent.trim().split(\"\\n\");\n        const headers = lines[0].split(\",\");\n        const items = [];\n        for(let i = 1; i < lines.length; i++){\n            const values = lines[i].split(\",\");\n            if (values.length >= 4) {\n                items.push({\n                    id: parseInt(values[0]),\n                    text: values[1],\n                    scale: values[2],\n                    reverse: values[3] === \"true\"\n                });\n            }\n        }\n        res.status(200).json({\n            success: true,\n            items,\n            total: items.length,\n            scales: [\n                ...new Set(items.map((item)=>item.scale))\n            ]\n        });\n    } catch (error) {\n        console.error(\"Ошибка загрузки вопросов:\", error);\n        res.status(500).json({\n            error: \"Ошибка загрузки вопросов\",\n            details: error.message\n        });\n    }\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi9wYWdlcy9hcGkvcHJvZmlsaW5nL2F0dGl0dWRlL2l0ZW1zLmpzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7O0FBQUEsd0NBQXdDO0FBRXBCO0FBQ0k7QUFFVCxlQUFlRSxRQUFRQyxHQUFHLEVBQUVDLEdBQUc7SUFDNUMsSUFBSUQsSUFBSUUsTUFBTSxLQUFLLE9BQU87UUFDeEIsT0FBT0QsSUFBSUUsTUFBTSxDQUFDLEtBQUtDLElBQUksQ0FBQztZQUFFQyxPQUFPO1FBQXFCO0lBQzVEO0lBRUEsSUFBSTtRQUNGLDhCQUE4QjtRQUM5QixNQUFNQyxVQUFVUixnREFBUyxDQUFDVSxRQUFRQyxHQUFHLElBQUksUUFBUTtRQUNqRCxNQUFNQyxhQUFhYixzREFBZSxDQUFDUyxTQUFTO1FBRTVDLGFBQWE7UUFDYixNQUFNTSxRQUFRRixXQUFXRyxJQUFJLEdBQUdDLEtBQUssQ0FBQztRQUN0QyxNQUFNQyxVQUFVSCxLQUFLLENBQUMsRUFBRSxDQUFDRSxLQUFLLENBQUM7UUFDL0IsTUFBTUUsUUFBUSxFQUFFO1FBRWhCLElBQUssSUFBSUMsSUFBSSxHQUFHQSxJQUFJTCxNQUFNTSxNQUFNLEVBQUVELElBQUs7WUFDckMsTUFBTUUsU0FBU1AsS0FBSyxDQUFDSyxFQUFFLENBQUNILEtBQUssQ0FBQztZQUM5QixJQUFJSyxPQUFPRCxNQUFNLElBQUksR0FBRztnQkFDdEJGLE1BQU1JLElBQUksQ0FBQztvQkFDVEMsSUFBSUMsU0FBU0gsTUFBTSxDQUFDLEVBQUU7b0JBQ3RCSSxNQUFNSixNQUFNLENBQUMsRUFBRTtvQkFDZkssT0FBT0wsTUFBTSxDQUFDLEVBQUU7b0JBQ2hCTSxTQUFTTixNQUFNLENBQUMsRUFBRSxLQUFLO2dCQUN6QjtZQUNGO1FBQ0Y7UUFFQWxCLElBQUlFLE1BQU0sQ0FBQyxLQUFLQyxJQUFJLENBQUM7WUFDbkJzQixTQUFTO1lBQ1RWO1lBQ0FXLE9BQU9YLE1BQU1FLE1BQU07WUFDbkJVLFFBQVE7bUJBQUksSUFBSUMsSUFBSWIsTUFBTWMsR0FBRyxDQUFDQyxDQUFBQSxPQUFRQSxLQUFLUCxLQUFLO2FBQUc7UUFDckQ7SUFDRixFQUFFLE9BQU9uQixPQUFPO1FBQ2QyQixRQUFRM0IsS0FBSyxDQUFDLDZCQUE2QkE7UUFDM0NKLElBQUlFLE1BQU0sQ0FBQyxLQUFLQyxJQUFJLENBQUM7WUFDbkJDLE9BQU87WUFDUDRCLFNBQVM1QixNQUFNNkIsT0FBTztRQUN4QjtJQUNGO0FBQ0YiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9iZW5laGFiLXRyaWFnZS1uZXh0Ly4vcGFnZXMvYXBpL3Byb2ZpbGluZy9hdHRpdHVkZS9pdGVtcy5qcz85NGE4Il0sInNvdXJjZXNDb250ZW50IjpbIi8vIHBhZ2VzL2FwaS9wcm9maWxpbmcvYXR0aXR1ZGUvaXRlbXMuanNcclxuXHJcbmltcG9ydCBmcyBmcm9tICdmcyc7XHJcbmltcG9ydCBwYXRoIGZyb20gJ3BhdGgnO1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgYXN5bmMgZnVuY3Rpb24gaGFuZGxlcihyZXEsIHJlcykge1xyXG4gIGlmIChyZXEubWV0aG9kICE9PSAnR0VUJykge1xyXG4gICAgcmV0dXJuIHJlcy5zdGF0dXMoNDA1KS5qc29uKHsgZXJyb3I6ICdNZXRob2Qgbm90IGFsbG93ZWQnIH0pO1xyXG4gIH1cclxuXHJcbiAgdHJ5IHtcclxuICAgIC8vINCn0LjRgtCw0LXQvCBDU1Yg0YTQsNC50Lsg0YEg0LLQvtC/0YDQvtGB0LDQvNC4XHJcbiAgICBjb25zdCBjc3ZQYXRoID0gcGF0aC5qb2luKHByb2Nlc3MuY3dkKCksICdkYXRhJywgJ2F0dGl0dWRlX2l0ZW1zLmNzdicpO1xyXG4gICAgY29uc3QgY3N2Q29udGVudCA9IGZzLnJlYWRGaWxlU3luYyhjc3ZQYXRoLCAndXRmLTgnKTtcclxuICAgIFxyXG4gICAgLy8g0J/QsNGA0YHQuNC8IENTVlxyXG4gICAgY29uc3QgbGluZXMgPSBjc3ZDb250ZW50LnRyaW0oKS5zcGxpdCgnXFxuJyk7XHJcbiAgICBjb25zdCBoZWFkZXJzID0gbGluZXNbMF0uc3BsaXQoJywnKTtcclxuICAgIGNvbnN0IGl0ZW1zID0gW107XHJcbiAgICBcclxuICAgIGZvciAobGV0IGkgPSAxOyBpIDwgbGluZXMubGVuZ3RoOyBpKyspIHtcclxuICAgICAgY29uc3QgdmFsdWVzID0gbGluZXNbaV0uc3BsaXQoJywnKTtcclxuICAgICAgaWYgKHZhbHVlcy5sZW5ndGggPj0gNCkge1xyXG4gICAgICAgIGl0ZW1zLnB1c2goe1xyXG4gICAgICAgICAgaWQ6IHBhcnNlSW50KHZhbHVlc1swXSksXHJcbiAgICAgICAgICB0ZXh0OiB2YWx1ZXNbMV0sXHJcbiAgICAgICAgICBzY2FsZTogdmFsdWVzWzJdLFxyXG4gICAgICAgICAgcmV2ZXJzZTogdmFsdWVzWzNdID09PSAndHJ1ZSdcclxuICAgICAgICB9KTtcclxuICAgICAgfVxyXG4gICAgfVxyXG5cclxuICAgIHJlcy5zdGF0dXMoMjAwKS5qc29uKHtcclxuICAgICAgc3VjY2VzczogdHJ1ZSxcclxuICAgICAgaXRlbXMsXHJcbiAgICAgIHRvdGFsOiBpdGVtcy5sZW5ndGgsXHJcbiAgICAgIHNjYWxlczogWy4uLm5ldyBTZXQoaXRlbXMubWFwKGl0ZW0gPT4gaXRlbS5zY2FsZSkpXVxyXG4gICAgfSk7XHJcbiAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgIGNvbnNvbGUuZXJyb3IoJ9Ce0YjQuNCx0LrQsCDQt9Cw0LPRgNGD0LfQutC4INCy0L7Qv9GA0L7RgdC+0LI6JywgZXJyb3IpO1xyXG4gICAgcmVzLnN0YXR1cyg1MDApLmpzb24oeyBcclxuICAgICAgZXJyb3I6ICfQntGI0LjQsdC60LAg0LfQsNCz0YDRg9C30LrQuCDQstC+0L/RgNC+0YHQvtCyJyxcclxuICAgICAgZGV0YWlsczogZXJyb3IubWVzc2FnZSBcclxuICAgIH0pO1xyXG4gIH1cclxufVxyXG4iXSwibmFtZXMiOlsiZnMiLCJwYXRoIiwiaGFuZGxlciIsInJlcSIsInJlcyIsIm1ldGhvZCIsInN0YXR1cyIsImpzb24iLCJlcnJvciIsImNzdlBhdGgiLCJqb2luIiwicHJvY2VzcyIsImN3ZCIsImNzdkNvbnRlbnQiLCJyZWFkRmlsZVN5bmMiLCJsaW5lcyIsInRyaW0iLCJzcGxpdCIsImhlYWRlcnMiLCJpdGVtcyIsImkiLCJsZW5ndGgiLCJ2YWx1ZXMiLCJwdXNoIiwiaWQiLCJwYXJzZUludCIsInRleHQiLCJzY2FsZSIsInJldmVyc2UiLCJzdWNjZXNzIiwidG90YWwiLCJzY2FsZXMiLCJTZXQiLCJtYXAiLCJpdGVtIiwiY29uc29sZSIsImRldGFpbHMiLCJtZXNzYWdlIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(api)/./pages/api/profiling/attitude/items.js\n");
+
+/***/ })
+
+};
+;
+
+// load runtime
+var __webpack_require__ = require("../../../../webpack-api-runtime.js");
+__webpack_require__.C(exports);
+var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next"], () => (__webpack_exec__("(api)/./node_modules/next/dist/build/webpack/loaders/next-route-loader/index.js?kind=PAGES_API&page=%2Fapi%2Fprofiling%2Fattitude%2Fitems&preferredRegion=&absolutePagePath=.%2Fpages%5Capi%5Cprofiling%5Cattitude%5Citems.js&middlewareConfigBase64=e30%3D!")));
+module.exports = __webpack_exports__;
+
+})();
