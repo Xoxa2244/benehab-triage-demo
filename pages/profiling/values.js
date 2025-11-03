@@ -14,7 +14,7 @@ export default function ValuesSurvey() {
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
-  const itemsPerPage = 5;
+  const itemsPerPage = 1;
 
   const colors = [
     { name: 'red', label: 'Red', class: 'bg-red-400' },
@@ -361,49 +361,49 @@ export default function ValuesSurvey() {
               </p>
             </div>
             
-            {/* Page indicator */}
+            {/* Concept indicator */}
             <div className="flex justify-center mb-8">
               <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
                 <span className="text-sm font-medium text-gray-600">
-                  Page {currentPage} of {totalPages}
+                  Concept {currentPage} of {totalPages}
                 </span>
                 <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
               </div>
             </div>
             
-            {/* Concepts grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* Single Concept Display */}
+            <div className="max-w-2xl mx-auto mb-8">
               {currentItems.map((item) => (
                 <div key={item.id} className="group relative">
                   <div className={`
-                    bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
+                    bg-gradient-to-br from-white to-gray-50 rounded-3xl p-12 border-2 transition-all duration-300
                     ${validationErrors[item.concept]
-                      ? 'border-red-400 shadow-lg shadow-red-100 bg-red-50'
+                      ? 'border-red-400 shadow-xl shadow-red-100 bg-red-50'
                       : colorAssociations[item.concept] 
-                        ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                        ? 'border-emerald-300 shadow-xl shadow-emerald-100' 
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
                     }
                   `}>
                     {/* Concept name */}
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <div className="text-center mb-10">
+                      <h3 className="text-5xl font-bold text-gray-900 mb-4">
                         {item.concept}
                       </h3>
-                      <div className="w-12 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mx-auto"></div>
+                      <div className="w-24 h-1.5 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mx-auto"></div>
                     </div>
                     
                     {/* Color selection */}
-                    <div className="grid grid-cols-4 gap-3 mb-4">
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-4 mb-6">
                       {colors.map((color) => (
                         <button
                           key={color.name}
                           onClick={() => handleColorSelect(item.concept, color.name)}
                           className={`
-                            w-12 h-12 rounded-2xl transition-all duration-300 transform
+                            w-16 h-16 md:w-20 md:h-20 rounded-2xl transition-all duration-300 transform
                             ${color.class}
                             ${colorAssociations[item.concept] === color.name 
-                              ? 'ring-4 ring-emerald-300 scale-110 shadow-lg' 
-                              : 'hover:scale-105 hover:shadow-md'
+                              ? 'ring-4 ring-emerald-400 scale-110 shadow-xl ring-offset-2' 
+                              : 'hover:scale-110 hover:shadow-lg'
                             }
                           `}
                           title={color.label}
@@ -414,9 +414,9 @@ export default function ValuesSurvey() {
                     {/* Selection indicator */}
                     {colorAssociations[item.concept] && (
                       <div className="text-center">
-                        <div className="inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
-                          <div className={`w-3 h-3 rounded-full mr-2 ${colors.find(c => c.name === colorAssociations[item.concept])?.class}`}></div>
-                          {colors.find(c => c.name === colorAssociations[item.concept])?.label}
+                        <div className="inline-flex items-center px-6 py-3 bg-emerald-100 text-emerald-700 rounded-full text-lg font-semibold shadow-md">
+                          <div className={`w-4 h-4 rounded-full mr-3 ${colors.find(c => c.name === colorAssociations[item.concept])?.class}`}></div>
+                          Selected: {colors.find(c => c.name === colorAssociations[item.concept])?.label}
                         </div>
                       </div>
                     )}
@@ -454,7 +454,7 @@ export default function ValuesSurvey() {
                     }
                   `}
                 >
-                  ← Previous
+                  ← Previous Concept
                 </button>
                 
                 {isLastPage() ? (
@@ -476,7 +476,7 @@ export default function ValuesSurvey() {
                     onClick={goToNextPage}
                     className="px-8 py-3 rounded-xl font-medium transition-all duration-300 transform bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105"
                   >
-                    Next Page →
+                    Next Concept →
                   </button>
                 )}
               </div>
