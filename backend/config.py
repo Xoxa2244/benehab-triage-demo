@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
+from pydantic import field_validator
+from typing import Optional, Any
 
 
 class Settings(BaseSettings):
@@ -20,8 +21,8 @@ class Settings(BaseSettings):
     api_host: str = "localhost"
     api_port: int = 8000
     
-    # CORS
-    cors_origins: list[str] = ["*"]
+    # CORS - stored as string, converted to list
+    cors_origins: str = "*"
     
     # Режим разработки
     debug: bool = True
@@ -32,6 +33,12 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore"
     )
+    
+    def get_cors_origins_list(self) -> list[str]:
+        """Get CORS origins as a list"""
+        if not self.cors_origins or self.cors_origins == "*":
+            return ["*"]
+        return [origin.strip() for origin in self.cors_origins.split(',') if origin.strip()]
 
 
 # Создаем глобальный экземпляр настроек
