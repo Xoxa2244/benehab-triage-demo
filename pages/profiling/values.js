@@ -283,67 +283,67 @@ export default function ValuesSurvey() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-3xl p-8 mb-6 shadow-lg text-white">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-6">
+      <div className="max-w-4xl mx-auto p-3">
+        {/* Header - Compact */}
+        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-4 mb-4 shadow-lg text-white">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-4">
               <div>
-                <h1 className="text-4xl font-bold mb-2">Values Model</h1>
-                <p className="text-emerald-100 text-lg">
-                  Discover your personal value system through color associations
+                <h1 className="text-2xl font-bold mb-1">Values Model</h1>
+                <p className="text-emerald-100 text-sm">
+                  Stage {currentStage} of 2
                 </p>
               </div>
-              {/* Progress circle */}
-              <div className="relative w-20 h-20">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
+              {/* Progress circle - Smaller */}
+              <div className="relative w-14 h-14">
+                <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 36 36">
                   <path
                     className="text-emerald-200"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="2.5"
                     fill="none"
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
                   <path
                     className="text-white"
                     stroke="currentColor"
-                    strokeWidth="3"
+                    strokeWidth="2.5"
                     fill="none"
                     strokeDasharray={`${progress}, 100`}
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">{Math.round(progress)}%</span>
+                  <span className="text-white font-bold text-sm">{Math.round(progress)}%</span>
                 </div>
               </div>
             </div>
             <Link 
               href="/" 
-              className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-2xl transition-all duration-300 font-medium"
+              className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-xl transition-all duration-300 font-medium text-sm"
             >
-              ← Back to Chat
+              ← Back
             </Link>
           </div>
           
-          <div className="mb-6">
-            <div className="flex justify-between text-emerald-100 mb-3">
-              <span className="font-medium">Overall Progress: {Math.round(progress)}%</span>
-              <span className="font-medium">Stage {currentStage} of 2</span>
+          <div className="mb-2">
+            <div className="flex justify-between text-emerald-100 mb-2 text-xs">
+              <span>Progress: {Math.round(progress)}%</span>
+              <span>{Object.keys(colorAssociations).length} of {items.length} concepts</span>
             </div>
-            <div className="w-full bg-white bg-opacity-20 rounded-full h-3">
+            <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
               <div 
-                className="bg-white h-3 rounded-full transition-all duration-500 shadow-lg"
+                className="bg-white h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
           </div>
 
           <div className="text-center">
-            <p className="text-xl text-emerald-100">
+            <p className="text-sm text-emerald-100">
               {currentStage === 1 
-                ? 'Choose colors that best represent each concept to you'
-                : 'Arrange your selected colors from most to least pleasant'
+                ? 'Choose a color for each concept'
+                : 'Arrange colors from most to least pleasant'
               }
             </p>
           </div>
@@ -351,59 +351,50 @@ export default function ValuesSurvey() {
 
         {/* Stage 1: Color associations */}
         {currentStage === 1 && (
-          <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg border border-gray-100">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Stage 1: Color Associations
-              </h2>
-              <p className="text-gray-600 text-lg">
-                Choose a color that best represents each concept
-              </p>
-            </div>
-            
-            {/* Concept indicator */}
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
-                <span className="text-sm font-medium text-gray-600">
+          <div className="bg-white rounded-2xl p-6 mb-4 shadow-lg border border-gray-100">
+            {/* Concept indicator - Compact */}
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-3 py-1.5">
+                <span className="text-xs font-medium text-gray-600">
                   Concept {currentPage} of {totalPages}
                 </span>
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
               </div>
             </div>
             
-            {/* Single Concept Display */}
-            <div className="max-w-2xl mx-auto mb-8">
+            {/* Single Concept Display - Compact */}
+            <div className="max-w-xl mx-auto mb-4">
               {currentItems.map((item) => (
                 <div key={item.id} className="group relative">
                   <div className={`
-                    bg-gradient-to-br from-white to-gray-50 rounded-3xl p-12 border-2 transition-all duration-300
+                    bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border-2 transition-all duration-300
                     ${validationErrors[item.concept]
-                      ? 'border-red-400 shadow-xl shadow-red-100 bg-red-50'
+                      ? 'border-red-400 shadow-lg shadow-red-100 bg-red-50'
                       : colorAssociations[item.concept] 
-                        ? 'border-emerald-300 shadow-xl shadow-emerald-100' 
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                        ? 'border-emerald-300 shadow-lg shadow-emerald-100' 
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                     }
                   `}>
-                    {/* Concept name */}
-                    <div className="text-center mb-10">
-                      <h3 className="text-5xl font-bold text-gray-900 mb-4">
+                    {/* Concept name - Smaller */}
+                    <div className="text-center mb-6">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-2">
                         {item.concept}
                       </h3>
-                      <div className="w-24 h-1.5 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mx-auto"></div>
+                      <div className="w-16 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mx-auto"></div>
                     </div>
                     
-                    {/* Color selection */}
-                    <div className="grid grid-cols-4 md:grid-cols-6 gap-4 mb-6">
+                    {/* Color selection - Smaller */}
+                    <div className="grid grid-cols-6 gap-3 mb-4">
                       {colors.map((color) => (
                         <button
                           key={color.name}
                           onClick={() => handleColorSelect(item.concept, color.name)}
                           className={`
-                            w-16 h-16 md:w-20 md:h-20 rounded-2xl transition-all duration-300 transform
+                            w-12 h-12 rounded-xl transition-all duration-300 transform
                             ${color.class}
                             ${colorAssociations[item.concept] === color.name 
-                              ? 'ring-4 ring-emerald-400 scale-110 shadow-xl ring-offset-2' 
-                              : 'hover:scale-110 hover:shadow-lg'
+                              ? 'ring-3 ring-emerald-400 scale-110 shadow-lg ring-offset-1' 
+                              : 'hover:scale-105 hover:shadow-md'
                             }
                           `}
                           title={color.label}
@@ -411,12 +402,12 @@ export default function ValuesSurvey() {
                       ))}
                     </div>
                     
-                    {/* Selection indicator */}
+                    {/* Selection indicator - Smaller */}
                     {colorAssociations[item.concept] && (
                       <div className="text-center">
-                        <div className="inline-flex items-center px-6 py-3 bg-emerald-100 text-emerald-700 rounded-full text-lg font-semibold shadow-md">
-                          <div className={`w-4 h-4 rounded-full mr-3 ${colors.find(c => c.name === colorAssociations[item.concept])?.class}`}></div>
-                          Selected: {colors.find(c => c.name === colorAssociations[item.concept])?.label}
+                        <div className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium shadow-sm">
+                          <div className={`w-3 h-3 rounded-full mr-2 ${colors.find(c => c.name === colorAssociations[item.concept])?.class}`}></div>
+                          {colors.find(c => c.name === colorAssociations[item.concept])?.label}
                         </div>
                       </div>
                     )}
@@ -425,61 +416,44 @@ export default function ValuesSurvey() {
               ))}
             </div>
             
-            {/* Progress and navigation */}
-            <div className="flex flex-col items-center space-y-6">
-              {/* Progress bar */}
-              <div className="w-full max-w-md">
-                <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span>Progress: {Object.keys(colorAssociations).length} of {items.length}</span>
-                  <span>{Math.round((Object.keys(colorAssociations).length / items.length) * 100)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.min((Object.keys(colorAssociations).length / items.length) * 100, 100)}%` }}
-                  ></div>
-                </div>
-              </div>
+            {/* Navigation buttons - Always visible */}
+            <div className="flex items-center justify-center space-x-3 mt-4">
+              <button
+                onClick={goToPreviousPage}
+                disabled={!canGoToPreviousPage()}
+                className={`
+                  px-6 py-2.5 rounded-xl font-medium transition-all duration-300 text-sm
+                  ${!canGoToPreviousPage()
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
+                  }
+                `}
+              >
+                ← Previous
+              </button>
               
-              {/* Navigation buttons */}
-              <div className="flex items-center space-x-4">
+              {isLastPage() ? (
                 <button
-                  onClick={goToPreviousPage}
-                  disabled={!canGoToPreviousPage()}
+                  onClick={goToStage2}
+                  disabled={!canGoToStage2()}
                   className={`
-                    px-6 py-3 rounded-xl font-medium transition-all duration-300
-                    ${!canGoToPreviousPage()
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-md'
+                    px-6 py-2.5 rounded-xl font-medium transition-all duration-300 transform text-sm
+                    ${canGoToStage2()
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg hover:scale-105'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }
                   `}
                 >
-                  ← Previous Concept
+                  Complete Stage 1 →
                 </button>
-                
-                {isLastPage() ? (
-                  <button
-                    onClick={goToStage2}
-                    disabled={!canGoToStage2()}
-                    className={`
-                      px-8 py-3 rounded-xl font-medium transition-all duration-300 transform
-                      ${canGoToStage2()
-                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg hover:scale-105'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }
-                    `}
-                  >
-                    Complete Stage 1 →
-                  </button>
-                ) : (
-                  <button
-                    onClick={goToNextPage}
-                    className="px-8 py-3 rounded-xl font-medium transition-all duration-300 transform bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105"
-                  >
-                    Next Concept →
-                  </button>
-                )}
-              </div>
+              ) : (
+                <button
+                  onClick={goToNextPage}
+                  className="px-6 py-2.5 rounded-xl font-medium transition-all duration-300 transform bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:scale-105 text-sm"
+                >
+                  Next Concept →
+                </button>
+              )}
             </div>
           </div>
         )}
