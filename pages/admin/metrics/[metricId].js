@@ -49,7 +49,8 @@ export default function MetricEditorPage() {
       const ranksRes = await fetch('/api/admin/ranks')
       const ranksData = await ranksRes.json()
       if (!ranksData.success) throw new Error(ranksData.error)
-      setM(ranksData.M || 5)
+      // Use M directly from API response, fallback to rankConfig.M if needed
+      setM(ranksData.M || ranksData.rankConfig?.M || 5)
 
       // Load matrices
       const sameRes = await fetch(`/api/admin/metrics/${metricId}/matrices/same`)
