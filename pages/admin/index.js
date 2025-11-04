@@ -8,7 +8,10 @@ import {
   SwatchIcon,
   Cog6ToothIcon,
   ChartBarIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  TableCellsIcon,
+  CalculatorIcon,
+  BeakerIcon
 } from '@heroicons/react/24/outline';
 
 export default function AdminPanel() {
@@ -183,35 +186,53 @@ export default function AdminPanel() {
             <div className="p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">Управление опросом "Психосемантика"</h2>
-                <p className="text-gray-600">Управление понятиями, их категориями и описаниями</p>
+                <p className="text-gray-600">Управление понятиями, метриками, весовыми матрицами и настройками Affinity</p>
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Link 
-                  href="/admin/values/concepts"
+                  href="/admin/concepts"
                   className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
                 >
                   <SwatchIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Понятия</h3>
-                  <p className="text-sm text-gray-600 text-center">Управление понятиями, их названиями и описаниями</p>
+                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Concepts</h3>
+                  <p className="text-sm text-gray-600 text-center">Управление понятиями (concepts) и их описаниями</p>
                 </Link>
                 
                 <Link 
-                  href="/admin/values/categories"
+                  href="/admin/ranks"
                   className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
                 >
-                  <ChartBarIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Категории</h3>
-                  <p className="text-sm text-gray-600 text-center">Группировка понятий по категориям</p>
+                  <TableCellsIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Ranks (M)</h3>
+                  <p className="text-sm text-gray-600 text-center">Настройка длины ранга M для матриц Rank × Concept</p>
                 </Link>
                 
                 <Link 
-                  href="/admin/values/analysis"
+                  href="/admin/metrics"
+                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
+                >
+                  <CalculatorIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Metrics</h3>
+                  <p className="text-sm text-gray-600 text-center">Управление метриками и их весовыми матрицами</p>
+                </Link>
+
+                <Link 
+                  href="/admin/settings"
                   className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
                 >
                   <Cog6ToothIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Анализ</h3>
-                  <p className="text-sm text-gray-600 text-center">Настройка логики анализа цветовых ассоциаций</p>
+                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Settings</h3>
+                  <p className="text-sm text-gray-600 text-center">Настройка Affinity: Self/Ideal concepts и anchors</p>
+                </Link>
+
+                <Link 
+                  href="/admin/debug"
+                  className="group p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-colors"
+                >
+                  <BeakerIcon className="h-12 w-12 text-purple-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 text-center mb-2">Debug</h3>
+                  <p className="text-sm text-gray-600 text-center">Тестирование вычислений Score и Affinity</p>
                 </Link>
               </div>
             </div>
