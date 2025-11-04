@@ -47,9 +47,10 @@ export default function ValuesSurvey() {
           name: c.name,
           label: c.label,
           hex: c.hex,
+          // Use inline style for arbitrary colors, keep class for white (border)
           class: c.hex === '#FFFFFF' || c.hex === '#ffffff' 
             ? 'bg-white border-2 border-gray-300' 
-            : `bg-[${c.hex}]`
+            : ''
         }));
         setColors(formattedColors);
         console.log('✅ Colors loaded successfully:', formattedColors.length);
@@ -416,12 +417,13 @@ export default function ValuesSurvey() {
                           onClick={() => handleColorSelect(item.concept, color.name)}
                           className={`
                             w-12 h-12 rounded-xl transition-all duration-300 transform
-                            ${color.class}
+                            ${color.class || ''}
                             ${colorAssociations[item.concept] === color.name 
                               ? 'ring-3 ring-emerald-400 scale-110 shadow-lg ring-offset-1' 
                               : 'hover:scale-105 hover:shadow-md'
                             }
                           `}
+                          style={color.class ? {} : { backgroundColor: color.hex }}
                           title={color.label}
                         />
                       ))}
@@ -431,8 +433,18 @@ export default function ValuesSurvey() {
                     {colorAssociations[item.concept] && (
                       <div className="text-center">
                         <div className="inline-flex items-center px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium shadow-sm">
-                          <div className={`w-3 h-3 rounded-full mr-2 ${colors.find(c => c.name === colorAssociations[item.concept])?.class}`}></div>
-                          {colors.find(c => c.name === colorAssociations[item.concept])?.label}
+                          {(() => {
+                            const selectedColor = colors.find(c => c.name === colorAssociations[item.concept]);
+                            return (
+                              <>
+                                <div 
+                                  className={`w-3 h-3 rounded-full mr-2 ${selectedColor?.class || ''}`}
+                                  style={selectedColor?.class ? {} : { backgroundColor: selectedColor?.hex }}
+                                ></div>
+                                {selectedColor?.label}
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
@@ -507,7 +519,15 @@ export default function ValuesSurvey() {
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl font-bold text-lg mr-4">
                       {index + 1}
                     </div>
-                    <div className={`w-12 h-12 rounded-2xl mr-4 shadow-md ${colors.find(c => c.name === color)?.class}`}></div>
+                    {(() => {
+                      const colorObj = colors.find(c => c.name === color);
+                      return (
+                        <div 
+                          className={`w-12 h-12 rounded-2xl mr-4 shadow-md ${colorObj?.class || ''}`}
+                          style={colorObj?.class ? {} : { backgroundColor: colorObj?.hex }}
+                        ></div>
+                      );
+                    })()}
                     <div className="flex-1">
                       <span className="text-lg font-semibold text-gray-900">
                         {colors.find(c => c.name === color)?.label || color}
