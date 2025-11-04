@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import toast from 'react-hot-toast'
 
 export default function MatrixEditorNxN({ 
@@ -11,11 +11,66 @@ export default function MatrixEditorNxN({
 }) {
   const [localMatrix, setLocalMatrix] = useState({})
   const [hasChanges, setHasChanges] = useState(false)
+  const scrollContainerRef = useRef(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [scrollStart, setScrollStart] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     setLocalMatrix(matrix || {})
     setHasChanges(false)
   }, [matrix])
+
+  // Right-click drag scrolling
+  const handleMouseDown = useCallback((e) => {
+    if (e.button === 2) { // Right mouse button
+      e.preventDefault()
+      setIsDragging(true)
+      setDragStart({ x: e.clientX, y: e.clientY })
+      if (scrollContainerRef.current) {
+        setScrollStart({
+          x: scrollContainerRef.current.scrollLeft,
+          y: scrollContainerRef.current.scrollTop
+        })
+      }
+    }
+  }, [])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging && scrollContainerRef.current) {
+      e.preventDefault()
+      const deltaX = dragStart.x - e.clientX
+      const deltaY = dragStart.y - e.clientY
+      scrollContainerRef.current.scrollLeft = scrollStart.x + deltaX
+      scrollContainerRef.current.scrollTop = scrollStart.y + deltaY
+    }
+  }, [isDragging, dragStart, scrollStart])
+
+  const handleMouseUp = useCallback((e) => {
+    if (e.button === 2) {
+      setIsDragging(false)
+    }
+  }, [])
+
+  const handleContextMenu = useCallback((e) => {
+    if (isDragging) {
+      e.preventDefault()
+    }
+  }, [isDragging])
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('contextmenu', handleContextMenu)
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove)
+        document.removeEventListener('mouseup', handleMouseUp)
+        document.removeEventListener('contextmenu', handleContextMenu)
+      }
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleContextMenu])
 
   const handleCellChange = (conceptI, conceptJ, value) => {
     const numValue = parseFloat(value) || 0
@@ -81,7 +136,12 @@ export default function MatrixEditorNxN({
       </div>
 
       {/* Matrix Table */}
-      <div className="overflow-x-auto">
+      <div 
+        ref={scrollContainerRef}
+        className="overflow-x-auto overflow-y-auto max-h-[600px]"
+        onMouseDown={handleMouseDown}
+        style={{ cursor: isDragging ? 'grabbing' : 'default' }}
+      >
         <table className="w-full">
           <thead>
             <tr>
