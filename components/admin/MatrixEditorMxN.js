@@ -118,9 +118,9 @@ export default function MatrixEditorMxN({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col" style={{ maxHeight: '80vh' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4">
+      <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white">{title}</h3>
           {summary && (
@@ -135,9 +135,9 @@ export default function MatrixEditorMxN({
       {/* Matrix Table */}
       <div 
         ref={scrollContainerRef}
-        className="overflow-x-auto overflow-y-auto max-h-[600px]"
+        className="overflow-x-auto overflow-y-auto flex-1"
         onMouseDown={handleMouseDown}
-        style={{ cursor: isDragging ? 'grabbing' : 'default' }}
+        style={{ cursor: isDragging ? 'grabbing' : 'default', minHeight: 0 }}
       >
         <table className="w-full">
           <thead>
@@ -191,7 +191,7 @@ export default function MatrixEditorMxN({
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
         <div className="text-sm text-gray-600">
           Sum: <span className="font-medium">{calculateSum().toFixed(2)}</span>
         </div>
