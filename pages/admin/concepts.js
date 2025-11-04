@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { PlusIcon, TrashIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, ArrowLeftIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 
 export default function ConceptsPage() {
   const [concepts, setConcepts] = useState([])
@@ -9,6 +9,7 @@ export default function ConceptsPage() {
   const [newConceptName, setNewConceptName] = useState('')
   const [isAdding, setIsAdding] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [isLoadingBulk, setIsLoadingBulk] = useState(false)
 
   useEffect(() => {
     loadConcepts()
@@ -87,6 +88,34 @@ export default function ConceptsPage() {
     }
   }
 
+  const handleBulkLoad = async () => {
+    if (!confirm('This will load all 65 concepts from CSV file and update M (rank) to 11. Continue?')) {
+      return
+    }
+
+    try {
+      setIsLoadingBulk(true)
+      setError(null)
+      
+      const response = await fetch('/api/admin/concepts/bulk-load', {
+        method: 'POST'
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        alert(`Successfully loaded ${data.summary.loaded} concepts. ${data.summary.skipped} already existed, ${data.summary.errors} errors. M (rank) updated to 11.`)
+        await loadConcepts() // Reload to show new concepts
+      } else {
+        setError(data.error || 'Failed to bulk load concepts')
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsLoadingBulk(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -118,15 +147,25 @@ export default function ConceptsPage() {
         )}
 
         {/* Add concept form */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center space-x-4">
           {!showAddForm ? (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Add Concept
-            </button>
+            <>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                Add Concept
+              </button>
+              <button
+                onClick={handleBulkLoad}
+                disabled={isLoadingBulk}
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
+                {isLoadingBulk ? 'Loading...' : 'Load from CSV (65 concepts)'}
+              </button>
+            </>
           ) : (
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <div className="flex items-center space-x-4">
