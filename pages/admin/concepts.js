@@ -104,7 +104,17 @@ export default function ConceptsPage() {
       const data = await response.json()
 
       if (data.success) {
-        alert(`Successfully loaded ${data.summary.loaded} concepts. ${data.summary.skipped} already existed, ${data.summary.errors} errors. M (rank) updated to 11.`)
+        let message = `Successfully loaded ${data.summary.loaded} concepts. ${data.summary.skipped} already existed, ${data.summary.errors} errors.`
+        
+        if (data.rankConfig) {
+          if (data.rankConfig.updated) {
+            message += `\n\nM (rank) updated to 11.`
+          } else if (data.rankConfig.error) {
+            message += `\n\n⚠️ Warning: Failed to update M (rank): ${data.rankConfig.error}`
+          }
+        }
+        
+        alert(message)
         await loadConcepts() // Reload to show new concepts
       } else {
         setError(data.error || 'Failed to bulk load concepts')

@@ -106,12 +106,50 @@ export default async function handler(req, res) {
     }
 
     // Обновляем M (ранг) на 11
+    let mUpdated = false
+    let mError = null
     try {
-      await supabaseAdmin
+      // Проверяем, существует ли запись
+      const { data: existing } = await supabaseAdmin
         .from('rank_config')
-        .update({ M: 11, updated_at: new Date().toISOString() })
+        .select('id, M')
         .eq('id', 1)
+        .single()
+
+      if (!existing) {
+        // Создаем запись, если её нет
+        const { data, error } = await supabaseAdmin
+          .from('rank_config')
+          .insert([{ id: 1, M: 11 }])
+          .select()
+          .single()
+
+        if (error) {
+          mError = `Failed to create rank_config: ${error.message}`
+          console.error('Error creating rank_config:', error)
+        } else {
+          mUpdated = true
+          console.log('✅ Created rank_config with M = 11')
+        }
+      } else {
+        // Обновляем существующую запись
+        const { data, error } = await supabaseAdmin
+          .from('rank_config')
+          .update({ M: 11, updated_at: new Date().toISOString() })
+          .eq('id', 1)
+          .select()
+          .single()
+
+        if (error) {
+          mError = `Failed to update M: ${error.message}`
+          console.error('Error updating M:', error)
+        } else {
+          mUpdated = true
+          console.log(`✅ Updated M from ${existing.M} to 11`)
+        }
+      }
     } catch (error) {
+      mError = `Error updating M: ${error.message}`
       console.error('Error updating M:', error)
     }
 
@@ -122,6 +160,10 @@ export default async function handler(req, res) {
         loaded: successCount,
         skipped: skipCount,
         errors: errorCount
+      },
+      rankConfig: {
+        updated: mUpdated,
+        error: mError || undefined
       },
       errors: errors.length > 0 ? errors : undefined
     })
