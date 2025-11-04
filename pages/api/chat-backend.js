@@ -13,8 +13,12 @@ export default async function handler(req, res) {
 
     console.log('🔄 Proxying to backend:', message);
     
-    // Get backend URL from environment or use default
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    // Use INTERNAL_API_URL for server-side requests, NEXT_PUBLIC_API_URL for client-side
+    const baseUrl = typeof window === 'undefined'
+      ? process.env.INTERNAL_API_URL
+      : process.env.NEXT_PUBLIC_API_URL;
+    
+    const backendUrl = baseUrl || 'http://localhost:8000';
     const endpoint = `${backendUrl}/api/chat`;
     
     console.log('🎯 Backend URL:', endpoint);

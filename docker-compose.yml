@@ -36,7 +36,7 @@ services:
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o}
       - API_HOST=0.0.0.0
       - API_PORT=8000
-      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,http://localhost:3001
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,http://localhost:3001,http://165.227.24.223:3000
       - DEBUG=True
     depends_on:
       mongodb:
@@ -57,7 +57,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=http://165.227.24.223:8000
+      - INTERNAL_API_URL=http://backend:8000
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - .:/app
