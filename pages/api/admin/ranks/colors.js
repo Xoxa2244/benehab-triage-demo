@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../../../lib/supabase/server'
+import { supabaseAdmin } from '../../../../lib/supabase/server'
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {

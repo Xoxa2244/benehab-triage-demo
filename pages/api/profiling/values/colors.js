@@ -1,7 +1,7 @@
 // pages/api/profiling/values/colors.js
 // API endpoint to get rank colors for the survey
 
-import { supabaseAdmin } from '../../../../lib/supabase/server'
+import { supabaseAdmin } from '../../../lib/supabase/server'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
