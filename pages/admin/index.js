@@ -1,6 +1,7 @@
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { 
   ClipboardDocumentListIcon, 
@@ -15,7 +16,21 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function AdminPanel() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('attitude');
+
+  // Sync tab with URL query parameter
+  useEffect(() => {
+    if (router.query.tab && ['attitude', 'typology', 'values'].includes(router.query.tab)) {
+      setActiveTab(router.query.tab);
+    }
+  }, [router.query.tab]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    router.push(`/admin?tab=${tabId}`, undefined, { shallow: true });
+  };
 
   const tabs = [
     {
@@ -88,7 +103,7 @@ export default function AdminPanel() {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`
                   flex items-center space-x-2 px-4 py-3 rounded-lg font-medium text-sm transition-colors
                   ${activeTab === tab.id

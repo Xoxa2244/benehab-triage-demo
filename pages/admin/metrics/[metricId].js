@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { ArrowLeftIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import toast, { Toaster } from 'react-hot-toast'
+import BackButton from '../../../components/admin/BackButton'
+import Breadcrumbs from '../../../components/admin/Breadcrumbs'
 import MatrixEditorNxN from '../../../components/admin/MatrixEditorNxN'
 import MatrixEditorMxN from '../../../components/admin/MatrixEditorMxN'
 import SummaryPanel from '../../../components/admin/SummaryPanel'
@@ -259,12 +261,7 @@ export default function MetricEditorPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Link
-                href="/admin/metrics"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeftIcon className="h-5 w-5" />
-              </Link>
+              <BackButton href="/admin/metrics" label="Metrics" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{metric.text}</h1>
                 <div className="flex items-center space-x-2 mt-1">
@@ -303,6 +300,15 @@ export default function MetricEditorPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Психосемантика', href: '/admin?tab=values' },
+            { label: 'Metrics', href: '/admin/metrics' },
+            { label: metric?.text || 'Edit Metric' }
+          ]}
+        />
+
         {/* Summary Panel */}
         <div className="mb-6">
           <SummaryPanel

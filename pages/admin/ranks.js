@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { ArrowLeftIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, MinusIcon } from '@heroicons/react/24/outline'
+import BackButton from '../../components/admin/BackButton'
+import Breadcrumbs from '../../components/admin/Breadcrumbs'
 
 export default function RanksPage() {
   const [M, setM] = useState(5)
@@ -160,12 +161,7 @@ export default function RanksPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Link
-                href="/admin"
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeftIcon className="h-5 w-5" />
-              </Link>
+              <BackButton href="/admin?tab=values" label="Психосемантика" />
               <h1 className="text-2xl font-bold text-gray-900">Manage Rank Length (M)</h1>
             </div>
           </div>
@@ -173,6 +169,14 @@ export default function RanksPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Психосемантика', href: '/admin?tab=values' },
+            { label: 'Ranks (M)' }
+          ]}
+        />
+
         {/* Messages */}
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
