@@ -16,24 +16,49 @@ export default function ValuesSurvey() {
   const [validationErrors, setValidationErrors] = useState({});
   const itemsPerPage = 1;
 
-  const colors = [
-    { name: 'red', label: 'Red', class: 'bg-red-400' },
-    { name: 'blue', label: 'Blue', class: 'bg-blue-400' },
-    { name: 'green', label: 'Green', class: 'bg-green-400' },
-    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-300' },
-    { name: 'purple', label: 'Purple', class: 'bg-purple-400' },
-    { name: 'orange', label: 'Orange', class: 'bg-orange-400' },
-    { name: 'pink', label: 'Pink', class: 'bg-pink-400' },
-    { name: 'brown', label: 'Brown', class: 'bg-yellow-700' },
-    { name: 'gray', label: 'Gray', class: 'bg-gray-400' },
-    { name: 'black', label: 'Black', class: 'bg-gray-700' },
-    { name: 'white', label: 'White', class: 'bg-white border-2 border-gray-300' }
-  ];
+  const [colors, setColors] = useState([
+    { name: 'red', label: 'Red', class: 'bg-red-400', hex: '#EF4444' },
+    { name: 'blue', label: 'Blue', class: 'bg-blue-400', hex: '#3B82F6' },
+    { name: 'green', label: 'Green', class: 'bg-green-400', hex: '#10B981' },
+    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-300', hex: '#FBBF24' },
+    { name: 'purple', label: 'Purple', class: 'bg-purple-400', hex: '#A78BFA' },
+    { name: 'orange', label: 'Orange', class: 'bg-orange-400', hex: '#F97316' },
+    { name: 'pink', label: 'Pink', class: 'bg-pink-400', hex: '#EC4899' },
+    { name: 'brown', label: 'Brown', class: 'bg-yellow-700', hex: '#92400E' },
+    { name: 'gray', label: 'Gray', class: 'bg-gray-400', hex: '#9CA3AF' },
+    { name: 'black', label: 'Black', class: 'bg-gray-700', hex: '#1F2937' },
+    { name: 'white', label: 'White', class: 'bg-white border-2 border-gray-300', hex: '#FFFFFF' }
+  ]);
 
   useEffect(() => {
     loadItems();
+    loadColors();
     loadProgress();
   }, []);
+
+  const loadColors = async () => {
+    try {
+      const response = await fetch('/api/profiling/values/colors');
+      const data = await response.json();
+      
+      if (data.success && data.colors) {
+        // Convert colors to format expected by the component
+        const formattedColors = data.colors.map(c => ({
+          name: c.name,
+          label: c.label,
+          hex: c.hex,
+          class: c.hex === '#FFFFFF' || c.hex === '#ffffff' 
+            ? 'bg-white border-2 border-gray-300' 
+            : `bg-[${c.hex}]`
+        }));
+        setColors(formattedColors);
+        console.log('✅ Colors loaded successfully:', formattedColors.length);
+      }
+    } catch (error) {
+      console.error('❌ Error loading colors:', error);
+      // Keep default colors on error
+    }
+  };
 
   useEffect(() => {
     updateProgress();

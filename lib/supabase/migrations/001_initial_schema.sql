@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS concepts (
 -- 3. Create rank_config table
 CREATE TABLE IF NOT EXISTS rank_config (
   id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-  M INTEGER NOT NULL CHECK (M >= 2),
+  "M" INTEGER NOT NULL CHECK ("M" >= 2),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Initialize rank_config
-INSERT INTO rank_config (id, M) VALUES (1, 5) 
+INSERT INTO rank_config (id, "M") VALUES (1, 5) 
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Create metrics table
@@ -104,7 +104,7 @@ DECLARE
   M_value INTEGER;
 BEGIN
   -- Get M from rank_config
-  SELECT M INTO M_value FROM rank_config WHERE id = 1;
+  SELECT "M" INTO M_value FROM rank_config WHERE id = 1;
   
   -- For each metric
   FOR metric_record IN SELECT id FROM metrics LOOP
@@ -152,8 +152,8 @@ DECLARE
   concept_record RECORD;
   rank_value INTEGER;
 BEGIN
-  old_M := OLD.M;
-  new_M := NEW.M;
+  old_M := OLD."M";
+  new_M := NEW."M";
   
   IF new_M > old_M THEN
     -- Increased M: add rows for new ranks
@@ -184,7 +184,7 @@ DROP TRIGGER IF EXISTS on_rank_config_updated ON rank_config;
 CREATE TRIGGER on_rank_config_updated
 BEFORE UPDATE ON rank_config
 FOR EACH ROW
-WHEN (OLD.M IS DISTINCT FROM NEW.M)
+WHEN (OLD."M" IS DISTINCT FROM NEW."M")
 EXECUTE FUNCTION update_rank_config();
 
 -- 13. Enable Row Level Security (optional - can be disabled for admin)
