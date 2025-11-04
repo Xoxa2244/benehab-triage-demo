@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { ArrowLeftIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import toast, { Toaster } from 'react-hot-toast'
-import MatrixEditorNxN from '../../../../components/admin/MatrixEditorNxN'
-import MatrixEditorMxN from '../../../../components/admin/MatrixEditorMxN'
-import SummaryPanel from '../../../../components/admin/SummaryPanel'
+import MatrixEditorNxN from '../../../components/admin/MatrixEditorNxN'
+import MatrixEditorMxN from '../../../components/admin/MatrixEditorMxN'
+import SummaryPanel from '../../../components/admin/SummaryPanel'
 
 export default function MetricEditorPage() {
   const router = useRouter()
