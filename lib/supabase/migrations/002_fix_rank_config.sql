@@ -1,22 +1,41 @@
 -- Migration 002: Fix rank_config column name and trigger function
 -- Execute this in Supabase Dashboard → SQL Editor
 
--- Step 1: Check if column exists as 'm' (lowercase) and rename it to "M" (uppercase with quotes)
+-- Step 1: Check and fix column name
+-- First, let's see what columns exist
 DO $$
+DECLARE
+  col_exists_m BOOLEAN;
+  col_exists_M BOOLEAN;
 BEGIN
-  -- Check if column 'm' exists
-  IF EXISTS (
-    SELECT 1 
-    FROM information_schema.columns 
+  -- Check if column 'm' (lowercase) exists
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns 
     WHERE table_name = 'rank_config' 
-    AND column_name = 'm'
-  ) THEN
-    -- Rename column from 'm' to "M"
+      AND table_schema = 'public'
+      AND column_name = 'm'
+  ) INTO col_exists_m;
+
+  -- Check if column 'M' (uppercase) exists  
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'rank_config' 
+      AND table_schema = 'public'
+      AND column_name = 'M'
+  ) INTO col_exists_M;
+
+  -- If lowercase 'm' exists, rename to "M"
+  IF col_exists_m AND NOT col_exists_M THEN
     ALTER TABLE rank_config RENAME COLUMN m TO "M";
     RAISE NOTICE 'Renamed column m to "M"';
+  ELSIF col_exists_M THEN
+    RAISE NOTICE 'Column "M" already exists with correct name';
   ELSE
-    RAISE NOTICE 'Column "M" already exists or table does not exist';
+    RAISE NOTICE 'Warning: No column found in rank_config. Table might not exist or have different structure.';
   END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE NOTICE 'Error: %', SQLERRM;
 END $$;
 
 -- Step 2: Recreate the trigger function with correct column name
