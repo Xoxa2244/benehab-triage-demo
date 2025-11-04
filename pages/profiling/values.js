@@ -579,7 +579,10 @@ export default function ValuesSurvey() {
                       onClick={() => handleColorRankingChange(color.name, colorRankings.length)}
                       className="group flex flex-col items-center p-4 border-2 border-gray-200 rounded-2xl hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-300 transform hover:scale-105"
                     >
-                      <div className={`w-12 h-12 rounded-2xl mb-3 shadow-md ${color.class}`}></div>
+                      <div 
+                        className={`w-12 h-12 rounded-2xl mb-3 shadow-md ${color.class || ''}`}
+                        style={color.class ? {} : { backgroundColor: color.hex }}
+                      ></div>
                       <span className="text-sm font-medium text-gray-700 text-center group-hover:text-emerald-700">
                         {color.label}
                       </span>
