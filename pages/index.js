@@ -182,9 +182,8 @@ export default function Home() {
     setIsTyping(true);
 
     try {
-      // Use FastAPI backend endpoint directly
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-      const response = await fetch(`${backendUrl}/api/chats/${chatId}/message`, {
+      // Use Next.js API route (which proxies to backend)
+      const response = await fetch(`/api/chats/${chatId}/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
