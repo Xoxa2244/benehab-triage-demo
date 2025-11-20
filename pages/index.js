@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { areAllTestsCompleted, isChatCreated, getChatId } from '../lib/profiling/profilingUtils';
 import { initializeChatWithProfiling } from '../lib/profiling/chatInitializer';
 
+const CHAT_HISTORY_KEY = 'benehab_chat_history';
+
 export default function Home() {
   const [demographics, setDemographics] = useState(null);
   const [completedSurveys, setCompletedSurveys] = useState({
@@ -52,6 +54,19 @@ export default function Home() {
     const testsComplete = areAllTestsCompleted();
     setAllTestsComplete(testsComplete);
     
+    // Load chat history from localStorage if present
+    try {
+      const savedChatHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (savedChatHistory) {
+        const parsedHistory = JSON.parse(savedChatHistory);
+        if (Array.isArray(parsedHistory) && parsedHistory.length > 0) {
+          setChatMessages(parsedHistory);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    }
+
     // Check if chat is already created
     const existingChatId = getChatId();
     if (existingChatId) {
@@ -88,8 +103,18 @@ export default function Home() {
       text: welcomeText,
       timestamp: new Date().toISOString()
     };
-    setChatMessages([welcomeMessage]);
+    setChatMessages(prev => (prev.length ? prev : [welcomeMessage]));
   }, []);
+
+  // Persist chat history to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined' || chatMessages.length === 0) return;
+    try {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(chatMessages));
+    } catch (error) {
+      console.error('Error saving chat history:', error);
+    }
+  }, [chatMessages]);
 
   // Handle click outside menu to close it
   useEffect(() => {

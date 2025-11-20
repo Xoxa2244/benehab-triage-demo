@@ -1,16 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAllTestResults, mapTestResultsToTags, getChatId } from '../lib/profiling/profilingUtils';
 
-export default function StaffConsolePage() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
-    patientInfo: false,
-    medication: false,
-    concerns: false,
-    adherence: false,
-    riskLevel: false
-  });
-  const [chatMessages, setChatMessages] = useState([
+const CHAT_HISTORY_KEY = 'benehab_chat_history';
+
+const defaultStaffChat = [
     {
       id: 1,
       sender: 'doctor',
@@ -37,15 +30,84 @@ export default function StaffConsolePage() {
       timestamp: '2025-01-20 14:33',
       source: 'SNOMED / dm+d / NHS.uk'
     }
-  ]);
+  ];
+
+export default function StaffConsolePage() {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    patientInfo: false,
+    medication: false,
+    concerns: false,
+    adherence: false,
+    riskLevel: false
+  });
+  const [chatMessages, setChatMessages] = useState(defaultStaffChat);
   const [newMessage, setNewMessage] = useState('');
+  const [overrideForms, setOverrideForms] = useState({
+    attitude: '',
+    typology: '',
+    values: ''
+  });
+  const [overrideStatus, setOverrideStatus] = useState('');
+  const [pibStatus, setPibStatus] = useState('');
+  const [backendInstructionStatus, setBackendInstructionStatus] = useState('');
+  const [clearStatus, setClearStatus] = useState('');
+  const [instructionsPreview, setInstructionsPreview] = useState({
+    patient_tags: [],
+    dos: [],
+    donts: [],
+    specific_instructions: ''
+  });
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'psychological', label: 'Psychological Profile' },
     { id: 'behavioral', label: 'Behavioral Metrics' },
-    { id: 'chat', label: 'Agent Chat' }
+    { id: 'chat', label: 'Agent Chat' },
+    { id: 'profiling-overrides', label: 'Profiling Overrides' }
   ];
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    if (savedHistory) {
+      try {
+        const parsed = JSON.parse(savedHistory);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const mapped = parsed.map((msg, index) => ({
+            id: msg.id || index,
+            sender: msg.type === 'user' ? 'patient' : 'agent',
+            message: msg.text,
+            timestamp: msg.timestamp ? new Date(msg.timestamp).toLocaleString() : ''
+          }));
+          setChatMessages(mapped);
+        }
+      } catch (error) {
+        console.error('Error loading chat history for staff console:', error);
+      }
+    }
+
+    const loadProfile = (key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return '';
+      try {
+        return JSON.stringify(JSON.parse(raw), null, 2);
+      } catch (err) {
+        console.error(`Error parsing saved ${key}:`, err);
+        return raw;
+      }
+    };
+
+    setOverrideForms({
+      attitude: loadProfile('benehab_attitude_profile'),
+      typology: loadProfile('benehab_typology_profile'),
+      values: loadProfile('benehab_values_profile')
+    });
+
+    loadInstructionsPreview();
+  }, []);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -57,6 +119,167 @@ export default function StaffConsolePage() {
       };
       setChatMessages([...chatMessages, doctorMessage]);
       setNewMessage('');
+    }
+  };
+
+  const handleOverrideChange = (key, value) => {
+    setOverrideForms(prev => ({ ...prev, [key]: value }));
+  };
+
+  const saveOverrides = () => {
+    if (typeof window === 'undefined') return;
+    setOverrideStatus('');
+
+    try {
+      const parsedAttitude = overrideForms.attitude ? JSON.parse(overrideForms.attitude) : null;
+      const parsedTypology = overrideForms.typology ? JSON.parse(overrideForms.typology) : null;
+      const parsedValues = overrideForms.values ? JSON.parse(overrideForms.values) : null;
+
+      if (parsedAttitude) {
+        localStorage.setItem('benehab_attitude_profile', JSON.stringify(parsedAttitude));
+      }
+      if (parsedTypology) {
+        localStorage.setItem('benehab_typology_profile', JSON.stringify(parsedTypology));
+      }
+      if (parsedValues) {
+        localStorage.setItem('benehab_values_profile', JSON.stringify(parsedValues));
+      }
+
+      setOverrideStatus('Profiles saved to localStorage. Tests now count as completed.');
+    } catch (error) {
+      console.error('Error saving overrides:', error);
+      setOverrideStatus(`Error: ${error.message}`);
+    }
+  };
+
+  const regeneratePIB = async () => {
+    if (typeof window === 'undefined') return;
+    setPibStatus('Regenerating...');
+    try {
+      const response = await fetch('/api/profiling/pib', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          demographics: JSON.parse(localStorage.getItem('benehab_demographics') || '{}'),
+          attitude_profile: JSON.parse(localStorage.getItem('benehab_attitude_profile') || '{}'),
+          typology_profile: JSON.parse(localStorage.getItem('benehab_typology_profile') || '{}'),
+          values_profile: JSON.parse(localStorage.getItem('benehab_values_profile') || '{}')
+        })
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || 'Failed to regenerate PIB');
+      }
+
+      const result = await response.json();
+      localStorage.setItem('benehab.pib', JSON.stringify(result.pib));
+      setPibStatus('✅ PIB regenerated and saved to localStorage.');
+    } catch (error) {
+      console.error('Error regenerating PIB:', error);
+      setPibStatus(`Error: ${error.message}`);
+    }
+  };
+
+  const loadInstructionsPreview = async () => {
+    if (typeof window === 'undefined') return;
+    const chatId = getChatId();
+    if (!chatId) {
+      setInstructionsPreview({
+        patient_tags: [],
+        dos: [],
+        donts: [],
+        specific_instructions: ''
+      });
+      return;
+    }
+    try {
+      const response = await fetch(`/api/chats/${chatId}/instructions`);
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const data = await response.json();
+      setInstructionsPreview(data);
+    } catch (error) {
+      console.error('Error loading instructions preview:', error);
+    }
+  };
+
+  const updateBackendInstructions = async () => {
+    if (typeof window === 'undefined') return;
+    setBackendInstructionStatus('');
+
+    const chatId = getChatId();
+    if (!chatId) {
+      setBackendInstructionStatus('Чат не инициализирован. Сначала создайте чат на главной.');
+      return;
+    }
+
+    const testResults = getAllTestResults();
+    if (!testResults) {
+      setBackendInstructionStatus('Нет профилей в localStorage. Сохраните overrides или пройдите тесты.');
+      return;
+    }
+
+    const patientTags = mapTestResultsToTags(testResults);
+    if (!patientTags.length) {
+      setBackendInstructionStatus('Не удалось сформировать теги из профилей.');
+      return;
+    }
+
+    try {
+      setBackendInstructionStatus('Обновляем инструкции на бэкенде...');
+      const response = await fetch(`/api/chats/${chatId}/refresh-instructions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_tags: patientTags })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || 'API error');
+      }
+
+      setBackendInstructionStatus('✅ Инструкции обновлены на бэкенде.');
+      loadInstructionsPreview();
+    } catch (error) {
+      console.error('Error updating backend instructions:', error);
+      setBackendInstructionStatus(`Error: ${error.message}`);
+    }
+  };
+
+  const clearChatHistory = async () => {
+    if (typeof window === 'undefined') return;
+    setClearStatus('');
+
+    const chatId = getChatId();
+    if (!chatId) {
+      setClearStatus('Чат не инициализирован. Сначала создайте чат на главной.');
+      return;
+    }
+
+    try {
+      setClearStatus('Очищаем чат на бэкенде...');
+      const response = await fetch(`/api/chats/${chatId}/clear-history`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || 'API error');
+      }
+
+      // Clear local chat history for frontend
+      localStorage.removeItem(CHAT_HISTORY_KEY);
+      setChatMessages([]);
+
+      setClearStatus('✅ История чата очищена (backend + локально).');
+      loadInstructionsPreview();
+    } catch (error) {
+      console.error('Error clearing chat history:', error);
+      setClearStatus(`Error: ${error.message}`);
     }
   };
 
@@ -616,27 +839,36 @@ export default function StaffConsolePage() {
                 
                 {/* Chat Messages */}
                 <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
-                  {chatMessages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.sender === 'doctor' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        msg.sender === 'doctor' 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-gray-100 text-gray-900'
-                      }`}>
-                        <div className="text-sm">{msg.message}</div>
-                        <div className={`text-xs mt-1 ${
-                          msg.sender === 'doctor' ? 'text-blue-100' : 'text-gray-500'
-                        }`}>
-                          {msg.timestamp}
-                        </div>
-                        {msg.source && (
-                          <div className="text-xs mt-1 text-gray-500 italic">
-                            Source: {msg.source}
+                  {chatMessages.map((msg) => {
+                    const isDoctor = msg.sender === 'doctor';
+                    const isPatient = msg.sender === 'patient';
+                    const alignment = isDoctor ? 'justify-end' : 'justify-start';
+                    const bubbleColor = isDoctor
+                      ? 'bg-blue-600 text-white'
+                      : isPatient
+                        ? 'bg-emerald-50 text-emerald-900'
+                        : 'bg-gray-100 text-gray-900';
+                    const timestampColor = isDoctor ? 'text-blue-100' : 'text-gray-500';
+
+                    return (
+                      <div key={msg.id} className={`flex ${alignment}`}>
+                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${bubbleColor}`}>
+                          <div className="text-xs font-semibold mb-1 capitalize">
+                            {msg.sender || 'agent'}
                           </div>
-                        )}
+                          <div className="text-sm">{msg.message}</div>
+                          <div className={`text-xs mt-1 ${timestampColor}`}>
+                            {msg.timestamp}
+                          </div>
+                          {msg.source && (
+                            <div className="text-xs mt-1 text-gray-500 italic">
+                              Source: {msg.source}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Message Input */}
@@ -655,6 +887,127 @@ export default function StaffConsolePage() {
                     >
                       Send
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Profiling Overrides Tab */}
+          {activeTab === 'profiling-overrides' && (
+            <div className="grid grid-cols-1 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Override Profiling Results</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Paste JSON профили тестов, чтобы пересобрать результаты без повторного прохождения опросов.
+                  После сохранения данные попадут в localStorage, а чат откроется как завершённые тесты.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Attitude profile</label>
+                    <textarea
+                      value={overrideForms.attitude}
+                      onChange={(e) => handleOverrideChange('attitude', e.target.value)}
+                      placeholder='{"levels":{"severity":"high"},"scales":{"severity":8}}'
+                      className="w-full h-64 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Typology profile</label>
+                    <textarea
+                      value={overrideForms.typology}
+                      onChange={(e) => handleOverrideChange('typology', e.target.value)}
+                      placeholder='{"leading_types":["cyclothymic","sensitive"]}'
+                      className="w-full h-64 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Values profile</label>
+                    <textarea
+                      value={overrideForms.values}
+                      onChange={(e) => handleOverrideChange('values', e.target.value)}
+                      placeholder='{"value_indices":{"life_satisfaction":55,"treatment_attitude":72}}'
+                      className="w-full h-64 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    onClick={saveOverrides}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Save overrides to localStorage
+                  </button>
+                  <button
+                    onClick={regeneratePIB}
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Regenerate PIB
+                  </button>
+                  <button
+                    onClick={updateBackendInstructions}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Push instructions to backend
+                  </button>
+                  <button
+                    onClick={clearChatHistory}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Clear chat history
+                  </button>
+                </div>
+
+                {overrideStatus && (
+                  <div className="mt-3 text-sm text-gray-700 bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg">
+                    {overrideStatus}
+                  </div>
+                )}
+                {pibStatus && (
+                  <div className="mt-2 text-sm text-gray-700 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-lg">
+                    {pibStatus}
+                  </div>
+                )}
+                {backendInstructionStatus && (
+                  <div className="mt-2 text-sm text-gray-700 bg-purple-50 border border-purple-100 px-3 py-2 rounded-lg">
+                    {backendInstructionStatus}
+                  </div>
+                )}
+                {clearStatus && (
+                  <div className="mt-2 text-sm text-gray-700 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
+                    {clearStatus}
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Instructions preview</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">Patient tags</div>
+                    <div className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[72px] whitespace-pre-wrap">
+                      {instructionsPreview.patient_tags.join(', ') || '—'}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">Dos (raw)</div>
+                    <div className="text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[120px] whitespace-pre-wrap overflow-y-auto">
+                      {instructionsPreview.dos.length ? instructionsPreview.dos.join('\n') : '—'}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">Don'ts (raw)</div>
+                    <div className="text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[120px] whitespace-pre-wrap overflow-y-auto">
+                      {instructionsPreview.donts.length ? instructionsPreview.donts.join('\n') : '—'}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm font-medium text-gray-700 mb-1">Specific instructions (LLM summary)</div>
+                  <div className="text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[140px] whitespace-pre-wrap">
+                    {instructionsPreview.specific_instructions || '—'}
                   </div>
                 </div>
               </div>

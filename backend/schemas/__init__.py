@@ -1,12 +1,14 @@
 from .chat_schemas import (
     CreateChatRequest,
     SendMessageRequest,
+    UpdateInstructionsRequest,
     ChatResponse,
     MessageResponse,
     ChatListResponse,
     SuccessResponse,
     ErrorResponse,
-    MessageDict
+    MessageDict,
+    InstructionsPreviewResponse,
 )
 from .profiling_schemas import (
     IssueType,
@@ -17,12 +19,14 @@ from .profiling_schemas import (
 __all__ = [
     "CreateChatRequest",
     "SendMessageRequest",
+    "UpdateInstructionsRequest",
     "ChatResponse",
     "MessageResponse",
     "ChatListResponse",
     "SuccessResponse",
     "ErrorResponse",
     "MessageDict",
+    "InstructionsPreviewResponse",
     "IssueType",
     "PatientType",
     "InstructionType",

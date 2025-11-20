@@ -4,11 +4,13 @@ from typing import List
 from backend.schemas import (
     CreateChatRequest,
     SendMessageRequest,
+    UpdateInstructionsRequest,
     ChatResponse,
     MessageResponse,
     ChatListResponse,
     SuccessResponse,
-    ErrorResponse
+    ErrorResponse,
+    InstructionsPreviewResponse
 )
 from backend.services import ChatService, InstructionService
 from backend.documents.ChatDocument import ChatDocument
@@ -214,6 +216,28 @@ async def clear_chat_history(chat_id: str):
         )
 
 
+@router.post(
+    "/{chat_id}/refresh-instructions",
+    response_model=ChatResponse,
+    summary="Пересчитать инструкции чата",
+    description="Обновляет specific_instructions на основе переданных тегов пациента или текущих тегов чата"
+)
+async def refresh_chat_instructions(chat_id: str, request: UpdateInstructionsRequest):
+    try:
+        chat = await chat_service.refresh_instructions(chat_id, request.patient_tags)
+        return chat_document_to_response(chat)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка при обновлении инструкций: {str(e)}"
+        )
+
+
 @router.delete(
     "/{chat_id}",
     response_model=SuccessResponse,
@@ -249,6 +273,56 @@ async def delete_chat(chat_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Ошибка при удалении чата: {str(e)}"
+        )
+
+
+@router.post(
+    "/{chat_id}/clear-history",
+    response_model=SuccessResponse,
+    summary="Очистить историю чата (POST)",
+    description="Удаляет все сообщения из чата, сохраняя метаданные. Аналогично DELETE /{chat_id}/clear."
+)
+async def clear_chat_history_post(chat_id: str):
+    try:
+        await chat_service.clear_chat_history(chat_id)
+
+        return SuccessResponse(
+            success=True,
+            message="История чата успешно очищена",
+            chat_id=chat_id
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка при очистке истории: {str(e)}"
+        )
+
+
+@router.get(
+    "/{chat_id}/instructions",
+    response_model=InstructionsPreviewResponse,
+    summary="Получить инструкции чата",
+    description="Возвращает сырые dos/donts и финальные instructions для чата"
+)
+async def get_chat_instructions(chat_id: str):
+    try:
+        preview = await chat_service.instructions_preview(chat_id)
+        return preview
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка при получении инструкций: {str(e)}"
         )
 
 

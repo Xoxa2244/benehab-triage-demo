@@ -124,3 +124,23 @@ class ErrorResponse(BaseModel):
                 "detail": "Чат с ID 'chat_123456' не найден"
             }
         }
+
+
+class UpdateInstructionsRequest(BaseModel):
+    """Запрос на обновление инструкций чата на основе новых тегов"""
+    patient_tags: Optional[List[str]] = Field(None, description="Новые теги пациента (если не переданы, используются теги чата)")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "patient_tags": ["CLOSED", "ANXIETY", "HEAVY_STATE"]
+            }
+        }
+
+
+class InstructionsPreviewResponse(BaseModel):
+    """Ответ с сырыми и финальными инструкциями по чату"""
+    patient_tags: List[str]
+    dos: List[str]
+    donts: List[str]
+    specific_instructions: str

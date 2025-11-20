@@ -128,6 +128,73 @@ class ChatService:
         await chat.save()
         
         return chat
+
+    async def refresh_instructions(
+        self,
+        chat_id: str,
+        patient_tags: Optional[list[str]] = None
+    ) -> ChatDocument:
+        """
+        Пересчитывает инструкции для чата. Может обновлять теги пациента.
+        
+        Args:
+            chat_id: Идентификатор чата
+            patient_tags: Новый список тегов пациента (если None, используются текущие из чата)
+        """
+        chat = await self.get_chat(chat_id)
+        is_new_chat = False
+        if not chat:
+            # Создаем новый чат с пустой историей и заданным chat_id
+            chat = ChatDocument(
+                chat_id=chat_id,
+                diagnosis="",
+                prescriptions="",
+                patient_tags=patient_tags or [],
+                specific_instructions="",
+                messages=[],
+                is_active=True,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            is_new_chat = True
+
+        tags_to_use = patient_tags or chat.patient_tags
+
+        # Валидация тегов
+        is_valid, invalid_tags = self.instruction_service.validate_patient_tags(tags_to_use)
+        if not is_valid:
+            raise ValueError(f"Невалидные теги пациента: {', '.join(invalid_tags)}")
+
+        # Генерация инструкций
+        specific_instructions = await self.instruction_service.generate_specific_instructions(tags_to_use)
+
+        # Обновление полей
+        chat.patient_tags = tags_to_use
+        chat.specific_instructions = specific_instructions
+        chat.updated_at = datetime.utcnow()
+
+        if is_new_chat:
+            await chat.insert()
+        else:
+            await chat.save()
+        return chat
+
+    async def instructions_preview(self, chat_id: str) -> dict:
+        """
+        Возвращает сырые и финальные инструкции по чату.
+        """
+        chat = await self.get_chat(chat_id)
+        if not chat:
+            raise ValueError(f"Чат с ID '{chat_id}' не найден")
+
+        dos, donts = self.instruction_service.get_raw_instructions(chat.patient_tags)
+
+        return {
+            "patient_tags": chat.patient_tags,
+            "dos": dos,
+            "donts": donts,
+            "specific_instructions": chat.specific_instructions
+        }
     
     async def generate_nurse_response(
         self,

@@ -83,3 +83,9 @@ class InstructionService:
         invalid_tags = [tag for tag in patient_tags if tag not in valid_tags]
         
         return len(invalid_tags) == 0, invalid_tags
+
+    def get_raw_instructions(self, patient_tags: list[str]) -> tuple[list[str], list[str]]:
+        """
+        Возвращает сырые инструкции dos/donts для списка тегов без обращения к LLM.
+        """
+        return get_instructions_for_tags(patient_tags)
