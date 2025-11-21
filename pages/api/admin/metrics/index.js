@@ -12,10 +12,18 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true, metrics: data || [] })
     } catch (error) {
-      console.error('Error fetching metrics:', error)
+      console.error('Error fetching metrics:', {
+        message: error.message,
+        details: error.toString(),
+        hint: error.hint,
+        code: error.code
+      })
       return res.status(500).json({ 
         success: false, 
-        error: error.message 
+        error: error.message,
+        details: error.toString(),
+        hint: error.hint,
+        code: error.code
       })
     }
   }

@@ -81,10 +81,18 @@ export default async function handler(req, res) {
       total: allColors.length
     })
   } catch (error) {
-    console.error('Ошибка загрузки цветов:', error)
+    console.error('Ошибка загрузки цветов:', {
+      message: error.message,
+      details: error.toString(),
+      hint: error.hint,
+      code: error.code
+    })
     res.status(500).json({ 
       error: 'Ошибка загрузки цветов',
-      details: error.message 
+      message: error.message,
+      details: error.toString(),
+      hint: error.hint,
+      code: error.code
     })
   }
 }
