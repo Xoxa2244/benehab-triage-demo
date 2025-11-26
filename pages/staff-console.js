@@ -64,12 +64,13 @@ export default function StaffConsolePage() {
   const [selectedMetric, setSelectedMetric] = useState(null);
   const [metricForm, setMetricForm] = useState({
     metric_name: '',
-    similarity_same_weights: '[]',
-    similarity_diff_weights: '[]',
-    attractiveness_rank_weights: '[]',
+    similarity_same_weights: [],
+    similarity_diff_weights: [],
+    attractiveness_rank_weights: [],
   });
   const [colorInputs, setColorInputs] = useState({ colors: [], concepts: [] });
   const [metricStatus, setMetricStatus] = useState('');
+  const [metricsLoaded, setMetricsLoaded] = useState(false);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -106,6 +107,20 @@ export default function StaffConsolePage() {
     loadColorTestInputs();
     loadMetrics();
   }, []);
+
+  useEffect(() => {
+    // When inputs or metrics arrive, normalize current selection or pick the first available
+    if (!metricsLoaded) return;
+    if (colorInputs.concepts.length === 0 || colorInputs.colors.length === 0) return;
+
+    const refreshedSelection = selectedMetric
+      ? colorMetrics.find((m) => m.metric_name === selectedMetric.metric_name)
+      : null;
+
+    const metricToUse = refreshedSelection || selectedMetric || colorMetrics[0];
+
+    if (metricToUse) handleSelectMetric(metricToUse);
+  }, [colorInputs, colorMetrics, metricsLoaded, selectedMetric]); 
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -348,6 +363,221 @@ export default function StaffConsolePage() {
     }
   };
 
+  const ensureMatrices = (same, diff, rank) => {
+    const n = Math.max(colorInputs.concepts.length, same?.length || 0, diff?.length || 0);
+    const r = Math.max(colorInputs.colors.length, rank?.[0]?.length || 0, rank?.length || 0);
+
+    const fillMatrix = (mat) => {
+      const out = Array.from({ length: n }, (_, i) =>
+        Array.from({ length: n }, (_, j) => Number(mat?.[i]?.[j] ?? 0))
+      );
+      return out;
+    };
+
+    const fillRank = (mat) => {
+      const out = Array.from({ length: n }, (_, i) =>
+        Array.from({ length: r }, (_, j) => Number(mat?.[i]?.[j] ?? 0))
+      );
+      return out;
+    };
+
+    return {
+      same: fillMatrix(same),
+      diff: fillMatrix(diff),
+      rank: fillRank(rank),
+    };
+  };
+
+  const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSet }) => {
+    const [rowIdx, setRowIdx] = useState(0);
+    const [colIdx, setColIdx] = useState(0);
+    const [val, setVal] = useState(0);
+
+    useEffect(() => {
+      if (matrix?.[rowIdx]?.[colIdx] !== undefined) {
+        setVal(matrix[rowIdx][colIdx]);
+      }
+    }, [rowIdx, colIdx, matrix]);
+
+    const apply = () => {
+      const num = Number(val) || 0;
+      const next = matrix.map((row, r) =>
+        row.map((c, cc) => (r === rowIdx && cc === colIdx ? num : c))
+      );
+      onChange(next);
+      if (onSet) onSet(next);
+    };
+
+    const renderTable = () => (
+          <div className="max-h-64 overflow-auto border rounded-lg text-xs">
+            <table className="min-w-full text-left text-gray-700">
+              <thead className="sticky top-0 bg-gray-50">
+                <tr>
+                  <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept</th>
+                  {concepts.map((c, idx) => (
+                    <th key={c} className="px-2 py-1 whitespace-nowrap">
+                      {idx + 1}. {c}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {matrix.map((row, r) => (
+                  <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
+                      {r + 1}. {concepts[r]}
+                    </td>
+                    {row.map((c, cc) => (
+                      <td key={cc} className="px-2 py-1 text-right">
+                        {Number(c).toFixed(2)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+    );
+
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <label className="text-sm text-gray-700">Row:</label>
+          <select
+            value={rowIdx}
+            onChange={(e) => setRowIdx(Number(e.target.value))}
+            className="border rounded-lg px-2 py-1 text-sm"
+          >
+            {concepts.map((c, idx) => (
+              <option key={c} value={idx}>
+                {idx + 1}. {c}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm text-gray-700">Col:</label>
+          <select
+            value={colIdx}
+            onChange={(e) => setColIdx(Number(e.target.value))}
+            className="border rounded-lg px-2 py-1 text-sm"
+          >
+            {concepts.map((c, idx) => (
+              <option key={c} value={idx}>
+                {idx + 1}. {c}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm text-gray-700">Value:</label>
+          <input
+            type="number"
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            className="w-24 border rounded-lg px-2 py-1 text-sm"
+          />
+          <button
+            onClick={apply}
+            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+          >
+            Set
+          </button>
+        </div>
+        {!compact && renderTable()}
+      </div>
+    );
+  };
+
+  const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet }) => {
+    const [conceptIdx, setConceptIdx] = useState(0);
+    const [colorIdx, setColorIdx] = useState(0);
+    const [val, setVal] = useState(0);
+
+    useEffect(() => {
+      if (matrix?.[conceptIdx]?.[colorIdx] !== undefined) {
+        setVal(matrix[conceptIdx][colorIdx]);
+      }
+    }, [conceptIdx, colorIdx, matrix]);
+
+    const apply = () => {
+      const num = Number(val) || 0;
+      const next = matrix.map((row, r) =>
+        row.map((c, cc) => (r === conceptIdx && cc === colorIdx ? num : c))
+      );
+      onChange(next);
+      if (onSet) onSet(next);
+    };
+
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <label className="text-sm text-gray-700">Concept:</label>
+          <select
+            value={conceptIdx}
+            onChange={(e) => setConceptIdx(Number(e.target.value))}
+            className="border rounded-lg px-2 py-1 text-sm"
+          >
+            {concepts.map((c, idx) => (
+              <option key={c} value={idx}>
+                {idx + 1}. {c}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm text-gray-700">Color/Rank:</label>
+          <select
+            value={colorIdx}
+            onChange={(e) => setColorIdx(Number(e.target.value))}
+            className="border rounded-lg px-2 py-1 text-sm"
+          >
+            {colors.map((c, idx) => (
+              <option key={c} value={idx}>
+                {idx + 1}. {c}
+              </option>
+            ))}
+          </select>
+          <label className="text-sm text-gray-700">Value:</label>
+          <input
+            type="number"
+            value={val}
+            onChange={(e) => setVal(e.target.value)}
+            className="w-24 border rounded-lg px-2 py-1 text-sm"
+          />
+          <button
+            onClick={apply}
+            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+          >
+            Set
+          </button>
+        </div>
+        <div className="max-h-64 overflow-auto border rounded-lg text-xs">
+          <table className="min-w-full text-left text-gray-700">
+            <thead className="sticky top-0 bg-gray-50">
+              <tr>
+                <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept \\ Color</th>
+                {colors.map((c, idx) => (
+                  <th key={c} className="px-2 py-1 whitespace-nowrap">
+                    {idx + 1}. {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {matrix.map((row, r) => (
+                <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
+                    {r + 1}. {concepts[r]}
+                  </td>
+                  {row.map((c, cc) => (
+                    <td key={cc} className="px-2 py-1 text-right">
+                      {Number(c).toFixed(2)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   const loadMetrics = async () => {
     try {
       const response = await fetch('/api/metrics');
@@ -356,9 +586,10 @@ export default function StaffConsolePage() {
       }
       const data = await response.json();
       setColorMetrics(data || []);
-      if (data && data.length) {
-        handleSelectMetric(data[0]);
+      if (!data || !data.length) {
+        handleSelectMetric(null);
       }
+      setMetricsLoaded(true);
     } catch (err) {
       console.error('Error loading metrics:', err);
       setMetricStatus(`Error loading metrics: ${err.message}`);
@@ -370,18 +601,23 @@ export default function StaffConsolePage() {
       setSelectedMetric(null);
       setMetricForm({
         metric_name: '',
-        similarity_same_weights: '[]',
-        similarity_diff_weights: '[]',
-        attractiveness_rank_weights: '[]',
+        similarity_same_weights: [],
+        similarity_diff_weights: [],
+        attractiveness_rank_weights: [],
       });
       return;
     }
     setSelectedMetric(metric);
+    const normalized = ensureMatrices(
+      metric.similarity_same_weights,
+      metric.similarity_diff_weights,
+      metric.attractiveness_rank_weights
+    );
     setMetricForm({
       metric_name: metric.metric_name || '',
-      similarity_same_weights: JSON.stringify(metric.similarity_same_weights || [], null, 2),
-      similarity_diff_weights: JSON.stringify(metric.similarity_diff_weights || [], null, 2),
-      attractiveness_rank_weights: JSON.stringify(metric.attractiveness_rank_weights || [], null, 2),
+      similarity_same_weights: normalized.same,
+      similarity_diff_weights: normalized.diff,
+      attractiveness_rank_weights: normalized.rank,
     });
   };
 
@@ -389,27 +625,44 @@ export default function StaffConsolePage() {
     setMetricForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const saveMetric = async () => {
+  const saveMetric = async (overrides = {}) => {
     setMetricStatus('');
     try {
-      const body = {
-        metric_name: metricForm.metric_name.trim(),
-        similarity_same_weights: JSON.parse(metricForm.similarity_same_weights || '[]'),
-        similarity_diff_weights: JSON.parse(metricForm.similarity_diff_weights || '[]'),
-        attractiveness_rank_weights: JSON.parse(metricForm.attractiveness_rank_weights || '[]'),
-      };
-      if (!body.metric_name) {
-        throw new Error('Metric name is required');
+      const resolvedName =
+        (overrides.metric_name || metricForm.metric_name || '').trim() ||
+        selectedMetric?.metric_name ||
+        'default';
+      if (!metricForm.metric_name.trim() && !overrides.metric_name) {
+        setMetricForm((prev) => ({ ...prev, metric_name: resolvedName }));
       }
-      const resp = await fetch(`/api/metrics/${body.metric_name}`, {
+      const normalized = ensureMatrices(
+        overrides.similarity_same_weights ?? metricForm.similarity_same_weights,
+        overrides.similarity_diff_weights ?? metricForm.similarity_diff_weights,
+        overrides.attractiveness_rank_weights ?? metricForm.attractiveness_rank_weights
+      );
+      const body = {
+        metric_name: resolvedName,
+        similarity_same_weights: normalized.same,
+        similarity_diff_weights: normalized.diff,
+        attractiveness_rank_weights: normalized.rank,
+      };
+      console.log('Saving metric', body.metric_name);
+      let resp = await fetch(`/api/metrics/${body.metric_name}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
+      if (resp.status === 404) {
+        resp = await fetch('/api/metrics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
       if (!resp.ok) {
         throw new Error(await resp.text());
       }
-      setMetricStatus('Metric saved');
+      setMetricStatus(`Metric "${body.metric_name}" saved`);
       await loadMetrics();
     } catch (err) {
       console.error('Error saving metric:', err);
@@ -420,11 +673,16 @@ export default function StaffConsolePage() {
   const createMetric = async () => {
     setMetricStatus('');
     try {
+      const normalized = ensureMatrices(
+        metricForm.similarity_same_weights,
+        metricForm.similarity_diff_weights,
+        metricForm.attractiveness_rank_weights
+      );
       const body = {
         metric_name: metricForm.metric_name.trim() || `metric_${Date.now()}`,
-        similarity_same_weights: JSON.parse(metricForm.similarity_same_weights || '[]'),
-        similarity_diff_weights: JSON.parse(metricForm.similarity_diff_weights || '[]'),
-        attractiveness_rank_weights: JSON.parse(metricForm.attractiveness_rank_weights || '[]'),
+        similarity_same_weights: normalized.same,
+        similarity_diff_weights: normalized.diff,
+        attractiveness_rank_weights: normalized.rank,
       };
       const resp = await fetch('/api/metrics', {
         method: 'POST',
@@ -456,6 +714,56 @@ export default function StaffConsolePage() {
       console.error('Error deleting metric:', err);
       setMetricStatus(`Error deleting metric: ${err.message}`);
     }
+  };
+
+  const setSingleMatrixValue = (type, i, j, value) => {
+    const normalized = ensureMatrices(
+      metricForm.similarity_same_weights,
+      metricForm.similarity_diff_weights,
+      metricForm.attractiveness_rank_weights
+    );
+    const matKey =
+      type === 'same' ? 'similarity_same_weights' : 'similarity_diff_weights';
+    const mat = type === 'same' ? normalized.same : normalized.diff;
+    const next = mat.map((row, ri) =>
+      row.map((col, cj) => {
+        if ((ri === i && cj === j) || (type === 'same' && ri === j && cj === i)) {
+          return value;
+        }
+        return col;
+      })
+    );
+    setMetricForm((prev) => ({ ...prev, [matKey]: next }));
+  };
+
+  const setRankValue = (i, colorIndex, value) => {
+    const normalized = ensureMatrices(
+      metricForm.similarity_same_weights,
+      metricForm.similarity_diff_weights,
+      metricForm.attractiveness_rank_weights
+    );
+    const mat = normalized.rank.map((row, ri) =>
+      row.map((col, cj) => {
+        if (ri === i && cj === colorIndex) {
+          return value;
+        }
+        return col;
+      })
+    );
+    setMetricForm((prev) => ({ ...prev, attractiveness_rank_weights: mat }));
+  };
+
+  const zeroMatrices = () => {
+    const n = colorInputs.concepts.length || 0;
+    const r = colorInputs.colors.length || 0;
+    const zerosSame = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
+    const zerosRank = Array.from({ length: n }, () => Array.from({ length: r }, () => 0));
+    setMetricForm((prev) => ({
+      ...prev,
+      similarity_same_weights: zerosSame,
+      similarity_diff_weights: zerosSame.map((row) => [...row]),
+      attractiveness_rank_weights: zerosRank,
+    }));
   };
 
   const updateBackendInstructions = async () => {
@@ -1389,41 +1697,67 @@ export default function StaffConsolePage() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         similarity_same_weights (Concept x Concept)
                       </label>
-                      <textarea
-                        value={metricForm.similarity_same_weights}
-                        onChange={(e) =>
-                          handleMetricFieldChange('similarity_same_weights', e.target.value)
-                        }
-                        className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="[[0,1,...], ...]"
-                      />
-                    </div>
-                    <div className="md:col-span-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        similarity_diff_weights
-                      </label>
-                      <textarea
-                        value={metricForm.similarity_diff_weights}
-                        onChange={(e) =>
-                          handleMetricFieldChange('similarity_diff_weights', e.target.value)
-                        }
-                        className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="[[0,0,...], ...]"
-                      />
-                    </div>
+                    <ConceptMatrixEditor
+                      concepts={colorInputs.concepts}
+                      matrix={ensureMatrices(
+                        metricForm.similarity_same_weights,
+                        metricForm.similarity_diff_weights,
+                        metricForm.attractiveness_rank_weights
+                      ).same}
+                      onChange={(mat) =>
+                        setMetricForm((prev) => ({ ...prev, similarity_same_weights: mat }))
+                      }
+                      onSet={(next) =>
+                        saveMetric({
+                          similarity_same_weights: next,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      similarity_diff_weights
+                    </label>
+                    <ConceptMatrixEditor
+                      concepts={colorInputs.concepts}
+                      compact
+                      matrix={ensureMatrices(
+                        metricForm.similarity_same_weights,
+                        metricForm.similarity_diff_weights,
+                        metricForm.attractiveness_rank_weights
+                      ).diff}
+                      onChange={(mat) =>
+                        setMetricForm((prev) => ({ ...prev, similarity_diff_weights: mat }))
+                      }
+                      onSet={(next) =>
+                        saveMetric({
+                          similarity_diff_weights: next,
+                        })
+                      }
+                    />
+                  </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       attractiveness_rank_weights (Concept x Rank)
                     </label>
-                    <textarea
-                      value={metricForm.attractiveness_rank_weights}
-                      onChange={(e) =>
-                        handleMetricFieldChange('attractiveness_rank_weights', e.target.value)
+                    <RankMatrixEditor
+                      concepts={colorInputs.concepts}
+                      colors={colorInputs.colors}
+                      matrix={ensureMatrices(
+                        metricForm.similarity_same_weights,
+                        metricForm.similarity_diff_weights,
+                        metricForm.attractiveness_rank_weights
+                      ).rank}
+                      onChange={(mat) =>
+                        setMetricForm((prev) => ({ ...prev, attractiveness_rank_weights: mat }))
                       }
-                      className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="[[...], ...]"
+                      onSet={(next) =>
+                        saveMetric({
+                          attractiveness_rank_weights: next,
+                        })
+                      }
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Concepts: {colorInputs.concepts.length || '—'} | Colors/Ranks: {colorInputs.colors.length || '—'}
