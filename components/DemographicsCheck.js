@@ -18,13 +18,15 @@ export default function DemographicsCheck({ children, onDemographicsComplete }) 
     
     // Check for demographic data
     const savedData = localStorage.getItem('benehab_demographics');
+    const savedUserId = localStorage.getItem('benehab_user_id');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         if (parsed.name && parsed.gender && parsed.weight && parsed.height && parsed.age) {
-          setDemographics(parsed);
+          const withUserId = savedUserId ? { ...parsed, userId: savedUserId } : parsed;
+          setDemographics(withUserId);
           if (onDemographicsComplete) {
-            onDemographicsComplete(parsed);
+            onDemographicsComplete(withUserId);
           }
         }
       } catch (e) {

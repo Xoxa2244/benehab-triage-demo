@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { answers } = req.body;
+    const { answers, userId } = req.body;
 
     if (!answers || typeof answers !== 'object') {
       return res.status(400).json({ 
@@ -24,6 +24,13 @@ export default async function handler(req, res) {
 
     // Рассчитываем профиль
     const profile = calculateTypologyProfile(answers, types);
+
+    // Сохраняем профиль пользователю, если есть userId
+    if (userId) {
+      await saveProfileToBackend(userId, {
+        typology_profile: profile,
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -177,4 +184,27 @@ function generateInterpretation(leadingTypes, types, scores) {
     descriptions: dominantTypes.map(t => t.short_desc),
     recommendation: 'Рекомендуется комбинированный подход, учитывающий особенности нескольких типов личности.'
   };
+}
+
+async function saveProfileToBackend(userId, payload) {
+  try {
+    const baseUrl = typeof window === 'undefined'
+      ? process.env.INTERNAL_API_URL
+      : process.env.NEXT_PUBLIC_API_URL;
+    const backendUrl = baseUrl || 'http://localhost:8000';
+    const endpoint = `${backendUrl}/api/users/${userId}/profiles`;
+
+    const response = await fetch(endpoint, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Failed to save typology profile:', response.status, text);
+    }
+  } catch (err) {
+    console.error('Error saving typology profile:', err);
+  }
 }

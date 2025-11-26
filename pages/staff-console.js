@@ -60,13 +60,24 @@ export default function StaffConsolePage() {
     donts: [],
     specific_instructions: ''
   });
+  const [colorMetrics, setColorMetrics] = useState([]);
+  const [selectedMetric, setSelectedMetric] = useState(null);
+  const [metricForm, setMetricForm] = useState({
+    metric_name: '',
+    similarity_same_weights: '[]',
+    similarity_diff_weights: '[]',
+    attractiveness_rank_weights: '[]',
+  });
+  const [colorInputs, setColorInputs] = useState({ colors: [], concepts: [] });
+  const [metricStatus, setMetricStatus] = useState('');
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'psychological', label: 'Psychological Profile' },
     { id: 'behavioral', label: 'Behavioral Metrics' },
     { id: 'chat', label: 'Agent Chat' },
-    { id: 'profiling-overrides', label: 'Profiling Overrides' }
+    { id: 'profiling-overrides', label: 'Profiling Overrides' },
+    { id: 'color-metrics', label: 'Color Metrics' }
   ];
 
   useEffect(() => {
@@ -92,6 +103,8 @@ export default function StaffConsolePage() {
 
     loadProfilesFromBackend();
     loadInstructionsPreview();
+    loadColorTestInputs();
+    loadMetrics();
   }, []);
 
   const handleSendMessage = () => {
@@ -318,6 +331,131 @@ export default function StaffConsolePage() {
     setOverrideStatus(
       `Cleared ${key} profile ${userId ? '(backend + localStorage)' : '(localStorage)'}`
     );
+  };
+
+  const loadColorTestInputs = async () => {
+    try {
+      const response = await fetch('/api/color-tests/inputs');
+      if (response.ok) {
+        const data = await response.json();
+        setColorInputs({
+          colors: data.colors || [],
+          concepts: data.concepts || [],
+        });
+      }
+    } catch (err) {
+      console.error('Error loading color test inputs:', err);
+    }
+  };
+
+  const loadMetrics = async () => {
+    try {
+      const response = await fetch('/api/metrics');
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const data = await response.json();
+      setColorMetrics(data || []);
+      if (data && data.length) {
+        handleSelectMetric(data[0]);
+      }
+    } catch (err) {
+      console.error('Error loading metrics:', err);
+      setMetricStatus(`Error loading metrics: ${err.message}`);
+    }
+  };
+
+  const handleSelectMetric = (metric) => {
+    if (!metric) {
+      setSelectedMetric(null);
+      setMetricForm({
+        metric_name: '',
+        similarity_same_weights: '[]',
+        similarity_diff_weights: '[]',
+        attractiveness_rank_weights: '[]',
+      });
+      return;
+    }
+    setSelectedMetric(metric);
+    setMetricForm({
+      metric_name: metric.metric_name || '',
+      similarity_same_weights: JSON.stringify(metric.similarity_same_weights || [], null, 2),
+      similarity_diff_weights: JSON.stringify(metric.similarity_diff_weights || [], null, 2),
+      attractiveness_rank_weights: JSON.stringify(metric.attractiveness_rank_weights || [], null, 2),
+    });
+  };
+
+  const handleMetricFieldChange = (field, value) => {
+    setMetricForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveMetric = async () => {
+    setMetricStatus('');
+    try {
+      const body = {
+        metric_name: metricForm.metric_name.trim(),
+        similarity_same_weights: JSON.parse(metricForm.similarity_same_weights || '[]'),
+        similarity_diff_weights: JSON.parse(metricForm.similarity_diff_weights || '[]'),
+        attractiveness_rank_weights: JSON.parse(metricForm.attractiveness_rank_weights || '[]'),
+      };
+      if (!body.metric_name) {
+        throw new Error('Metric name is required');
+      }
+      const resp = await fetch(`/api/metrics/${body.metric_name}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        throw new Error(await resp.text());
+      }
+      setMetricStatus('Metric saved');
+      await loadMetrics();
+    } catch (err) {
+      console.error('Error saving metric:', err);
+      setMetricStatus(`Error saving metric: ${err.message}`);
+    }
+  };
+
+  const createMetric = async () => {
+    setMetricStatus('');
+    try {
+      const body = {
+        metric_name: metricForm.metric_name.trim() || `metric_${Date.now()}`,
+        similarity_same_weights: JSON.parse(metricForm.similarity_same_weights || '[]'),
+        similarity_diff_weights: JSON.parse(metricForm.similarity_diff_weights || '[]'),
+        attractiveness_rank_weights: JSON.parse(metricForm.attractiveness_rank_weights || '[]'),
+      };
+      const resp = await fetch('/api/metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!resp.ok) {
+        throw new Error(await resp.text());
+      }
+      setMetricStatus('Metric created');
+      await loadMetrics();
+    } catch (err) {
+      console.error('Error creating metric:', err);
+      setMetricStatus(`Error creating metric: ${err.message}`);
+    }
+  };
+
+  const deleteMetric = async (metricName) => {
+    setMetricStatus('');
+    try {
+      const resp = await fetch(`/api/metrics/${metricName}`, { method: 'DELETE' });
+      if (!resp.ok && resp.status !== 204) {
+        throw new Error(await resp.text());
+      }
+      setMetricStatus('Metric deleted');
+      await loadMetrics();
+      handleSelectMetric(null);
+    } catch (err) {
+      console.error('Error deleting metric:', err);
+      setMetricStatus(`Error deleting metric: ${err.message}`);
+    }
   };
 
   const updateBackendInstructions = async () => {
@@ -1178,6 +1316,136 @@ export default function StaffConsolePage() {
                   <div className="text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[140px] whitespace-pre-wrap">
                     {instructionsPreview.specific_instructions || '—'}
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Color Metrics Tab */}
+          {activeTab === 'color-metrics' && (
+            <div className="grid grid-cols-1 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Color Metrics</h3>
+                    <p className="text-sm text-gray-600">
+                      Edit similarity/attractiveness matrices for the color test metrics.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={loadMetrics}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Refresh
+                    </button>
+                    <button
+                      onClick={createMetric}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Create metric
+                    </button>
+                    <button
+                      onClick={saveMetric}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      Save metric
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {colorMetrics.map((m) => (
+                    <button
+                      key={m.metric_name}
+                      onClick={() => handleSelectMetric(m)}
+                      className={`px-3 py-2 rounded-lg border text-sm ${
+                        selectedMetric?.metric_name === m.metric_name
+                          ? 'bg-blue-100 border-blue-300 text-blue-800'
+                          : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {m.metric_name}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Metric name
+                    </label>
+                    <input
+                      type="text"
+                      value={metricForm.metric_name}
+                      onChange={(e) => handleMetricFieldChange('metric_name', e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="metric name"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        similarity_same_weights (Concept x Concept)
+                      </label>
+                      <textarea
+                        value={metricForm.similarity_same_weights}
+                        onChange={(e) =>
+                          handleMetricFieldChange('similarity_same_weights', e.target.value)
+                        }
+                        className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="[[0,1,...], ...]"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        similarity_diff_weights
+                      </label>
+                      <textarea
+                        value={metricForm.similarity_diff_weights}
+                        onChange={(e) =>
+                          handleMetricFieldChange('similarity_diff_weights', e.target.value)
+                        }
+                        className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="[[0,0,...], ...]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      attractiveness_rank_weights (Concept x Rank)
+                    </label>
+                    <textarea
+                      value={metricForm.attractiveness_rank_weights}
+                      onChange={(e) =>
+                        handleMetricFieldChange('attractiveness_rank_weights', e.target.value)
+                      }
+                      className="w-full h-48 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="[[...], ...]"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Concepts: {colorInputs.concepts.length || '—'} | Colors/Ranks: {colorInputs.colors.length || '—'}
+                    </p>
+                  </div>
+
+                  {selectedMetric && (
+                    <div>
+                      <button
+                        onClick={() => deleteMetric(selectedMetric.metric_name)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Delete metric
+                      </button>
+                    </div>
+                  )}
+
+                  {metricStatus && (
+                    <div className="text-sm text-gray-700 bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg">
+                      {metricStatus}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

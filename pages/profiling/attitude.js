@@ -130,12 +130,13 @@ export default function AttitudeSurvey() {
 
     setLoading(true);
     try {
+      const userId = localStorage.getItem('benehab_user_id');
       const response = await fetch('/api/profiling/attitude/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, userId }),
       });
 
       if (response.ok) {

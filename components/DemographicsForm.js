@@ -20,20 +20,26 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
   
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     // Load saved data when opening the form
     const savedData = localStorage.getItem('benehab_demographics');
+    const savedUserId = localStorage.getItem('benehab_user_id');
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         setFormData(parsed);
         setIsSubmitted(true);
+        if (savedUserId && onComplete) {
+          onComplete({ ...parsed, userId: savedUserId });
+        }
       } catch (e) {
         console.error('Error loading demographic data:', e);
       }
     }
-  }, []);
+  }, [onComplete]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -72,13 +78,53 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      // Save data to localStorage
-      localStorage.setItem('benehab_demographics', JSON.stringify(formData));
-      setIsSubmitted(true);
-      onComplete(formData);
-    }
+    if (!validateForm()) return;
+
+    const save = async () => {
+      try {
+        setSubmitError('');
+        setIsSaving(true);
+        // Save data to localStorage for immediate reuse
+        localStorage.setItem('benehab_demographics', JSON.stringify(formData));
+
+        // Try to create/update user in backend
+        const chatId = localStorage.getItem('benehab_chat_id');
+        const response = await fetch('/api/users/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            demographics: formData,
+            chat_id: chatId || null,
+          }),
+        });
+
+        let userId;
+        if (response.ok) {
+          const data = await response.json();
+          userId = data?.user?.id;
+          if (userId) {
+            localStorage.setItem('benehab_user_id', userId);
+          }
+        } else {
+          const errorText = await response.text();
+          setSubmitError('Failed to create user. You can try again later.');
+          console.error('User creation failed:', response.status, errorText);
+        }
+
+        setIsSubmitted(true);
+        if (onComplete) {
+          onComplete({ ...formData, userId });
+        }
+      } catch (err) {
+        console.error('Error submitting demographics:', err);
+        setSubmitError('Unexpected error. Please try again.');
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    save();
   };
 
   const handleInputChange = (field, value) => {
@@ -250,12 +296,21 @@ export default function DemographicsForm({ onComplete, isOpen, onClose }) {
             </div>
 
             {/* Submit button */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-2">
+              {submitError && (
+                <p className="text-sm text-red-600 flex items-center">
+                  <ExclamationTriangleIcon className="w-4 h-4 mr-1" />
+                  {submitError}
+                </p>
+              )}
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                disabled={isSaving}
+                className={`w-full bg-blue-600 text-white py-2 px-4 rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+                  isSaving ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+                }`}
               >
-                Save and Continue
+                {isSaving ? 'Saving...' : 'Save and Continue'}
               </button>
             </div>
           </form>
