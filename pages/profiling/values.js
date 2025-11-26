@@ -4,10 +4,30 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+const colorClass = (color) => {
+  const map = {
+    red: 'bg-red-400',
+    blue: 'bg-blue-400',
+    green: 'bg-green-400',
+    yellow: 'bg-yellow-300',
+    purple: 'bg-purple-400',
+    orange: 'bg-orange-400',
+    pink: 'bg-pink-400',
+    brown: 'bg-yellow-700',
+    gray: 'bg-gray-400',
+    black: 'bg-gray-700',
+    white: 'bg-white border-2 border-gray-300'
+  };
+  return map[color] || 'bg-gray-200';
+};
+
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+
 export default function ValuesSurvey() {
   const router = useRouter();
   const [currentStage, setCurrentStage] = useState(1); // 1 - colors, 2 - color ranking
   const [items, setItems] = useState([]);
+  const [colors, setColors] = useState([]);
   const [colorAssociations, setColorAssociations] = useState({});
   const [colorRankings, setColorRankings] = useState([]); // Color ranking
   const [loading, setLoading] = useState(false);
@@ -16,24 +36,16 @@ export default function ValuesSurvey() {
   const [validationErrors, setValidationErrors] = useState({});
   const itemsPerPage = 5;
 
-  const colors = [
-    { name: 'red', label: 'Red', class: 'bg-red-400' },
-    { name: 'blue', label: 'Blue', class: 'bg-blue-400' },
-    { name: 'green', label: 'Green', class: 'bg-green-400' },
-    { name: 'yellow', label: 'Yellow', class: 'bg-yellow-300' },
-    { name: 'purple', label: 'Purple', class: 'bg-purple-400' },
-    { name: 'orange', label: 'Orange', class: 'bg-orange-400' },
-    { name: 'pink', label: 'Pink', class: 'bg-pink-400' },
-    { name: 'brown', label: 'Brown', class: 'bg-yellow-700' },
-    { name: 'gray', label: 'Gray', class: 'bg-gray-400' },
-    { name: 'black', label: 'Black', class: 'bg-gray-700' },
-    { name: 'white', label: 'White', class: 'bg-white border-2 border-gray-300' }
-  ];
-
   useEffect(() => {
     loadItems();
+    loadColors();
     loadProgress();
   }, []);
+
+  useEffect(() => {
+    if (colors.length === 0) return;
+    setColorRankings((prev) => prev.filter((c) => colors.some((col) => col.name === c)));
+  }, [colors]);
 
   useEffect(() => {
     updateProgress();
@@ -54,6 +66,22 @@ export default function ValuesSurvey() {
     } catch (error) {
       console.error('❌ Error loading concepts:', error);
       setItems([]);
+    }
+  };
+
+  const loadColors = async () => {
+    try {
+      const response = await fetch('/api/color-tests/inputs');
+      const data = await response.json();
+      const palette = (data.colors || []).map((c) => ({
+        name: c,
+        label: capitalize(c),
+        class: colorClass(c)
+      }));
+      setColors(palette);
+    } catch (error) {
+      console.error('❌ Error loading colors from backend:', error);
+      setColors([]);
     }
   };
 
@@ -95,7 +123,7 @@ export default function ValuesSurvey() {
       const coloredCount = Object.keys(colorAssociations).length;
       stageProgress = (coloredCount / items.length) * 50;
     } else if (currentStage === 2) {
-      stageProgress = 50 + (colorRankings.length / colors.length) * 50;
+      stageProgress = 50 + (colors.length ? (colorRankings.length / colors.length) * 50 : 0);
     }
     
     setProgress(Math.min(Math.max(stageProgress, 0), 100));
@@ -198,7 +226,7 @@ export default function ValuesSurvey() {
   };
 
   const canSubmit = () => {
-    return colorRankings.length === colors.length;
+    return colors.length > 0 && colorRankings.length === colors.length;
   };
 
   const goToStage2 = () => {
@@ -216,19 +244,23 @@ export default function ValuesSurvey() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/profiling/values/submit', {
+      const userId = localStorage.getItem('benehab_user_id');
+      const response = await fetch('/api/color-tests/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ colorAssociations, colorRankings }),
+        body: JSON.stringify({ colorAssociations, colorRankings, userId }),
       });
 
       if (response.ok) {
         const result = await response.json();
-        localStorage.setItem('benehab_values_profile', JSON.stringify(result.profile));
-        
-        // Generate PIB
+        // Persist completion marker for gating
+        localStorage.setItem('benehab_values_profile', JSON.stringify(result));
+        // Optionally save backend result for future use
+        localStorage.setItem('benehab_color_test_result', JSON.stringify(result));
+
+        // Generate PIB (uses stored profiles)
         await generatePIB();
         
         // Redirect to results page
@@ -485,7 +517,16 @@ export default function ValuesSurvey() {
         )}
 
         {/* Stage 2: Color ranking */}
-        {currentStage === 2 && (
+        {currentStage === 2 && colors.length === 0 && (
+          <div className="min-h-[200px] bg-white rounded-3xl p-8 mb-6 shadow-lg border border-gray-100 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+              <p>Loading colors...</p>
+            </div>
+          </div>
+        )}
+
+        {currentStage === 2 && colors.length > 0 && (
           <div className="bg-white rounded-3xl p-8 mb-6 shadow-lg border border-gray-100">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">

@@ -6,8 +6,16 @@ from beanie import init_beanie
 
 from backend.documents.ChatDocument import ChatDocument
 from backend.routes.chat_router import router as chat_router, init_services
+from backend.routes.color_test_router import router as color_test_router
+from backend.routes.user_router import router as user_router
+from backend.routes.metric_router import router as metric_router
 from backend.services import InstructionService, ChatService
 from backend.config import settings
+from backend.color_test.entities import (
+    ColorTestResultDocument,
+    MetricDocument,
+    UserDocument,
+)
 
 
 @asynccontextmanager
@@ -25,7 +33,12 @@ async def lifespan(app: FastAPI):
     # Инициализация Beanie с документами
     await init_beanie(
         database=database,
-        document_models=[ChatDocument]
+        document_models=[
+            ChatDocument,
+            ColorTestResultDocument,
+            MetricDocument,
+            UserDocument,
+        ],
     )
     
     print(f"✅ MongoDB подключена к базе данных: {settings.database_name}")
@@ -65,6 +78,9 @@ app.add_middleware(
 
 # Подключение роутеров
 app.include_router(chat_router)
+app.include_router(color_test_router)
+app.include_router(user_router)
+app.include_router(metric_router)
 
 
 @app.get("/", tags=["root"])

@@ -47,7 +47,8 @@ export default function StaffConsolePage() {
   const [overrideForms, setOverrideForms] = useState({
     attitude: '',
     typology: '',
-    values: ''
+    values: '',
+    demographics: ''
   });
   const [overrideStatus, setOverrideStatus] = useState('');
   const [pibStatus, setPibStatus] = useState('');
@@ -89,23 +90,7 @@ export default function StaffConsolePage() {
       }
     }
 
-    const loadProfile = (key) => {
-      const raw = localStorage.getItem(key);
-      if (!raw) return '';
-      try {
-        return JSON.stringify(JSON.parse(raw), null, 2);
-      } catch (err) {
-        console.error(`Error parsing saved ${key}:`, err);
-        return raw;
-      }
-    };
-
-    setOverrideForms({
-      attitude: loadProfile('benehab_attitude_profile'),
-      typology: loadProfile('benehab_typology_profile'),
-      values: loadProfile('benehab_values_profile')
-    });
-
+    loadProfilesFromBackend();
     loadInstructionsPreview();
   }, []);
 
@@ -126,15 +111,44 @@ export default function StaffConsolePage() {
     setOverrideForms(prev => ({ ...prev, [key]: value }));
   };
 
-  const saveOverrides = () => {
+  const saveOverrides = async () => {
     if (typeof window === 'undefined') return;
     setOverrideStatus('');
+
+    const userId = localStorage.getItem('benehab_user_id');
+    if (!userId) {
+      setOverrideStatus('User is not created. Fill demographics to create user.');
+      return;
+    }
 
     try {
       const parsedAttitude = overrideForms.attitude ? JSON.parse(overrideForms.attitude) : null;
       const parsedTypology = overrideForms.typology ? JSON.parse(overrideForms.typology) : null;
       const parsedValues = overrideForms.values ? JSON.parse(overrideForms.values) : null;
+      const parsedDemographics = overrideForms.demographics ? JSON.parse(overrideForms.demographics) : null;
 
+      const baseUrl = typeof window === 'undefined'
+        ? process.env.INTERNAL_API_URL
+        : process.env.NEXT_PUBLIC_API_URL;
+      const backendUrl = baseUrl || 'http://localhost:8000';
+
+      const response = await fetch(`${backendUrl}/api/users/${userId}/profiles`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          attitude_profile: parsedAttitude,
+          typology_profile: parsedTypology,
+          values_profile: parsedValues,
+          demographics: parsedDemographics
+        })
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || 'Failed to save overrides');
+      }
+
+      // Sync localStorage for compatibility with existing flows
       if (parsedAttitude) {
         localStorage.setItem('benehab_attitude_profile', JSON.stringify(parsedAttitude));
       }
@@ -144,8 +158,11 @@ export default function StaffConsolePage() {
       if (parsedValues) {
         localStorage.setItem('benehab_values_profile', JSON.stringify(parsedValues));
       }
+      if (parsedDemographics) {
+        localStorage.setItem('benehab_demographics', JSON.stringify(parsedDemographics));
+      }
 
-      setOverrideStatus('Profiles saved to localStorage. Tests now count as completed.');
+      setOverrideStatus('Profiles saved to backend and synced locally.');
     } catch (error) {
       console.error('Error saving overrides:', error);
       setOverrideStatus(`Error: ${error.message}`);
@@ -205,6 +222,102 @@ export default function StaffConsolePage() {
     } catch (error) {
       console.error('Error loading instructions preview:', error);
     }
+  };
+
+  const loadProfilesFromBackend = async () => {
+    if (typeof window === 'undefined') return;
+    const userId = localStorage.getItem('benehab_user_id');
+    if (!userId) {
+      setOverrideStatus('User is not created. Fill demographics to create user.');
+      return;
+    }
+
+    try {
+      const baseUrl = typeof window === 'undefined'
+        ? process.env.INTERNAL_API_URL
+        : process.env.NEXT_PUBLIC_API_URL;
+      const backendUrl = baseUrl || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/users/${userId}`);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || 'Failed to load user profiles');
+      }
+      const data = await response.json();
+
+      const attitudeProfile = data.attitude_profile || null;
+      const typologyProfile = data.typology_profile || null;
+      const valuesProfile = data.values_profile || null;
+      const demographicsProfile = data.demographics || null;
+
+      setOverrideForms({
+        attitude: attitudeProfile ? JSON.stringify(attitudeProfile, null, 2) : '',
+        typology: typologyProfile ? JSON.stringify(typologyProfile, null, 2) : '',
+        values: valuesProfile ? JSON.stringify(valuesProfile, null, 2) : '',
+        demographics: demographicsProfile ? JSON.stringify(demographicsProfile, null, 2) : ''
+      });
+
+      // Sync localStorage for other flows
+      if (attitudeProfile) {
+        localStorage.setItem('benehab_attitude_profile', JSON.stringify(attitudeProfile));
+      }
+      if (typologyProfile) {
+        localStorage.setItem('benehab_typology_profile', JSON.stringify(typologyProfile));
+      }
+      if (valuesProfile) {
+        localStorage.setItem('benehab_values_profile', JSON.stringify(valuesProfile));
+      }
+      if (demographicsProfile) {
+        localStorage.setItem('benehab_demographics', JSON.stringify(demographicsProfile));
+      }
+
+      setOverrideStatus('Profiles loaded from backend.');
+    } catch (error) {
+      console.error('Error loading profiles:', error);
+      setOverrideStatus(`Error loading profiles: ${error.message}`);
+    }
+  };
+
+  const resetOverride = async (key) => {
+    if (typeof window === 'undefined') return;
+    const storageKeysMap = {
+      attitude: ['benehab_attitude_profile', 'benehab_attitude_answers'],
+      typology: ['benehab_typology_profile', 'benehab_typology_answers'],
+      values: [
+        'benehab_values_profile',
+        'benehab_values_colors',
+        'benehab_values_color_rankings',
+        'benehab_color_test_result',
+      ],
+      demographics: ['benehab_demographics'],
+    };
+    const payloadKeyMap = {
+      attitude: 'attitude_profile',
+      typology: 'typology_profile',
+      values: 'values_profile',
+      demographics: 'demographics',
+    };
+
+    const payloadKey = payloadKeyMap[key];
+    const userId = localStorage.getItem('benehab_user_id');
+
+    if (userId && payloadKey) {
+      try {
+        await fetch(`/api/users/${userId}/profiles`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ [payloadKey]: null }),
+        });
+      } catch (err) {
+        console.error('Error resetting override on backend:', err);
+      }
+    }
+
+    // Always clear localStorage copies
+    (storageKeysMap[key] || []).forEach((k) => localStorage.removeItem(k));
+    setOverrideForms((prev) => ({ ...prev, [key]: '' }));
+    setOverrideStatus(
+      `Cleared ${key} profile ${userId ? '(backend + localStorage)' : '(localStorage)'}`
+    );
   };
 
   const updateBackendInstructions = async () => {
@@ -897,15 +1010,41 @@ export default function StaffConsolePage() {
           {activeTab === 'profiling-overrides' && (
             <div className="grid grid-cols-1 gap-6">
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Override Profiling Results</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Paste JSON профили тестов, чтобы пересобрать результаты без повторного прохождения опросов.
-                  После сохранения данные попадут в localStorage, а чат откроется как завершённые тесты.
-                </p>
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Override Profiling Results</h3>
+                    <p className="text-sm text-gray-600">
+                      Paste JSON профили тестов, чтобы пересобрать результаты без повторного прохождения опросов.
+                      После сохранения данные уйдут в backend (user profile) и синхронизируются локально.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={loadProfilesFromBackend}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Refresh from backend
+                    </button>
+                    <button
+                      onClick={saveOverrides}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Save overrides
+                    </button>
+                  </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Attitude profile</label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Attitude profile</label>
+                      <button
+                        onClick={() => resetOverride('attitude')}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Reset
+                      </button>
+                    </div>
                     <textarea
                       value={overrideForms.attitude}
                       onChange={(e) => handleOverrideChange('attitude', e.target.value)}
@@ -914,7 +1053,15 @@ export default function StaffConsolePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Typology profile</label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Typology profile</label>
+                      <button
+                        onClick={() => resetOverride('typology')}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Reset
+                      </button>
+                    </div>
                     <textarea
                       value={overrideForms.typology}
                       onChange={(e) => handleOverrideChange('typology', e.target.value)}
@@ -923,7 +1070,15 @@ export default function StaffConsolePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Values profile</label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Values profile</label>
+                      <button
+                        onClick={() => resetOverride('values')}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Reset
+                      </button>
+                    </div>
                     <textarea
                       value={overrideForms.values}
                       onChange={(e) => handleOverrideChange('values', e.target.value)}
@@ -933,13 +1088,27 @@ export default function StaffConsolePage() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 gap-4 mt-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">Demographics</label>
+                      <button
+                        onClick={() => resetOverride('demographics')}
+                        className="text-xs text-red-600 hover:text-red-800"
+                      >
+                        Reset
+                      </button>
+                    </div>
+                    <textarea
+                      value={overrideForms.demographics}
+                      onChange={(e) => handleOverrideChange('demographics', e.target.value)}
+                      placeholder='{"name":"John","gender":"male","age":35,"weight":80,"height":180}'
+                      className="w-full h-32 border border-gray-300 rounded-lg p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    onClick={saveOverrides}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Save overrides to localStorage
-                  </button>
                   <button
                     onClick={regeneratePIB}
                     className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"

@@ -75,26 +75,30 @@ export default function ValuesResults() {
         {/* Main indices */}
         <div className="bg-white rounded-lg shadow-lg border p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Indicators</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {profile.indices && Object.entries(profile.indices).map(([index, value]) => (
-              <div key={index} className="p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700 capitalize">
-                    {index.replace(/_/g, ' ')}
-                  </span>
-                  <span className="text-lg font-bold text-blue-600">
-                    {Math.round(value * 100)}%
-                  </span>
+          {profile.calculated_metrics ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(profile.calculated_metrics).map(([metric, value]) => (
+                <div key={metric} className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700 capitalize">
+                      {metric.replace(/_/g, ' ')}
+                    </span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {typeof value === 'number' ? value.toFixed(2) : String(value)}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full bg-blue-500"
+                      style={{ width: '100%' }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full bg-blue-500"
-                    style={{ width: `${Math.abs(value) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-600">No metrics available. Complete the color test to see results.</div>
+          )}
         </div>
 
         {/* Recommendations */}

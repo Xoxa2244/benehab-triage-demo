@@ -36,7 +36,9 @@ export default function Home() {
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
-        setDemographics(parsed);
+        const savedUserId = localStorage.getItem('benehab_user_id');
+        const withUserId = savedUserId ? { ...parsed, userId: savedUserId } : parsed;
+        setDemographics(withUserId);
       } catch (e) {
         console.error('Error loading demographic data:', e);
       }
@@ -339,10 +341,10 @@ export default function Home() {
           progress = Math.round((typologyAnswered / 9) * 100);
           break;
         case 'values':
-          const valuesAnswers = JSON.parse(localStorage.getItem('benehab_values_answers') || '{}');
-          const valuesAnswered = Object.keys(valuesAnswers).length;
-          // Assuming 15 concepts for values
-          progress = Math.round((valuesAnswered / 15) * 100);
+          const valuesColors = JSON.parse(localStorage.getItem('benehab_values_colors') || '{}');
+          const valuesAnswered = Object.keys(valuesColors).length;
+          // heuristic: cap at 100, assume 60 concepts total
+          progress = Math.min(100, Math.round((valuesAnswered / 60) * 100));
           break;
       }
       return Math.min(progress, 100);
@@ -367,7 +369,7 @@ export default function Home() {
   };
 
   if (!demographics) {
-    return <DemographicsCheck onComplete={setDemographics} />;
+    return <DemographicsCheck onDemographicsComplete={setDemographics} />;
   }
 
   return (

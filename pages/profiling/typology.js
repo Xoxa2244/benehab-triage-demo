@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -12,6 +12,13 @@ export default function TypologySurvey() {
   const [validationErrors, setValidationErrors] = useState({});
 
   const itemsPerPage = 5;
+  const questionMap = useMemo(() => {
+    return items.reduce((acc, q) => {
+      acc[q.id] = q;
+      acc[String(q.id)] = q;
+      return acc;
+    }, {});
+  }, [items]);
 
   useEffect(() => {
     loadItems();
@@ -85,12 +92,16 @@ export default function TypologySurvey() {
     }
   };
   
+  const getAnswerArray = (questionId) => {
+    return answers[questionId] || answers[String(questionId)] || [];
+  };
+
   const canGoToNextPage = () => {
     if (currentPage >= totalPages) return false;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, items.length);
     const pageItems = items.slice(startIndex, endIndex);
-    return pageItems.every(item => answers[item.id] && answers[item.id].length > 0);
+    return pageItems.every(item => getAnswerArray(item.id).length > 0);
   };
   
   const canGoToPreviousPage = () => {
@@ -108,7 +119,8 @@ export default function TypologySurvey() {
     const pageItems = items.slice(startIndex, endIndex);
     
     pageItems.forEach(item => {
-      if (!answers[item.id] || answers[item.id].length === 0) {
+      const arr = getAnswerArray(item.id);
+      if (!arr || arr.length === 0) {
         errors[item.id] = true;
       }
     });
@@ -118,41 +130,54 @@ export default function TypologySurvey() {
   };
 
   const handleAnswer = (questionId, optionId) => {
-    const currentAnswers = answers[questionId] || [];
+    const question = questionMap[questionId];
+    if (!question) return;
+
+    const currentAnswers = getAnswerArray(questionId);
+      const optionObj = question.options.find((o) => String(o.option_id) === String(optionId));
+    if (!optionObj) return;
+
+    const exists = currentAnswers.some(
+      (a) => a === optionId || a?.option_id === optionId
+    );
+
     let newAnswers;
-    
-    if (currentAnswers.includes(optionId)) {
+    if (exists) {
       // Remove if already selected
-      newAnswers = currentAnswers.filter(id => id !== optionId);
+      newAnswers = currentAnswers.filter(
+        (a) => (a?.option_id ?? a) !== optionId
+      );
     } else if (currentAnswers.length < 3) {
       // Add if less than 3 selected
-      newAnswers = [...currentAnswers, optionId];
+      newAnswers = [...currentAnswers, { option_id: optionObj.option_id, ptype: optionObj.ptype }];
     } else {
       // Replace first if 3 already selected
-      newAnswers = [optionId, ...currentAnswers.slice(1)];
+      const [, ...rest] = currentAnswers;
+      newAnswers = [{ option_id: optionObj.option_id, ptype: optionObj.ptype }, ...rest];
     }
-    
-    setAnswers(prev => ({
+
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: newAnswers
+      [questionId]: newAnswers,
     }));
-    
+
     // Clear validation error for this question
-    setValidationErrors(prev => {
+    setValidationErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[questionId];
       return newErrors;
     });
-    
+
     saveProgress();
   };
 
   const getSelectedCount = (questionId) => {
-    return answers[questionId] ? answers[questionId].length : 0;
+    const arr = getAnswerArray(questionId);
+    return arr ? arr.length : 0;
   };
 
   const canSubmit = () => {
-    return items.every(item => answers[item.id] && answers[item.id].length > 0);
+    return items.every((item) => getAnswerArray(item.id).length > 0);
   };
 
   const submitSurvey = async () => {
@@ -160,12 +185,18 @@ export default function TypologySurvey() {
 
     setLoading(true);
     try {
+      const userId = localStorage.getItem('benehab_user_id');
+    const payloadAnswers = buildPayloadAnswers();
+
+    if (!Object.keys(payloadAnswers).length) {
+      throw new Error('No answers selected');
+    }
       const response = await fetch('/api/profiling/typology/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers: payloadAnswers, userId }),
       });
 
       if (response.ok) {
@@ -212,6 +243,28 @@ export default function TypologySurvey() {
     } catch (error) {
       console.error('Error generating PIB:', error);
     }
+  };
+
+  const buildPayloadAnswers = () => {
+    const payload = {};
+    Object.entries(answers).forEach(([questionId, optionObjs]) => {
+      const question = questionMap[questionId];
+      if (!question || !Array.isArray(optionObjs)) return;
+
+      const normalized = optionObjs
+        .map((a) => {
+          const id = a?.option_id ?? a;
+          const opt = question.options.find((o) => String(o.option_id) === String(id));
+          if (!opt) return null;
+          return { optionId: opt.option_id, ptype: opt.ptype };
+        })
+        .filter(Boolean);
+
+      if (normalized.length) {
+        payload[questionId] = normalized;
+      }
+    });
+    return payload;
   };
 
   if (items.length === 0) {
