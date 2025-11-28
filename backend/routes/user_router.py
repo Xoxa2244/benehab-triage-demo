@@ -36,6 +36,7 @@ class UpdateProfilesRequest(BaseModel):
     typology_profile: dict[str, Any] | None = None
     values_profile: dict[str, Any] | None = None
     demographics: dict[str, Any] | None = None
+    color_test_solution: dict[str, Any] | None = None
 
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -94,6 +95,10 @@ async def update_profiles(user_id: str, payload: UpdateProfilesRequest):
         user_doc.values_profile = updates["values_profile"]
     if "demographics" in updates:
         user_doc.demographics = updates["demographics"]
+    if "color_test_solution" in updates and updates["color_test_solution"]:
+        # Lightweight persistence of last color-test state alongside values_profile
+        user_doc.values_profile = user_doc.values_profile or {}
+        user_doc.values_profile["concept_color_matrix"] = updates["color_test_solution"]
 
     await user_doc.save()
 
@@ -118,6 +123,17 @@ async def get_user(user_id: str):
     user_doc = await UserDocument.get(user_id)
     if user_doc is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+    # Backfill values_profile from latest color test result if missing
+    if user_doc.values_profile is None:
+        await user_doc.fetch_link(UserDocument.color_test_results)
+        if user_doc.color_test_results:
+            latest = user_doc.color_test_results[-1]
+            user_doc.values_profile = {
+                "calculated_metrics": latest.calculated_metrics,
+                "concept_color_matrix": latest.color_test_solution.concept_color_matrix,
+            }
+            await user_doc.save()
 
     return UserResponse(
         id=user_doc.id,

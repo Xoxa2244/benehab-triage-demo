@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       typeof window === 'undefined'
         ? process.env.INTERNAL_API_URL
         : process.env.NEXT_PUBLIC_API_URL;
-    const backendUrl = baseUrl || 'http://localhost:8001';
+    const backendUrl = baseUrl || 'http://localhost:8000';
 
     const response = await fetch(`${backendUrl}/api/users/${userId}/profiles`, {
       method: 'PATCH',

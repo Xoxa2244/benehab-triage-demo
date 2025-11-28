@@ -34,7 +34,7 @@ export default function ValuesSurvey() {
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [validationErrors, setValidationErrors] = useState({});
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   useEffect(() => {
     loadItems();
@@ -51,18 +51,38 @@ export default function ValuesSurvey() {
     updateProgress();
   }, [currentStage, colorAssociations, colorRankings]);
 
+  useEffect(() => {
+    if (!items.length) return;
+    // Drop associations for concepts that are no longer present
+    setColorAssociations((prev) => {
+      const allowed = new Set(items.map((i) => i.concept));
+      const filtered = {};
+      Object.entries(prev).forEach(([concept, color]) => {
+        if (allowed.has(concept)) {
+          filtered[concept] = color;
+        }
+      });
+      return filtered;
+    });
+  }, [items]);
+
   const loadItems = async () => {
     try {
-      const response = await fetch('/api/profiling/values/items');
+      // Use backend color-test concepts to stay in sync with calculation
+      const response = await fetch('/api/color-tests/inputs');
       const data = await response.json();
-      
-      if (data.success) {
-        setItems(data.items || []);
-        console.log('✅ Concepts loaded successfully:', data.items?.length);
-      } else {
-        console.error('❌ API returned error:', data.error);
-        setItems([]);
+      const concepts = data?.concepts || [];
+      if (Array.isArray(concepts) && concepts.length) {
+        const mapped = concepts.map((concept, idx) => ({
+          id: idx + 1,
+          concept,
+        }));
+        setItems(mapped);
+        console.log('✅ Concepts loaded from color-test inputs:', mapped.length);
+        return;
       }
+      console.error('❌ No concepts from color-test inputs');
+      setItems([]);
     } catch (error) {
       console.error('❌ Error loading concepts:', error);
       setItems([]);

@@ -10,6 +10,7 @@ from backend.color_test.entities import (
     ColorTestResultDocument,
     MetricDocument,
     UserDocument,
+    ConceptDocument,
 )
 from backend.routes.color_test_router import router as color_test_router
 
@@ -24,7 +25,12 @@ async def lifespan(app: FastAPI):
     # Initialize Beanie with the document models
     await beanie.init_beanie(
         database=database,
-        document_models=[ColorTestResultDocument, MetricDocument, UserDocument]
+        document_models=[
+            ColorTestResultDocument,
+            MetricDocument,
+            UserDocument,
+            ConceptDocument,
+        ],
     )
 
     print(f"Connected to MongoDB: {settings.mongodb_url}")

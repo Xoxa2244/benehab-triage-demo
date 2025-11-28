@@ -15,6 +15,7 @@ from backend.color_test.entities import (
     ColorTestResultDocument,
     MetricDocument,
     UserDocument,
+    ConceptDocument,
 )
 
 
@@ -38,6 +39,7 @@ async def lifespan(app: FastAPI):
             ColorTestResultDocument,
             MetricDocument,
             UserDocument,
+            ConceptDocument,
         ],
     )
     

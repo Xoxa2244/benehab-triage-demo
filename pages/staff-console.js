@@ -69,6 +69,8 @@ export default function StaffConsolePage() {
     attractiveness_rank_weights: [],
   });
   const [colorInputs, setColorInputs] = useState({ colors: [], concepts: [] });
+  const [conceptInput, setConceptInput] = useState('');
+  const [conceptsStatus, setConceptsStatus] = useState('');
   const [metricStatus, setMetricStatus] = useState('');
   const [metricsLoaded, setMetricsLoaded] = useState(false);
 
@@ -80,6 +82,16 @@ export default function StaffConsolePage() {
     { id: 'profiling-overrides', label: 'Profiling Overrides' },
     { id: 'color-metrics', label: 'Color Metrics' }
   ];
+
+  const safeParse = (value) => {
+    if (!value) return null;
+    try {
+      return typeof value === 'string' ? JSON.parse(value) : value;
+    } catch (err) {
+      console.error('Error parsing JSON', err);
+      return null;
+    }
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -272,10 +284,20 @@ export default function StaffConsolePage() {
       }
       const data = await response.json();
 
-      const attitudeProfile = data.attitude_profile || null;
-      const typologyProfile = data.typology_profile || null;
-      const valuesProfile = data.values_profile || null;
-      const demographicsProfile = data.demographics || null;
+      const fromLocal = (key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+          console.error(`Error parsing ${key} from localStorage`, err);
+          return null;
+        }
+      };
+
+      const attitudeProfile = data.attitude_profile || fromLocal('benehab_attitude_profile') || null;
+      const typologyProfile = data.typology_profile || fromLocal('benehab_typology_profile') || null;
+      const valuesProfile = data.values_profile || fromLocal('benehab_values_profile') || null;
+      const demographicsProfile = data.demographics || fromLocal('benehab_demographics') || null;
 
       setOverrideForms({
         attitude: attitudeProfile ? JSON.stringify(attitudeProfile, null, 2) : '',
@@ -302,6 +324,20 @@ export default function StaffConsolePage() {
     } catch (error) {
       console.error('Error loading profiles:', error);
       setOverrideStatus(`Error loading profiles: ${error.message}`);
+      // Try fallback to localStorage when backend unavailable
+      const localAtt = localStorage.getItem('benehab_attitude_profile');
+      const localTyp = localStorage.getItem('benehab_typology_profile');
+      const localVal = localStorage.getItem('benehab_values_profile');
+      const localDemo = localStorage.getItem('benehab_demographics');
+      if (localAtt || localTyp || localVal || localDemo) {
+        setOverrideForms({
+          attitude: localAtt ? JSON.stringify(JSON.parse(localAtt), null, 2) : '',
+          typology: localTyp ? JSON.stringify(JSON.parse(localTyp), null, 2) : '',
+          values: localVal ? JSON.stringify(JSON.parse(localVal), null, 2) : '',
+          demographics: localDemo ? JSON.stringify(JSON.parse(localDemo), null, 2) : ''
+        });
+        setOverrideStatus('Loaded profiles from localStorage (backend unavailable).');
+      }
     }
   };
 
@@ -353,10 +389,14 @@ export default function StaffConsolePage() {
       const response = await fetch('/api/color-tests/inputs');
       if (response.ok) {
         const data = await response.json();
-        setColorInputs({
-          colors: data.colors || [],
-          concepts: data.concepts || [],
-        });
+        const colors = data.colors || [];
+        const concepts = data.concepts || [];
+        setColorInputs((prev) => ({
+          ...prev,
+          colors,
+          concepts,
+        }));
+        setConceptList(concepts, '', colors.length);
       }
     } catch (err) {
       console.error('Error loading color test inputs:', err);
@@ -364,8 +404,12 @@ export default function StaffConsolePage() {
   };
 
   const ensureMatrices = (same, diff, rank) => {
-    const n = Math.max(colorInputs.concepts.length, same?.length || 0, diff?.length || 0);
-    const r = Math.max(colorInputs.colors.length, rank?.[0]?.length || 0, rank?.length || 0);
+    const n =
+      colorInputs.concepts.length ||
+      Math.max(same?.length || 0, diff?.length || 0);
+    const r =
+      colorInputs.colors.length ||
+      Math.max(rank?.[0]?.length || 0, rank?.length || 0);
 
     const fillMatrix = (mat) => {
       const out = Array.from({ length: n }, (_, i) =>
@@ -386,6 +430,86 @@ export default function StaffConsolePage() {
       diff: fillMatrix(diff),
       rank: fillRank(rank),
     };
+  };
+
+  const resizeMatricesForConcepts = (nextConcepts, rankColumnsOverride) => {
+    setMetricForm((prev) => {
+      const normalized = ensureMatrices(
+        prev.similarity_same_weights,
+        prev.similarity_diff_weights,
+        prev.attractiveness_rank_weights
+      );
+      const conceptCount = nextConcepts.length;
+      const rankColumns =
+        normalized.rank?.[0]?.length ||
+        rankColumnsOverride ||
+        colorInputs.colors.length ||
+        0;
+
+      const resizeSquare = (mat) =>
+        Array.from({ length: conceptCount }, (_, i) =>
+          Array.from({ length: conceptCount }, (_, j) => Number(mat?.[i]?.[j] ?? 0))
+        );
+
+      const resizeRank = (mat) =>
+        Array.from({ length: conceptCount }, (_, i) =>
+          Array.from({ length: rankColumns }, (_, j) => Number(mat?.[i]?.[j] ?? 0))
+        );
+
+      return {
+        ...prev,
+        similarity_same_weights: resizeSquare(normalized.same),
+        similarity_diff_weights: resizeSquare(normalized.diff),
+        attractiveness_rank_weights: resizeRank(normalized.rank),
+      };
+    });
+  };
+
+  const setConceptList = (nextConcepts, statusMessage = '', rankColumnsOverride) => {
+    const cleaned = nextConcepts.map((c) => c.trim()).filter(Boolean);
+    resizeMatricesForConcepts(cleaned, rankColumnsOverride);
+    setColorInputs((prev) => ({ ...prev, concepts: cleaned }));
+    setConceptsStatus(statusMessage);
+  };
+
+  const handleAddConcept = () => {
+    const normalized = conceptInput.trim();
+    if (!normalized) return;
+    if (colorInputs.concepts.some((c) => c.toLowerCase() === normalized.toLowerCase())) {
+      setConceptsStatus('Такое понятие уже есть.');
+      return;
+    }
+    persistConcepts([...colorInputs.concepts, normalized], 'Понятие добавлено.');
+    setConceptInput('');
+  };
+
+  const handleRemoveConcept = (concept) => {
+    const next = colorInputs.concepts.filter((c) => c !== concept);
+    persistConcepts(next, 'Понятие удалено.');
+  };
+
+  const persistConcepts = async (nextConcepts, successMessage = '') => {
+    setConceptsStatus('Сохраняем понятия на бэкенд...');
+    try {
+      const resp = await fetch('/api/color-tests/concepts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ concepts: nextConcepts }),
+      });
+      if (!resp.ok) {
+        throw new Error(await resp.text());
+      }
+      const data = await resp.json();
+      setConceptList(
+        data.concepts || nextConcepts,
+        successMessage || 'Список понятий сохранён.'
+      );
+    } catch (err) {
+      console.error('Error saving concepts:', err);
+      setConceptsStatus(`Ошибка сохранения понятий: ${err.message}`);
+      // Reload current list to stay in sync
+      loadColorTestInputs();
+    }
   };
 
   const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSet }) => {
@@ -528,7 +652,7 @@ export default function StaffConsolePage() {
           >
             {colors.map((c, idx) => (
               <option key={c} value={idx}>
-                {idx + 1}. {c}
+                {idx + 1}
               </option>
             ))}
           </select>
@@ -552,8 +676,8 @@ export default function StaffConsolePage() {
               <tr>
                 <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept \\ Color</th>
                 {colors.map((c, idx) => (
-                  <th key={c} className="px-2 py-1 whitespace-nowrap">
-                    {idx + 1}. {c}
+                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center">
+                    {idx + 1}
                   </th>
                 ))}
               </tr>
@@ -1619,17 +1743,167 @@ export default function StaffConsolePage() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-4">
-                  <div className="text-sm font-medium text-gray-700 mb-1">Specific instructions (LLM summary)</div>
-                  <div className="text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[140px] whitespace-pre-wrap">
-                    {instructionsPreview.specific_instructions || '—'}
-                  </div>
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-700 mb-1">Specific instructions (LLM summary)</div>
+                <div className="text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-lg p-3 min-h-[140px] whitespace-pre-wrap">
+                  {instructionsPreview.specific_instructions || '—'}
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Color Metrics Tab */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Profiling snapshots</h3>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-800">Attitude</div>
+                    <span className="text-xs text-gray-500">levels & risks</span>
+                  </div>
+                  {(() => {
+                    const att = safeParse(overrideForms.attitude);
+                    if (!att) return <div className="text-sm text-gray-500">Нет данных</div>;
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(att.levels || {}).map(([scale, lvl]) => {
+                            const color =
+                              lvl === 'high'
+                                ? 'bg-red-100 text-red-800'
+                                : lvl === 'medium'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-green-100 text-green-800';
+                            return (
+                              <span key={scale} className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>
+                                {scale.replace(/_/g, ' ')}: {lvl}
+                              </span>
+                            );
+                          })}
+                        </div>
+                        {!!(att.risk_tags?.length) && (
+                          <div className="text-xs text-gray-700">
+                            <div className="font-medium mb-1">Риски:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {att.risk_tags.map((tag) => (
+                                <span key={tag} className="px-2 py-1 rounded-full bg-red-50 text-red-700">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {!!(att.comm_flags?.length) && (
+                          <div className="text-xs text-gray-700">
+                            <div className="font-medium mb-1">Коммуникация:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {att.comm_flags.map((flag) => (
+                                <span key={flag} className="px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                                  {flag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-800">Typology</div>
+                    <span className="text-xs text-gray-500">leading types & scores</span>
+                  </div>
+                  {(() => {
+                    const typ = safeParse(overrideForms.typology);
+                    if (!typ) return <div className="text-sm text-gray-500">Нет данных</div>;
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                          {(typ.leading_types || []).map((t) => (
+                            <span key={t} className="px-2 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+                              {t}
+                            </span>
+                          ))}
+                          {!(typ.leading_types || []).length && (
+                            <span className="text-xs text-gray-500">Ведущие типы не определены</span>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          {Object.entries(typ.scores || {}).map(([type, score]) => (
+                            <div key={type} className="text-xs">
+                              <div className="flex justify-between text-gray-700">
+                                <span>{type}</span>
+                                <span className="font-semibold">{score}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                                <div
+                                  className="bg-purple-500 h-1.5"
+                                  style={{ width: `${Math.min(Number(score || 0) * 10, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {typ.interpretation?.description && (
+                          <div className="text-xs text-gray-700">
+                            <div className="font-medium mb-1">Комментарий:</div>
+                            <p>{typ.interpretation.description}</p>
+                            {typ.interpretation.recommendation && (
+                              <p className="mt-1 text-gray-600">{typ.interpretation.recommendation}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-800">Values / Color test</div>
+                    <span className="text-xs text-gray-500">metrics & ranks</span>
+                  </div>
+                  {(() => {
+                    const val = safeParse(overrideForms.values);
+                    if (!val) return <div className="text-sm text-gray-500">Нет данных</div>;
+                    const metrics = Object.entries(val.calculated_metrics || {});
+                    const ranks = (val.concept_color_matrix || []).map((col) => col?.length || 0);
+                    return (
+                      <div className="space-y-3">
+                        <div className="space-y-1 text-xs">
+                          {metrics.length ? (
+                            metrics.map(([name, v]) => (
+                              <div key={name} className="flex justify-between text-gray-700">
+                                <span>{name}</span>
+                                <span className="font-semibold">{typeof v === 'number' ? v.toFixed(2) : String(v)}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-500">Метрики отсутствуют</div>
+                          )}
+                        </div>
+                        {ranks.length ? (
+                          <div className="text-xs text-gray-700">
+                            <div className="font-medium mb-1">Концептов по рангам:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {ranks.map((cnt, idx) => (
+                                <span key={idx} className="px-2 py-1 rounded-full bg-emerald-50 text-emerald-700">
+                                  #{idx + 1}: {cnt}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Color Metrics Tab */}
           {activeTab === 'color-metrics' && (
             <div className="grid grid-cols-1 gap-6">
               <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -1662,6 +1936,65 @@ export default function StaffConsolePage() {
                   </div>
                 </div>
 
+                <div className="mb-6 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Концепты цветового теста</div>
+                      <p className="text-xs text-gray-600">
+                        Локально редактируйте список понятий: добавляйте новые или удаляйте лишние токеном с крестиком.
+                      </p>
+                    </div>
+                    <div className="flex w-full md:w-auto gap-2">
+                      <input
+                        type="text"
+                        value={conceptInput}
+                        onChange={(e) => setConceptInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddConcept();
+                          }
+                        }}
+                        className="flex-1 md:flex-none px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Новое понятие"
+                      />
+                      <button
+                        onClick={handleAddConcept}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {colorInputs.concepts.length ? (
+                      colorInputs.concepts.map((concept) => (
+                        <span
+                          key={concept}
+                          className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full text-sm shadow-sm"
+                        >
+                          <span className="text-gray-800">{concept}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveConcept(concept)}
+                            className="text-gray-500 hover:text-red-600"
+                            aria-label={`Удалить ${concept}`}
+                          >
+                            &times;
+                          </button>
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-500">Список понятий пуст.</span>
+                    )}
+                  </div>
+                  {conceptsStatus && (
+                    <div className="mt-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2">
+                      {conceptsStatus}
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-wrap gap-3 mb-4">
                   {colorMetrics.map((m) => (
                     <button
@@ -1692,50 +2025,49 @@ export default function StaffConsolePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-2">
+                  <div className="space-y-4">
+                    <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         similarity_same_weights (Concept x Concept)
                       </label>
-                    <ConceptMatrixEditor
-                      concepts={colorInputs.concepts}
-                      matrix={ensureMatrices(
-                        metricForm.similarity_same_weights,
-                        metricForm.similarity_diff_weights,
-                        metricForm.attractiveness_rank_weights
-                      ).same}
-                      onChange={(mat) =>
-                        setMetricForm((prev) => ({ ...prev, similarity_same_weights: mat }))
-                      }
-                      onSet={(next) =>
-                        saveMetric({
-                          similarity_same_weights: next,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      similarity_diff_weights
-                    </label>
-                    <ConceptMatrixEditor
-                      concepts={colorInputs.concepts}
-                      compact
-                      matrix={ensureMatrices(
-                        metricForm.similarity_same_weights,
-                        metricForm.similarity_diff_weights,
-                        metricForm.attractiveness_rank_weights
-                      ).diff}
-                      onChange={(mat) =>
-                        setMetricForm((prev) => ({ ...prev, similarity_diff_weights: mat }))
-                      }
-                      onSet={(next) =>
-                        saveMetric({
-                          similarity_diff_weights: next,
-                        })
-                      }
-                    />
-                  </div>
+                      <ConceptMatrixEditor
+                        concepts={colorInputs.concepts}
+                        matrix={ensureMatrices(
+                          metricForm.similarity_same_weights,
+                          metricForm.similarity_diff_weights,
+                          metricForm.attractiveness_rank_weights
+                        ).same}
+                        onChange={(mat) =>
+                          setMetricForm((prev) => ({ ...prev, similarity_same_weights: mat }))
+                        }
+                        onSet={(next) =>
+                          saveMetric({
+                            similarity_same_weights: next,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        similarity_diff_weights (Concept x Concept)
+                      </label>
+                      <ConceptMatrixEditor
+                        concepts={colorInputs.concepts}
+                        matrix={ensureMatrices(
+                          metricForm.similarity_same_weights,
+                          metricForm.similarity_diff_weights,
+                          metricForm.attractiveness_rank_weights
+                        ).diff}
+                        onChange={(mat) =>
+                          setMetricForm((prev) => ({ ...prev, similarity_diff_weights: mat }))
+                        }
+                        onSet={(next) =>
+                          saveMetric({
+                            similarity_diff_weights: next,
+                          })
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>

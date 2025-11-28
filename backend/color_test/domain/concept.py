@@ -67,3 +67,6 @@ class Concept(str, Enum):
     WEDDING = "Wedding"
     DIVORCE = "Divorce"
     RELOCATION = "Relocation"
+
+
+DEFAULT_CONCEPTS = [concept.value for concept in Concept.__members__.values()]
