@@ -1936,6 +1936,19 @@ export default function StaffConsolePage() {
                   </div>
                 </div>
 
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Metric name
+                  </label>
+                  <input
+                    type="text"
+                    value={metricForm.metric_name}
+                    onChange={(e) => handleMetricFieldChange('metric_name', e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="metric name"
+                  />
+                </div>
+
                 <div className="mb-6 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
                     <div>
@@ -2008,23 +2021,10 @@ export default function StaffConsolePage() {
                     >
                       {m.metric_name}
                     </button>
-                  ))}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Metric name
-                    </label>
-                    <input
-                      type="text"
-                      value={metricForm.metric_name}
-                      onChange={(e) => handleMetricFieldChange('metric_name', e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="metric name"
-                    />
+                    ))}
                   </div>
 
+                <div className="space-y-4">
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
