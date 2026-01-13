@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getAllTestResults, mapTestResultsToTags, getChatId } from '../lib/profiling/profilingUtils';
 
 const CHAT_HISTORY_KEY = 'benehab_chat_history';
@@ -31,6 +31,317 @@ const defaultStaffChat = [
       source: 'SNOMED / dm+d / NHS.uk'
     }
   ];
+
+const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSet }) => {
+  const [rowIdx, setRowIdx] = useState(0);
+  const [colIdx, setColIdx] = useState(0);
+  const [val, setVal] = useState('0');
+  const [scrollTop, setScrollTop] = useState(0);
+  const rowHeight = 32;
+  const containerHeight = 256;
+
+  const currentCellValue = matrix?.[rowIdx]?.[colIdx];
+
+  useEffect(() => {
+    if (currentCellValue !== undefined) {
+      setVal(String(currentCellValue));
+    }
+  }, [rowIdx, colIdx, currentCellValue]);
+
+  const updateCell = (r, cc, nextVal) => {
+    const numeric = Number(nextVal);
+    const normalized = Number.isFinite(numeric) ? numeric : 0;
+    const next = matrix.map((row, rowIdxValue) =>
+      row.map((c, colIdxValue) => {
+        if (rowIdxValue === r && colIdxValue === cc) return normalized;
+        if (rowIdxValue === cc && colIdxValue === r) return normalized;
+        return c;
+      })
+    );
+    onChange(next);
+    if (onSet) onSet(next);
+  };
+
+  const apply = () => {
+    const num = Number(val) || 0;
+    const next = matrix.map((row, r) =>
+      row.map((c, cc) => {
+        if (r === rowIdx && cc === colIdx) return num;
+        if (r === colIdx && cc === rowIdx) return num;
+        return c;
+      })
+    );
+    onChange(next);
+    if (onSet) onSet(next);
+  };
+
+  const totalRows = matrix.length;
+  const visibleCount = Math.ceil(containerHeight / rowHeight) + 2;
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - 1);
+  const endRow = Math.min(totalRows, startRow + visibleCount);
+  const visibleRows = matrix.slice(startRow, endRow);
+  const topSpacerHeight = startRow * rowHeight;
+  const bottomSpacerHeight = (totalRows - endRow) * rowHeight;
+
+  const renderTable = () => (
+        <div
+          className="max-h-64 overflow-auto border rounded-lg text-xs"
+          onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+        >
+          <table className="min-w-full text-left text-gray-700">
+            <thead className="sticky top-0 bg-gray-50">
+              <tr>
+                <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept</th>
+                {concepts.map((c, idx) => (
+                  <th key={c} className="px-2 py-1 whitespace-nowrap">
+                    {idx + 1}. {c}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {topSpacerHeight > 0 && (
+                <tr style={{ height: topSpacerHeight }}>
+                  <td colSpan={concepts.length + 1} />
+                </tr>
+              )}
+              {visibleRows.map((row, idx) => {
+                const r = startRow + idx;
+                return (
+                  <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
+                      {r + 1}. {concepts[r]}
+                    </td>
+                    {row.map((c, cc) => {
+                      const isInactive = cc >= r;
+                      return (
+                        <td key={cc} className="px-2 py-1">
+                          {isInactive ? (
+                            <div className="w-full rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-500 text-right">
+                              {(Number(c) || 0).toFixed(1)}
+                            </div>
+                          ) : (
+                            <input
+                              type="number"
+                              value={c ?? 0}
+                              min="0"
+                              max="1"
+                              step="0.1"
+                              onChange={(e) => updateCell(r, cc, e.target.value)}
+                              className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                            />
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              {bottomSpacerHeight > 0 && (
+                <tr style={{ height: bottomSpacerHeight }}>
+                  <td colSpan={concepts.length + 1} />
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+  );
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <label className="text-sm text-gray-700">Row:</label>
+        <select
+          value={rowIdx}
+          onChange={(e) => setRowIdx(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1 text-sm"
+        >
+          {concepts.map((c, idx) => (
+            <option key={c} value={idx}>
+              {idx + 1}. {c}
+            </option>
+          ))}
+        </select>
+        <label className="text-sm text-gray-700">Col:</label>
+        <select
+          value={colIdx}
+          onChange={(e) => setColIdx(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1 text-sm"
+        >
+          {concepts.map((c, idx) => (
+            <option key={c} value={idx}>
+              {idx + 1}. {c}
+            </option>
+          ))}
+        </select>
+        <label className="text-sm text-gray-700">Value:</label>
+        <input
+          type="number"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          min="0"
+          max="1"
+          step="0.1"
+          className="w-24 border rounded-lg px-2 py-1 text-sm"
+        />
+        <button
+          onClick={apply}
+          className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+        >
+          Set
+        </button>
+      </div>
+      {!compact && renderTable()}
+    </div>
+  );
+};
+
+const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact = false }) => {
+  const [conceptIdx, setConceptIdx] = useState(0);
+  const [colorIdx, setColorIdx] = useState(0);
+  const [val, setVal] = useState('0');
+  const [scrollTop, setScrollTop] = useState(0);
+  const rowHeight = 32;
+  const containerHeight = 256;
+
+  const currentCellValue = matrix?.[conceptIdx]?.[colorIdx];
+
+  useEffect(() => {
+    if (currentCellValue !== undefined) {
+      setVal(String(currentCellValue));
+    }
+  }, [conceptIdx, colorIdx, currentCellValue]);
+
+  const updateCell = (r, cc, nextVal) => {
+    const numeric = Number(nextVal);
+    const normalized = Number.isFinite(numeric) ? numeric : 0;
+    const next = matrix.map((row, rowIdxValue) =>
+      row.map((c, colIdxValue) =>
+        rowIdxValue === r && colIdxValue === cc ? normalized : c
+      )
+    );
+    onChange(next);
+    if (onSet) onSet(next);
+  };
+
+  const apply = () => {
+    const num = Number(val) || 0;
+    const next = matrix.map((row, r) =>
+      row.map((c, cc) => (r === conceptIdx && cc === colorIdx ? num : c))
+    );
+    onChange(next);
+    if (onSet) onSet(next);
+  };
+
+  const totalRows = matrix.length;
+  const visibleCount = Math.ceil(containerHeight / rowHeight) + 2;
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - 1);
+  const endRow = Math.min(totalRows, startRow + visibleCount);
+  const visibleRows = matrix.slice(startRow, endRow);
+  const topSpacerHeight = startRow * rowHeight;
+  const bottomSpacerHeight = (totalRows - endRow) * rowHeight;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <label className="text-sm text-gray-700">Concept:</label>
+        <select
+          value={conceptIdx}
+          onChange={(e) => setConceptIdx(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1 text-sm"
+        >
+          {concepts.map((c, idx) => (
+            <option key={c} value={idx}>
+              {idx + 1}. {c}
+            </option>
+          ))}
+        </select>
+        <label className="text-sm text-gray-700">Color/Rank:</label>
+        <select
+          value={colorIdx}
+          onChange={(e) => setColorIdx(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1 text-sm"
+        >
+          {colors.map((c, idx) => (
+            <option key={c} value={idx}>
+              {idx + 1}
+            </option>
+          ))}
+        </select>
+        <label className="text-sm text-gray-700">Value:</label>
+        <input
+          type="number"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          min="0"
+          max="1"
+          step="0.1"
+          className="w-24 border rounded-lg px-2 py-1 text-sm"
+        />
+        <button
+          onClick={apply}
+          className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+        >
+          Set
+        </button>
+      </div>
+      {!compact && (
+        <div
+          className="max-h-64 overflow-auto border rounded-lg text-xs"
+          onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+        >
+          <table className="min-w-full text-left text-gray-700">
+            <thead className="sticky top-0 bg-gray-50">
+              <tr>
+                <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept \\ Color</th>
+                {colors.map((c, idx) => (
+                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center">
+                    {idx + 1}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {topSpacerHeight > 0 && (
+                <tr style={{ height: topSpacerHeight }}>
+                  <td colSpan={colors.length + 1} />
+                </tr>
+              )}
+              {visibleRows.map((row, idx) => {
+                const r = startRow + idx;
+                return (
+                  <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
+                        {r + 1}. {concepts[r]}
+                      </td>
+                      {row.map((c, cc) => (
+                        <td key={cc} className="px-2 py-1">
+                          <input
+                            type="number"
+                            value={c ?? 0}
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            onChange={(e) => updateCell(r, cc, e.target.value)}
+                            className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              {bottomSpacerHeight > 0 && (
+                <tr style={{ height: bottomSpacerHeight }}>
+                  <td colSpan={colors.length + 1} />
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function StaffConsolePage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -74,6 +385,7 @@ export default function StaffConsolePage() {
   const [conceptsStatus, setConceptsStatus] = useState('');
   const [metricStatus, setMetricStatus] = useState('');
   const [metricsLoaded, setMetricsLoaded] = useState(false);
+  const [showFullMatrices, setShowFullMatrices] = useState(true);
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -93,8 +405,6 @@ export default function StaffConsolePage() {
       return null;
     }
   };
-
-  const matrixValueOptions = Array.from({ length: 11 }, (_, idx) => (idx / 10).toFixed(1));
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -435,6 +745,24 @@ export default function StaffConsolePage() {
     };
   };
 
+  const matrixSizeThreshold = 12;
+  const normalizedMatrices = useMemo(
+    () =>
+      ensureMatrices(
+        metricForm.similarity_same_weights,
+        metricForm.similarity_diff_weights,
+        metricForm.attractiveness_rank_weights
+      ),
+    [
+      metricForm.similarity_same_weights,
+      metricForm.similarity_diff_weights,
+      metricForm.attractiveness_rank_weights,
+      colorInputs.concepts.length,
+      colorInputs.colors.length,
+    ]
+  );
+
+
   const resizeMatricesForConcepts = (nextConcepts, rankColumnsOverride) => {
     setMetricForm((prev) => {
       const normalized = ensureMatrices(
@@ -513,255 +841,6 @@ export default function StaffConsolePage() {
       // Reload current list to stay in sync
       loadColorTestInputs();
     }
-  };
-
-  const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSet }) => {
-    const [rowIdx, setRowIdx] = useState(0);
-    const [colIdx, setColIdx] = useState(0);
-    const [val, setVal] = useState(0);
-
-    useEffect(() => {
-      if (matrix?.[rowIdx]?.[colIdx] !== undefined) {
-        setVal(matrix[rowIdx][colIdx]);
-      }
-    }, [rowIdx, colIdx, matrix]);
-
-    const updateCell = (r, cc, nextVal) => {
-      const numeric = Number(nextVal);
-      const normalized = Number.isFinite(numeric) ? numeric : 0;
-      const next = matrix.map((row, rowIdxValue) =>
-        row.map((c, colIdxValue) =>
-          rowIdxValue === r && colIdxValue === cc ? normalized : c
-        )
-      );
-      onChange(next);
-      if (onSet) onSet(next);
-    };
-
-    const apply = () => {
-      const num = Number(val) || 0;
-      const next = matrix.map((row, r) =>
-        row.map((c, cc) => (r === rowIdx && cc === colIdx ? num : c))
-      );
-      onChange(next);
-      if (onSet) onSet(next);
-    };
-
-    const renderTable = () => (
-          <div className="max-h-64 overflow-auto border rounded-lg text-xs">
-            <table className="min-w-full text-left text-gray-700">
-              <thead className="sticky top-0 bg-gray-50">
-                <tr>
-                  <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept</th>
-                  {concepts.map((c, idx) => (
-                    <th key={c} className="px-2 py-1 whitespace-nowrap">
-                      {idx + 1}. {c}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {matrix.map((row, r) => (
-                  <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
-                      {r + 1}. {concepts[r]}
-                    </td>
-                    {row.map((c, cc) => {
-                      const isInactive = cc >= r;
-                      return (
-                        <td key={cc} className="px-2 py-1">
-                          {isInactive ? (
-                            <div className="w-full rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-500 text-right">
-                              {(Number(c) || 0).toFixed(1)}
-                            </div>
-                          ) : (
-                            <select
-                              value={(Number(c) || 0).toFixed(1)}
-                              onChange={(e) => updateCell(r, cc, e.target.value)}
-                              className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
-                            >
-                              {matrixValueOptions.map((opt) => (
-                                <option key={opt} value={opt}>
-                                  {opt}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-    );
-
-    return (
-      <div className="space-y-2">
-        <div className="flex flex-wrap gap-2 items-center">
-          <label className="text-sm text-gray-700">Row:</label>
-          <select
-            value={rowIdx}
-            onChange={(e) => setRowIdx(Number(e.target.value))}
-            className="border rounded-lg px-2 py-1 text-sm"
-          >
-            {concepts.map((c, idx) => (
-              <option key={c} value={idx}>
-                {idx + 1}. {c}
-              </option>
-            ))}
-          </select>
-          <label className="text-sm text-gray-700">Col:</label>
-          <select
-            value={colIdx}
-            onChange={(e) => setColIdx(Number(e.target.value))}
-            className="border rounded-lg px-2 py-1 text-sm"
-          >
-            {concepts.map((c, idx) => (
-              <option key={c} value={idx}>
-                {idx + 1}. {c}
-              </option>
-            ))}
-          </select>
-          <label className="text-sm text-gray-700">Value:</label>
-          <input
-            type="number"
-            value={val}
-            onChange={(e) => setVal(e.target.value)}
-            min="0"
-            max="1"
-            step="0.1"
-            className="w-24 border rounded-lg px-2 py-1 text-sm"
-          />
-          <button
-            onClick={apply}
-            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-          >
-            Set
-          </button>
-        </div>
-        {!compact && renderTable()}
-      </div>
-    );
-  };
-
-  const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet }) => {
-    const [conceptIdx, setConceptIdx] = useState(0);
-    const [colorIdx, setColorIdx] = useState(0);
-    const [val, setVal] = useState(0);
-
-    useEffect(() => {
-      if (matrix?.[conceptIdx]?.[colorIdx] !== undefined) {
-        setVal(matrix[conceptIdx][colorIdx]);
-      }
-    }, [conceptIdx, colorIdx, matrix]);
-
-    const updateCell = (r, cc, nextVal) => {
-      const numeric = Number(nextVal);
-      const normalized = Number.isFinite(numeric) ? numeric : 0;
-      const next = matrix.map((row, rowIdxValue) =>
-        row.map((c, colIdxValue) =>
-          rowIdxValue === r && colIdxValue === cc ? normalized : c
-        )
-      );
-      onChange(next);
-      if (onSet) onSet(next);
-    };
-
-    const apply = () => {
-      const num = Number(val) || 0;
-      const next = matrix.map((row, r) =>
-        row.map((c, cc) => (r === conceptIdx && cc === colorIdx ? num : c))
-      );
-      onChange(next);
-      if (onSet) onSet(next);
-    };
-
-    return (
-      <div className="space-y-2">
-        <div className="flex flex-wrap gap-2 items-center">
-          <label className="text-sm text-gray-700">Concept:</label>
-          <select
-            value={conceptIdx}
-            onChange={(e) => setConceptIdx(Number(e.target.value))}
-            className="border rounded-lg px-2 py-1 text-sm"
-          >
-            {concepts.map((c, idx) => (
-              <option key={c} value={idx}>
-                {idx + 1}. {c}
-              </option>
-            ))}
-          </select>
-          <label className="text-sm text-gray-700">Color/Rank:</label>
-          <select
-            value={colorIdx}
-            onChange={(e) => setColorIdx(Number(e.target.value))}
-            className="border rounded-lg px-2 py-1 text-sm"
-          >
-            {colors.map((c, idx) => (
-              <option key={c} value={idx}>
-                {idx + 1}
-              </option>
-            ))}
-          </select>
-          <label className="text-sm text-gray-700">Value:</label>
-          <input
-            type="number"
-            value={val}
-            onChange={(e) => setVal(e.target.value)}
-            min="0"
-            max="1"
-            step="0.1"
-            className="w-24 border rounded-lg px-2 py-1 text-sm"
-          />
-          <button
-            onClick={apply}
-            className="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-          >
-            Set
-          </button>
-        </div>
-        <div className="max-h-64 overflow-auto border rounded-lg text-xs">
-          <table className="min-w-full text-left text-gray-700">
-            <thead className="sticky top-0 bg-gray-50">
-              <tr>
-                <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept \\ Color</th>
-                {colors.map((c, idx) => (
-                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center">
-                    {idx + 1}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {matrix.map((row, r) => (
-                <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
-                      {r + 1}. {concepts[r]}
-                    </td>
-                    {row.map((c, cc) => (
-                      <td key={cc} className="px-2 py-1">
-                        <select
-                          value={(Number(c) || 0).toFixed(1)}
-                          onChange={(e) => updateCell(r, cc, e.target.value)}
-                          className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
-                        >
-                          {matrixValueOptions.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
   };
 
   const loadMetrics = async () => {
@@ -2134,6 +2213,21 @@ export default function StaffConsolePage() {
                 </div>
               ) : (
                 <div className="space-y-4">
+                  {colorInputs.concepts.length > matrixSizeThreshold && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                      <div className="text-xs text-gray-600">
+                        Таблицы скрыты по умолчанию при {matrixSizeThreshold}+ концептах, чтобы не
+                        перегружать браузер.
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowFullMatrices((prev) => !prev)}
+                        className="px-3 py-1 text-xs rounded-full border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                      >
+                        {showFullMatrices ? 'Скрыть таблицы' : 'Показать таблицы'}
+                      </button>
+                    </div>
+                  )}
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2141,11 +2235,7 @@ export default function StaffConsolePage() {
                       </label>
                       <ConceptMatrixEditor
                         concepts={colorInputs.concepts}
-                        matrix={ensureMatrices(
-                          metricForm.similarity_same_weights,
-                          metricForm.similarity_diff_weights,
-                          metricForm.attractiveness_rank_weights
-                        ).same}
+                        matrix={normalizedMatrices.same}
                         onChange={(mat) =>
                           setMetricForm((prev) => ({ ...prev, similarity_same_weights: mat }))
                         }
@@ -2154,6 +2244,7 @@ export default function StaffConsolePage() {
                             similarity_same_weights: next,
                           })
                         }
+                        compact={!showFullMatrices}
                       />
                     </div>
                     <div>
@@ -2162,11 +2253,7 @@ export default function StaffConsolePage() {
                       </label>
                       <ConceptMatrixEditor
                         concepts={colorInputs.concepts}
-                        matrix={ensureMatrices(
-                          metricForm.similarity_same_weights,
-                          metricForm.similarity_diff_weights,
-                          metricForm.attractiveness_rank_weights
-                        ).diff}
+                        matrix={normalizedMatrices.diff}
                         onChange={(mat) =>
                           setMetricForm((prev) => ({ ...prev, similarity_diff_weights: mat }))
                         }
@@ -2175,6 +2262,7 @@ export default function StaffConsolePage() {
                             similarity_diff_weights: next,
                           })
                         }
+                        compact={!showFullMatrices}
                       />
                     </div>
                   </div>
@@ -2186,11 +2274,7 @@ export default function StaffConsolePage() {
                     <RankMatrixEditor
                       concepts={colorInputs.concepts}
                       colors={colorInputs.colors}
-                      matrix={ensureMatrices(
-                        metricForm.similarity_same_weights,
-                        metricForm.similarity_diff_weights,
-                        metricForm.attractiveness_rank_weights
-                      ).rank}
+                      matrix={normalizedMatrices.rank}
                       onChange={(mat) =>
                         setMetricForm((prev) => ({ ...prev, attractiveness_rank_weights: mat }))
                       }
@@ -2199,6 +2283,7 @@ export default function StaffConsolePage() {
                           attractiveness_rank_weights: next,
                         })
                       }
+                      compact={!showFullMatrices}
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       Concepts: {colorInputs.concepts.length || '—'} | Colors/Ranks:{' '}
