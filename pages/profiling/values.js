@@ -265,16 +265,27 @@ export default function ValuesSurvey() {
     setLoading(true);
     try {
       const userId = localStorage.getItem('benehab_user_id');
+      const demographicsRaw = localStorage.getItem('benehab_demographics');
+      const demographics = demographicsRaw ? JSON.parse(demographicsRaw) : null;
       const response = await fetch('/api/color-tests/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ colorAssociations, colorRankings, userId }),
+        body: JSON.stringify({
+          colorAssociations,
+          colorRankings,
+          userId,
+          name: demographics?.name,
+          demographics,
+        }),
       });
 
       if (response.ok) {
         const result = await response.json();
+        if (result?.user_id) {
+          localStorage.setItem('benehab_user_id', result.user_id);
+        }
         // Persist completion marker for gating
         localStorage.setItem('benehab_values_profile', JSON.stringify(result));
         // Optionally save backend result for future use
@@ -290,7 +301,7 @@ export default function ValuesSurvey() {
         let message = errorText;
         try {
           const parsed = JSON.parse(errorText);
-          message = parsed?.error || parsed?.detail || parsed?.details || errorText;
+          message = parsed?.details || parsed?.detail || parsed?.error || errorText;
         } catch (err) {
           message = errorText;
         }

@@ -5,8 +5,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { colorAssociations, colorRankings, userId } = req.body || {};
-    if (!userId) {
+    const { colorAssociations, colorRankings, userId, name, demographics, email, chat_id } =
+      req.body || {};
+    if (!userId && !name) {
       return res.status(400).json({ error: 'userId is required' });
     }
     if (!colorAssociations || typeof colorAssociations !== 'object') {
@@ -113,7 +114,55 @@ export default async function handler(req, res) {
 
     const concept_color_matrix = orderedColors.map((color) => colorToConcepts.get(color) || []);
 
-    const response = await fetch(`${backendUrl}/color-tests`, {
+    const submitColorTest = async (resolvedUserId) =>
+      fetch(`${backendUrl}/color-tests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: resolvedUserId,
+          color_test_solution: { concept_color_matrix },
+        }),
+      });
+
+    const parseBackendError = async (resp) => {
+      const text = await resp.text();
+      try {
+        const parsed = JSON.parse(text);
+        return { text, detail: parsed?.detail || parsed?.error || parsed?.details };
+      } catch (err) {
+        return { text, detail: text };
+      }
+    };
+
+    let resolvedUserId = userId;
+    if (!resolvedUserId && name) {
+      const userResp = await fetch(`${backendUrl}/api/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email: email || null,
+          demographics: demographics || null,
+          chat_id: chat_id || null,
+        }),
+      });
+      if (!userResp.ok) {
+        const userError = await parseBackendError(userResp);
+        return res.status(userResp.status).json({
+          error: 'Backend user creation failed',
+          details: userError.detail || userError.text,
+        });
+      }
+      const createdUser = await userResp.json();
+      resolvedUserId = createdUser?.id;
+      if (!resolvedUserId) {
+        return res
+          .status(500)
+          .json({ error: 'Backend user creation failed', details: 'Missing user id' });
+      }
+    }
+
+    let response = await submitColorTest(resolvedUserId);
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -123,8 +172,50 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const text = await response.text();
-      return res.status(response.status).json({ error: 'Backend error', details: text });
+      const backendError = await parseBackendError(response);
+      const isUserMissing =
+        response.status === 404 &&
+        backendError.detail &&
+        String(backendError.detail).toLowerCase().includes('user not found');
+
+      if (isUserMissing && name) {
+        const userResp = await fetch(`${backendUrl}/api/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email: email || null,
+            demographics: demographics || null,
+            chat_id: chat_id || null,
+          }),
+        });
+        if (userResp.ok) {
+          const createdUser = await userResp.json();
+          const resolvedUserId = createdUser?.id;
+          if (!resolvedUserId) {
+            return res
+              .status(500)
+              .json({ error: 'Backend user creation failed', details: 'Missing user id' });
+          }
+          response = await submitColorTest(resolvedUserId);
+          if (!response.ok) {
+            const retryError = await parseBackendError(response);
+            return res
+              .status(response.status)
+              .json({ error: 'Backend error', details: retryError.detail || retryError.text });
+          }
+        } else {
+          const userError = await parseBackendError(userResp);
+          return res.status(userResp.status).json({
+            error: 'Backend user creation failed',
+            details: userError.detail || userError.text,
+          });
+        }
+      } else {
+        return res
+          .status(response.status)
+          .json({ error: 'Backend error', details: backendError.detail || backendError.text });
+      }
     }
 
     const data = await response.json();
