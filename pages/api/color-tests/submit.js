@@ -163,13 +163,6 @@ export default async function handler(req, res) {
     }
 
     let response = await submitColorTest(resolvedUserId);
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: userId,
-        color_test_solution: { concept_color_matrix },
-      }),
-    });
 
     if (!response.ok) {
       const backendError = await parseBackendError(response);
