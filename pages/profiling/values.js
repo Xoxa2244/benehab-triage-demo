@@ -287,8 +287,15 @@ export default function ValuesSurvey() {
         router.push('/profiling/values-results');
       } else {
         const errorText = await response.text();
-        console.error('❌ Error submitting answers:', response.status, errorText);
-        alert(`Submission error: ${response.status}`);
+        let message = errorText;
+        try {
+          const parsed = JSON.parse(errorText);
+          message = parsed?.error || parsed?.detail || parsed?.details || errorText;
+        } catch (err) {
+          message = errorText;
+        }
+        console.error('❌ Error submitting answers:', response.status, message);
+        alert(`Submission error: ${response.status}${message ? ` - ${message}` : ''}`);
       }
     } catch (error) {
       console.error('❌ Error submitting answers:', error);

@@ -13,6 +13,33 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'colorAssociations are required' });
     }
 
+    const normalizeList = (items) => {
+      if (!Array.isArray(items)) return [];
+      return items
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          if (typeof item === 'number') return String(item);
+          if (item && typeof item === 'object') {
+            if (typeof item.name === 'string') return item.name;
+            if (typeof item.label === 'string') return item.label;
+            if (typeof item.value === 'string') return item.value;
+          }
+          return '';
+        })
+        .filter(Boolean);
+    };
+
+    const normalizeString = (value) => {
+      if (typeof value === 'string') return value;
+      if (typeof value === 'number') return String(value);
+      if (value && typeof value === 'object') {
+        if (typeof value.name === 'string') return value.name;
+        if (typeof value.label === 'string') return value.label;
+        if (typeof value.value === 'string') return value.value;
+      }
+      return '';
+    };
+
     // Fetch inputs to know available colors/concepts and their order
     const baseUrl =
       typeof window === 'undefined'
@@ -28,8 +55,8 @@ export default async function handler(req, res) {
         .json({ error: 'Failed to load inputs from backend', details: text });
     }
     const inputs = await inputsResp.json();
-    const colors = inputs.colors || [];
-    const concepts = inputs.concepts || [];
+    const colors = normalizeList(inputs?.colors);
+    const concepts = normalizeList(inputs?.concepts);
 
     if (!Array.isArray(colors) || colors.length === 0) {
       return res.status(500).json({ error: 'Backend returned empty colors' });
@@ -40,7 +67,7 @@ export default async function handler(req, res) {
 
     // Validate rankings: ensure all colors are present
     const rankings = Array.isArray(colorRankings) ? colorRankings : [];
-    const normalizedRankings = rankings.map((c) => String(c));
+    const normalizedRankings = normalizeList(rankings);
     const missingColors = colors.filter((c) => !normalizedRankings.includes(c));
     const extraColors = normalizedRankings.filter((c) => !colors.includes(c));
 
@@ -58,11 +85,15 @@ export default async function handler(req, res) {
     // Build concept_color_matrix: columns follow orderedColors; each column holds concepts assigned that color
     const colorToConcepts = new Map(colors.map((c) => [c, []]));
     Object.entries(colorAssociations).forEach(([concept, color]) => {
-      if (!colors.includes(color)) {
-        throw new Error(`Concept "${concept}" has unsupported color "${color}"`);
+      const normalizedConcept = normalizeString(concept);
+      const normalizedColor = normalizeString(color);
+      if (!colors.includes(normalizedColor)) {
+        throw new Error(
+          `Concept "${normalizedConcept || concept}" has unsupported color "${normalizedColor || color}"`
+        );
       }
-      const arr = colorToConcepts.get(color);
-      arr.push(concept);
+      const arr = colorToConcepts.get(normalizedColor);
+      arr.push(normalizedConcept || concept);
     });
 
     // Validate concepts coverage

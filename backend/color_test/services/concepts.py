@@ -1,7 +1,5 @@
 from typing import Iterable
 
-from fastapi import HTTPException, status
-
 from backend.color_test.domain.concept import DEFAULT_CONCEPTS
 from backend.color_test.entities.concept_document import ConceptDocument
 
@@ -25,28 +23,18 @@ def _sanitize(concepts: Iterable[str]) -> list[str]:
 
 async def get_concepts() -> list[str]:
     doc = await ConceptDocument.get("color_test_concepts")
-    if doc and doc.concepts:
+    if doc is not None:
         return doc.concepts
 
     # Seed with defaults on first access
     defaults = list(DEFAULT_CONCEPTS)
-    if doc:
-        doc.concepts = defaults
-        await doc.save()
-    else:
-        doc = ConceptDocument(concepts=defaults)
-        await doc.insert()
+    doc = ConceptDocument(concepts=defaults)
+    await doc.insert()
     return defaults
 
 
 async def set_concepts(concepts: Iterable[str]) -> list[str]:
     sanitized = _sanitize(concepts)
-    if not sanitized:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Список понятий пуст. Добавьте хотя бы одно значение.",
-        )
-
     doc = await ConceptDocument.get("color_test_concepts")
     if not doc:
         doc = ConceptDocument(concepts=sanitized)

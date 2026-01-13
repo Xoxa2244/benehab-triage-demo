@@ -54,6 +54,7 @@ export default function StaffConsolePage() {
   const [pibStatus, setPibStatus] = useState('');
   const [backendInstructionStatus, setBackendInstructionStatus] = useState('');
   const [clearStatus, setClearStatus] = useState('');
+  const [localStorageStatus, setLocalStorageStatus] = useState('');
   const [instructionsPreview, setInstructionsPreview] = useState({
     patient_tags: [],
     dos: [],
@@ -92,6 +93,8 @@ export default function StaffConsolePage() {
       return null;
     }
   };
+
+  const matrixValueOptions = Array.from({ length: 11 }, (_, idx) => (idx / 10).toFixed(1));
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -523,6 +526,18 @@ export default function StaffConsolePage() {
       }
     }, [rowIdx, colIdx, matrix]);
 
+    const updateCell = (r, cc, nextVal) => {
+      const numeric = Number(nextVal);
+      const normalized = Number.isFinite(numeric) ? numeric : 0;
+      const next = matrix.map((row, rowIdxValue) =>
+        row.map((c, colIdxValue) =>
+          rowIdxValue === r && colIdxValue === cc ? normalized : c
+        )
+      );
+      onChange(next);
+      if (onSet) onSet(next);
+    };
+
     const apply = () => {
       const num = Number(val) || 0;
       const next = matrix.map((row, r) =>
@@ -551,11 +566,30 @@ export default function StaffConsolePage() {
                     <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
                       {r + 1}. {concepts[r]}
                     </td>
-                    {row.map((c, cc) => (
-                      <td key={cc} className="px-2 py-1 text-right">
-                        {Number(c).toFixed(2)}
-                      </td>
-                    ))}
+                    {row.map((c, cc) => {
+                      const isInactive = cc >= r;
+                      return (
+                        <td key={cc} className="px-2 py-1">
+                          {isInactive ? (
+                            <div className="w-full rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-500 text-right">
+                              {(Number(c) || 0).toFixed(1)}
+                            </div>
+                          ) : (
+                            <select
+                              value={(Number(c) || 0).toFixed(1)}
+                              onChange={(e) => updateCell(r, cc, e.target.value)}
+                              className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                            >
+                              {matrixValueOptions.map((opt) => (
+                                <option key={opt} value={opt}>
+                                  {opt}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
@@ -595,6 +629,9 @@ export default function StaffConsolePage() {
             type="number"
             value={val}
             onChange={(e) => setVal(e.target.value)}
+            min="0"
+            max="1"
+            step="0.1"
             className="w-24 border rounded-lg px-2 py-1 text-sm"
           />
           <button
@@ -619,6 +656,18 @@ export default function StaffConsolePage() {
         setVal(matrix[conceptIdx][colorIdx]);
       }
     }, [conceptIdx, colorIdx, matrix]);
+
+    const updateCell = (r, cc, nextVal) => {
+      const numeric = Number(nextVal);
+      const normalized = Number.isFinite(numeric) ? numeric : 0;
+      const next = matrix.map((row, rowIdxValue) =>
+        row.map((c, colIdxValue) =>
+          rowIdxValue === r && colIdxValue === cc ? normalized : c
+        )
+      );
+      onChange(next);
+      if (onSet) onSet(next);
+    };
 
     const apply = () => {
       const num = Number(val) || 0;
@@ -661,6 +710,9 @@ export default function StaffConsolePage() {
             type="number"
             value={val}
             onChange={(e) => setVal(e.target.value)}
+            min="0"
+            max="1"
+            step="0.1"
             className="w-24 border rounded-lg px-2 py-1 text-sm"
           />
           <button
@@ -685,16 +737,26 @@ export default function StaffConsolePage() {
             <tbody>
               {matrix.map((row, r) => (
                 <tr key={r} className={r % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
-                    {r + 1}. {concepts[r]}
-                  </td>
-                  {row.map((c, cc) => (
-                    <td key={cc} className="px-2 py-1 text-right">
-                      {Number(c).toFixed(2)}
+                    <td className="px-2 py-1 font-medium whitespace-nowrap sticky left-0 bg-white z-10">
+                      {r + 1}. {concepts[r]}
                     </td>
-                  ))}
-                </tr>
-              ))}
+                    {row.map((c, cc) => (
+                      <td key={cc} className="px-2 py-1">
+                        <select
+                          value={(Number(c) || 0).toFixed(1)}
+                          onChange={(e) => updateCell(r, cc, e.target.value)}
+                          className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                        >
+                          {matrixValueOptions.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -964,6 +1026,37 @@ export default function StaffConsolePage() {
       console.error('Error clearing chat history:', error);
       setClearStatus(`Error: ${error.message}`);
     }
+  };
+
+  const clearAllLocalStorage = () => {
+    if (typeof window === 'undefined') return;
+    setLocalStorageStatus('');
+
+    const confirmed = window.confirm(
+      'Это удалит все данные из localStorage для этого домена. Продолжить?'
+    );
+    if (!confirmed) return;
+
+    localStorage.clear();
+
+    setOverrideForms({
+      attitude: '',
+      typology: '',
+      values: '',
+      demographics: ''
+    });
+    setInstructionsPreview({
+      patient_tags: [],
+      dos: [],
+      donts: [],
+      specific_instructions: ''
+    });
+    setChatMessages([]);
+    setOverrideStatus('');
+    setPibStatus('');
+    setBackendInstructionStatus('');
+    setClearStatus('');
+    setLocalStorageStatus('✅ localStorage полностью очищен.');
   };
 
   const handleMarkCompleted = (visit) => {
@@ -1697,6 +1790,12 @@ export default function StaffConsolePage() {
                   >
                     Clear chat history
                   </button>
+                  <button
+                    onClick={clearAllLocalStorage}
+                    className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    Clear localStorage
+                  </button>
                 </div>
 
                 {overrideStatus && (
@@ -1717,6 +1816,11 @@ export default function StaffConsolePage() {
                 {clearStatus && (
                   <div className="mt-2 text-sm text-gray-700 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
                     {clearStatus}
+                  </div>
+                )}
+                {localStorageStatus && (
+                  <div className="mt-2 text-sm text-gray-700 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">
+                    {localStorageStatus}
                   </div>
                 )}
               </div>
@@ -1904,126 +2008,131 @@ export default function StaffConsolePage() {
         )}
 
         {/* Color Metrics Tab */}
-          {activeTab === 'color-metrics' && (
-            <div className="grid grid-cols-1 gap-6">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+        {activeTab === 'color-metrics' && (
+          <div className="grid grid-cols-1 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Color Metrics</h3>
+                  <p className="text-sm text-gray-600">
+                    Edit similarity/attractiveness matrices for the color test metrics.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={loadMetrics}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Refresh
+                  </button>
+                  <button
+                    onClick={createMetric}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Create metric
+                  </button>
+                  <button
+                    onClick={saveMetric}
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Save metric
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Metric name
+                </label>
+                <input
+                  type="text"
+                  value={metricForm.metric_name}
+                  onChange={(e) => handleMetricFieldChange('metric_name', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="metric name"
+                />
+              </div>
+
+              <div className="mb-6 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Color Metrics</h3>
-                    <p className="text-sm text-gray-600">
-                      Edit similarity/attractiveness matrices for the color test metrics.
+                    <div className="text-sm font-medium text-gray-900">Концепты цветового теста</div>
+                    <p className="text-xs text-gray-600">
+                      Локально редактируйте список понятий: добавляйте новые или удаляйте лишние токеном с крестиком.
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex w-full md:w-auto gap-2">
+                    <input
+                      type="text"
+                      value={conceptInput}
+                      onChange={(e) => setConceptInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddConcept();
+                        }
+                      }}
+                      className="flex-1 md:flex-none px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Новое понятие"
+                    />
                     <button
-                      onClick={loadMetrics}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                    >
-                      Refresh
-                    </button>
-                    <button
-                      onClick={createMetric}
+                      onClick={handleAddConcept}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      Create metric
-                    </button>
-                    <button
-                      onClick={saveMetric}
-                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-                    >
-                      Save metric
+                      Add
                     </button>
                   </div>
                 </div>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Metric name
-                  </label>
-                  <input
-                    type="text"
-                    value={metricForm.metric_name}
-                    onChange={(e) => handleMetricFieldChange('metric_name', e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="metric name"
-                  />
-                </div>
-
-                <div className="mb-6 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">Концепты цветового теста</div>
-                      <p className="text-xs text-gray-600">
-                        Локально редактируйте список понятий: добавляйте новые или удаляйте лишние токеном с крестиком.
-                      </p>
-                    </div>
-                    <div className="flex w-full md:w-auto gap-2">
-                      <input
-                        type="text"
-                        value={conceptInput}
-                        onChange={(e) => setConceptInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddConcept();
-                          }
-                        }}
-                        className="flex-1 md:flex-none px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Новое понятие"
-                      />
-                      <button
-                        onClick={handleAddConcept}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                <div className="flex flex-wrap gap-2">
+                  {colorInputs.concepts.length ? (
+                    colorInputs.concepts.map((concept) => (
+                      <span
+                        key={concept}
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full text-sm shadow-sm"
                       >
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {colorInputs.concepts.length ? (
-                      colorInputs.concepts.map((concept) => (
-                        <span
-                          key={concept}
-                          className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-gray-200 rounded-full text-sm shadow-sm"
+                        <span className="text-gray-800">{concept}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveConcept(concept)}
+                          className="text-gray-500 hover:text-red-600"
+                          aria-label={`Удалить ${concept}`}
                         >
-                          <span className="text-gray-800">{concept}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveConcept(concept)}
-                            className="text-gray-500 hover:text-red-600"
-                            aria-label={`Удалить ${concept}`}
-                          >
-                            &times;
-                          </button>
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-xs text-gray-500">Список понятий пуст.</span>
-                    )}
-                  </div>
-                  {conceptsStatus && (
-                    <div className="mt-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2">
-                      {conceptsStatus}
-                    </div>
+                          &times;
+                        </button>
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs text-gray-500">Список понятий пуст.</span>
                   )}
                 </div>
-
-                <div className="flex flex-wrap gap-3 mb-4">
-                  {colorMetrics.map((m) => (
-                    <button
-                      key={m.metric_name}
-                      onClick={() => handleSelectMetric(m)}
-                      className={`px-3 py-2 rounded-lg border text-sm ${
-                        selectedMetric?.metric_name === m.metric_name
-                          ? 'bg-blue-100 border-blue-300 text-blue-800'
-                          : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {m.metric_name}
-                    </button>
-                    ))}
+                {conceptsStatus && (
+                  <div className="mt-3 text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-2">
+                    {conceptsStatus}
                   </div>
+                )}
+              </div>
 
+              <div className="flex flex-wrap gap-3 mb-4">
+                {colorMetrics.map((m) => (
+                  <button
+                    key={m.metric_name}
+                    onClick={() => handleSelectMetric(m)}
+                    className={`px-3 py-2 rounded-lg border text-sm ${
+                      selectedMetric?.metric_name === m.metric_name
+                        ? 'bg-blue-100 border-blue-300 text-blue-800'
+                        : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {m.metric_name}
+                  </button>
+                ))}
+              </div>
+
+              {colorInputs.concepts.length === 0 ? (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600">
+                  Список понятий пуст — матрицы скрыты. Добавьте концепты, чтобы редактировать веса.
+                </div>
+              ) : (
                 <div className="space-y-4">
                   <div className="space-y-4">
                     <div>
@@ -2092,30 +2201,32 @@ export default function StaffConsolePage() {
                       }
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      Concepts: {colorInputs.concepts.length || '—'} | Colors/Ranks: {colorInputs.colors.length || '—'}
+                      Concepts: {colorInputs.concepts.length || '—'} | Colors/Ranks:{' '}
+                      {colorInputs.colors.length || '—'}
                     </p>
                   </div>
-
-                  {selectedMetric && (
-                    <div>
-                      <button
-                        onClick={() => deleteMetric(selectedMetric.metric_name)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        Delete metric
-                      </button>
-                    </div>
-                  )}
-
-                  {metricStatus && (
-                    <div className="text-sm text-gray-700 bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg">
-                      {metricStatus}
-                    </div>
-                  )}
                 </div>
-              </div>
+              )}
+
+              {selectedMetric && (
+                <div>
+                  <button
+                    onClick={() => deleteMetric(selectedMetric.metric_name)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete metric
+                  </button>
+                </div>
+              )}
+
+              {metricStatus && (
+                <div className="text-sm text-gray-700 bg-blue-50 border border-blue-100 px-3 py-2 rounded-lg">
+                  {metricStatus}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
         </div>
       </div>
     </div>
