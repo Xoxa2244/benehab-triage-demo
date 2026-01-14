@@ -237,6 +237,18 @@ export default function ValuesSurvey() {
     saveProgress();
   };
 
+  const moveColorRanking = (color, direction) => {
+    const currentIndex = colorRankings.indexOf(color);
+    if (currentIndex === -1) return;
+    const nextIndex = currentIndex + direction;
+    if (nextIndex < 0 || nextIndex >= colorRankings.length) return;
+    const newColorRankings = [...colorRankings];
+    const [moved] = newColorRankings.splice(currentIndex, 1);
+    newColorRankings.splice(nextIndex, 0, moved);
+    setColorRankings(newColorRankings);
+    saveProgress();
+  };
+
   const canGoToStage2 = () => {
     return Object.keys(colorAssociations).length === items.length;
   };
@@ -596,15 +608,45 @@ export default function ValuesSurvey() {
                         {Object.keys(colorAssociations).filter(concept => colorAssociations[concept] === color).length} concepts associated
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleColorRankingChange(color, colorRankings.length)}
-                      className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-red-500 transition-all duration-300"
-                      title="Remove from ranking"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <button
+                        onClick={() => moveColorRanking(color, -1)}
+                        disabled={index === 0}
+                        className={`p-2 rounded-lg transition-all duration-300 ${
+                          index === 0
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50'
+                        }`}
+                        title="Move up"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => moveColorRanking(color, 1)}
+                        disabled={index === colorRankings.length - 1}
+                        className={`p-2 rounded-lg transition-all duration-300 ${
+                          index === colorRankings.length - 1
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50'
+                        }`}
+                        title="Move down"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleColorRankingChange(color, colorRankings.length)}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-all duration-300"
+                        title="Remove from ranking"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

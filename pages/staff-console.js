@@ -93,7 +93,7 @@ const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSe
               <tr>
                 <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept</th>
                 {concepts.map((c, idx) => (
-                  <th key={c} className="px-2 py-1 whitespace-nowrap">
+                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center w-16 min-w-[64px]">
                     {idx + 1}. {c}
                   </th>
                 ))}
@@ -115,7 +115,7 @@ const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSe
                     {row.map((c, cc) => {
                       const isInactive = cc >= r;
                       return (
-                        <td key={cc} className="px-2 py-1">
+                        <td key={cc} className="px-2 py-1 w-16 min-w-[64px]">
                           {isInactive ? (
                             <div className="w-full rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-500 text-right">
                               {(Number(c) || 0).toFixed(1)}
@@ -128,7 +128,7 @@ const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSe
                               max="1"
                               step="0.1"
                               onChange={(e) => updateCell(r, cc, e.target.value)}
-                              className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                              className="w-full border rounded-md px-2 py-1 text-xs text-gray-700 text-right"
                             />
                           )}
                         </td>
@@ -295,7 +295,7 @@ const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact =
               <tr>
                 <th className="px-2 py-1 sticky left-0 bg-gray-50 z-10">Concept \\ Color</th>
                 {colors.map((c, idx) => (
-                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center">
+                  <th key={c} className="px-2 py-1 whitespace-nowrap text-center w-16 min-w-[64px]">
                     {idx + 1}
                   </th>
                 ))}
@@ -315,7 +315,7 @@ const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact =
                         {r + 1}. {concepts[r]}
                       </td>
                       {row.map((c, cc) => (
-                        <td key={cc} className="px-2 py-1">
+                        <td key={cc} className="px-2 py-1 w-16 min-w-[64px]">
                           <input
                             type="number"
                             value={c ?? 0}
@@ -323,7 +323,7 @@ const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact =
                             max="1"
                             step="0.1"
                             onChange={(e) => updateCell(r, cc, e.target.value)}
-                            className="w-full border rounded-md px-2 py-1 text-xs text-gray-700"
+                            className="w-full border rounded-md px-2 py-1 text-xs text-gray-700 text-right"
                           />
                         </td>
                       ))}
