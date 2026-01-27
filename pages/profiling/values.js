@@ -30,6 +30,8 @@ export default function ValuesSurvey() {
   const [colors, setColors] = useState([]);
   const [colorAssociations, setColorAssociations] = useState({});
   const [colorRankings, setColorRankings] = useState([]); // Color ranking
+  const [draggingIndex, setDraggingIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -247,6 +249,52 @@ export default function ValuesSurvey() {
     newColorRankings.splice(nextIndex, 0, moved);
     setColorRankings(newColorRankings);
     saveProgress();
+  };
+
+  const handleDragStart = (event, index) => {
+    if (event?.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.dropEffect = 'move';
+      event.dataTransfer.setData('text/plain', String(index));
+    }
+    setDraggingIndex(index);
+    setDragOverIndex(index);
+  };
+
+  const handleDragOver = (event, index) => {
+    event.preventDefault();
+    if (event?.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    if (index !== dragOverIndex) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (event, index) => {
+    event.preventDefault();
+    const fromIndex =
+      event?.dataTransfer?.getData('text/plain') !== ''
+        ? Number(event.dataTransfer.getData('text/plain'))
+        : draggingIndex;
+    if (fromIndex == null || Number.isNaN(fromIndex)) return;
+    if (index === fromIndex) {
+      setDraggingIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const next = [...colorRankings];
+    const [moved] = next.splice(fromIndex, 1);
+    next.splice(index, 0, moved);
+    setColorRankings(next);
+    saveProgress();
+    setDraggingIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingIndex(null);
+    setDragOverIndex(null);
   };
 
   const canGoToStage2 = () => {
@@ -593,9 +641,24 @@ export default function ValuesSurvey() {
                 Your Color Ranking
               </h3>
               
-              <div className="space-y-3">
+              <div
+                className="space-y-3"
+                onDragOver={(event) => event.preventDefault()}
+              >
                 {colorRankings.map((color, index) => (
-                  <div key={color} className="group flex items-center p-4 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-200 hover:border-emerald-300 transition-all duration-300">
+                  <div
+                    key={color}
+                    draggable
+                    onDragStart={(event) => handleDragStart(event, index)}
+                    onDragOver={(event) => handleDragOver(event, index)}
+                    onDrop={(event) => handleDrop(event, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`group flex items-center p-4 bg-gradient-to-r from-gray-50 to-white rounded-2xl border transition-all duration-300 ${
+                      dragOverIndex === index
+                        ? 'border-emerald-500 ring-2 ring-emerald-200'
+                        : 'border-gray-200 hover:border-emerald-300'
+                    }`}
+                  >
                     <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl font-bold text-lg mr-4">
                       {index + 1}
                     </div>

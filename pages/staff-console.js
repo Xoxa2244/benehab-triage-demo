@@ -48,9 +48,14 @@ const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSe
     }
   }, [rowIdx, colIdx, currentCellValue]);
 
+  const parseNumericInput = (raw, fallback = 0) => {
+    const normalized = String(raw ?? '').replace(',', '.');
+    const numeric = Number(normalized);
+    return Number.isFinite(numeric) ? numeric : fallback;
+  };
+
   const updateCell = (r, cc, nextVal) => {
-    const numeric = Number(nextVal);
-    const normalized = Number.isFinite(numeric) ? numeric : 0;
+    const normalized = parseNumericInput(nextVal, matrix?.[r]?.[cc] ?? 0);
     const next = matrix.map((row, rowIdxValue) =>
       row.map((c, colIdxValue) => {
         if (rowIdxValue === r && colIdxValue === cc) return normalized;
@@ -63,7 +68,7 @@ const ConceptMatrixEditor = ({ concepts, matrix, onChange, compact = false, onSe
   };
 
   const apply = () => {
-    const num = Number(val) || 0;
+    const num = parseNumericInput(val, 0);
     const next = matrix.map((row, r) =>
       row.map((c, cc) => {
         if (r === rowIdx && cc === colIdx) return num;
@@ -212,9 +217,14 @@ const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact =
     }
   }, [conceptIdx, colorIdx, currentCellValue]);
 
+  const parseNumericInput = (raw, fallback = 0) => {
+    const normalized = String(raw ?? '').replace(',', '.');
+    const numeric = Number(normalized);
+    return Number.isFinite(numeric) ? numeric : fallback;
+  };
+
   const updateCell = (r, cc, nextVal) => {
-    const numeric = Number(nextVal);
-    const normalized = Number.isFinite(numeric) ? numeric : 0;
+    const normalized = parseNumericInput(nextVal, matrix?.[r]?.[cc] ?? 0);
     const next = matrix.map((row, rowIdxValue) =>
       row.map((c, colIdxValue) =>
         rowIdxValue === r && colIdxValue === cc ? normalized : c
@@ -225,7 +235,7 @@ const RankMatrixEditor = ({ concepts, colors, matrix, onChange, onSet, compact =
   };
 
   const apply = () => {
-    const num = Number(val) || 0;
+    const num = parseNumericInput(val, 0);
     const next = matrix.map((row, r) =>
       row.map((c, cc) => (r === conceptIdx && cc === colorIdx ? num : c))
     );
@@ -850,8 +860,13 @@ export default function StaffConsolePage() {
         throw new Error(await response.text());
       }
       const data = await response.json();
-      setColorMetrics(data || []);
-      if (!data || !data.length) {
+      const normalized = (data || []).map((metric) => ({
+        ...metric,
+        attractiveness_rank_weights:
+          metric.attractiveness_rank_weights ?? metric.attractiveness_rank_matrix ?? [],
+      }));
+      setColorMetrics(normalized);
+      if (!normalized.length) {
         handleSelectMetric(null);
       }
       setMetricsLoaded(true);
@@ -876,7 +891,7 @@ export default function StaffConsolePage() {
     const normalized = ensureMatrices(
       metric.similarity_same_weights,
       metric.similarity_diff_weights,
-      metric.attractiveness_rank_weights
+      metric.attractiveness_rank_weights ?? metric.attractiveness_rank_matrix
     );
     setMetricForm({
       metric_name: metric.metric_name || '',
@@ -927,8 +942,37 @@ export default function StaffConsolePage() {
       if (!resp.ok) {
         throw new Error(await resp.text());
       }
+      const savedMetric = await resp.json();
+      const hasRankOverride = overrides.attractiveness_rank_weights != null;
+      const normalizedSaved = {
+        ...savedMetric,
+        attractiveness_rank_weights: hasRankOverride
+          ? normalized.rank
+          : savedMetric.attractiveness_rank_weights ??
+            savedMetric.attractiveness_rank_matrix ??
+            normalized.rank,
+      };
       setMetricStatus(`Metric "${body.metric_name}" saved`);
-      await loadMetrics();
+      setColorMetrics((prev) => {
+        const idx = prev.findIndex((m) => m.metric_name === normalizedSaved.metric_name);
+        if (idx === -1) return [...prev, normalizedSaved];
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...normalizedSaved };
+        return next;
+      });
+      setSelectedMetric((prev) =>
+        prev?.metric_name === body.metric_name ||
+        prev?.metric_name === normalizedSaved.metric_name
+          ? normalizedSaved
+          : prev
+      );
+      setMetricForm((prev) => ({
+        ...prev,
+        metric_name: normalizedSaved.metric_name || body.metric_name,
+        similarity_same_weights: normalized.same,
+        similarity_diff_weights: normalized.diff,
+        attractiveness_rank_weights: normalized.rank,
+      }));
     } catch (err) {
       console.error('Error saving metric:', err);
       setMetricStatus(`Error saving metric: ${err.message}`);
@@ -938,16 +982,15 @@ export default function StaffConsolePage() {
   const createMetric = async () => {
     setMetricStatus('');
     try {
-      const normalized = ensureMatrices(
-        metricForm.similarity_same_weights,
-        metricForm.similarity_diff_weights,
-        metricForm.attractiveness_rank_weights
-      );
+      const n = colorInputs.concepts.length || 0;
+      const r = colorInputs.colors.length || 0;
+      const zerosSame = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
+      const zerosRank = Array.from({ length: n }, () => Array.from({ length: r }, () => 0));
       const body = {
         metric_name: metricForm.metric_name.trim() || `metric_${Date.now()}`,
-        similarity_same_weights: normalized.same,
-        similarity_diff_weights: normalized.diff,
-        attractiveness_rank_weights: normalized.rank,
+        similarity_same_weights: zerosSame,
+        similarity_diff_weights: zerosSame.map((row) => [...row]),
+        attractiveness_rank_weights: zerosRank,
       };
       const resp = await fetch('/api/metrics', {
         method: 'POST',
@@ -957,6 +1000,13 @@ export default function StaffConsolePage() {
       if (!resp.ok) {
         throw new Error(await resp.text());
       }
+      setMetricForm((prev) => ({
+        ...prev,
+        metric_name: body.metric_name,
+        similarity_same_weights: zerosSame,
+        similarity_diff_weights: zerosSame.map((row) => [...row]),
+        attractiveness_rank_weights: zerosRank,
+      }));
       setMetricStatus('Metric created');
       await loadMetrics();
     } catch (err) {
