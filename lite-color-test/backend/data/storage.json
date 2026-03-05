@@ -1,0 +1,668 @@
+{
+  "projects": [
+    {
+      "id": "project_d4acb78937",
+      "name": "qwert",
+      "description": "",
+      "status": "draft",
+      "concepts": [
+        {
+          "id": "concept_d3139c3821",
+          "label": "Health",
+          "position": 0,
+          "is_active": true
+        },
+        {
+          "id": "concept_dd3cac486d",
+          "label": "Family",
+          "position": 1,
+          "is_active": true
+        },
+        {
+          "id": "concept_e29d38fd8f",
+          "label": "Work",
+          "position": 2,
+          "is_active": true
+        },
+        {
+          "id": "concept_652cde75f6",
+          "label": "Rest",
+          "position": 3,
+          "is_active": true
+        },
+        {
+          "id": "concept_a46b187df5",
+          "label": "Future",
+          "position": 4,
+          "is_active": true
+        },
+        {
+          "id": "concept_6016185c27",
+          "label": "Treatment",
+          "position": 5,
+          "is_active": true
+        },
+        {
+          "id": "concept_c09955cc",
+          "label": "вфыв",
+          "position": 6,
+          "is_active": true
+        },
+        {
+          "id": "concept_0cc58e82",
+          "label": "фывфывф",
+          "position": 7,
+          "is_active": true
+        }
+      ],
+      "palette": [
+        {
+          "id": "color_e2952db658",
+          "label": "Red",
+          "hex": "#ef4444",
+          "position": 0,
+          "is_active": true
+        },
+        {
+          "id": "color_49840a7173",
+          "label": "Blue",
+          "hex": "#3b82f6",
+          "position": 1,
+          "is_active": true
+        },
+        {
+          "id": "color_6066ac787a",
+          "label": "Green",
+          "hex": "#22c55e",
+          "position": 2,
+          "is_active": true
+        },
+        {
+          "id": "color_92f341689a",
+          "label": "Yellow",
+          "hex": "#eab308",
+          "position": 3,
+          "is_active": true
+        },
+        {
+          "id": "color_3dfbb4237a",
+          "label": "Purple",
+          "hex": "#a855f7",
+          "position": 4,
+          "is_active": true
+        },
+        {
+          "id": "color_3fb8b10e37",
+          "label": "Orange",
+          "hex": "#f97316",
+          "position": 5,
+          "is_active": true
+        }
+      ],
+      "metric_ids": [
+        "metric_4a15659cff",
+        "metric_dcffee6fd1"
+      ],
+      "created_at": "2026-03-05T02:54:45.296931+00:00",
+      "updated_at": "2026-03-05T04:14:12.608781Z"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "metric_4a15659cff",
+      "project_id": "project_d4acb78937",
+      "name": "base_metric",
+      "position": 0,
+      "is_active": true,
+      "similarity_same_weights": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "similarity_diff_weights": [
+        [
+          0.0,
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.1,
+          0.0,
+          0.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "attractiveness_rank_weights": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "created_at": "2026-03-05T02:54:45.297004+00:00",
+      "updated_at": "2026-03-05T03:44:13.280648Z"
+    },
+    {
+      "id": "metric_dcffee6fd1",
+      "project_id": "project_d4acb78937",
+      "name": "metric_1772682291416",
+      "position": 1,
+      "is_active": true,
+      "similarity_same_weights": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "similarity_diff_weights": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "attractiveness_rank_weights": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "created_at": "2026-03-05T03:44:51.737517+00:00",
+      "updated_at": "2026-03-05T03:44:51.737624+00:00"
+    }
+  ],
+  "synthetic_users": [
+    {
+      "id": "syn_b2a2a9a0a3",
+      "display_name": "wqe",
+      "kind": "synthetic",
+      "note": "we",
+      "created_at": "2026-03-05T02:52:56.705463+00:00",
+      "updated_at": "2026-03-05T02:52:56.705484+00:00"
+    },
+    {
+      "id": "syn_7dd6fb7295",
+      "display_name": "ewq",
+      "kind": "synthetic",
+      "note": "ewq",
+      "created_at": "2026-03-05T02:53:04.021943+00:00",
+      "updated_at": "2026-03-05T02:53:04.021968+00:00"
+    }
+  ],
+  "survey_runs": [
+    {
+      "id": "run_26a29b250f",
+      "project_id": "project_d4acb78937",
+      "project_name_snapshot": "qwert",
+      "user_id": "syn_7dd6fb7295",
+      "user_name_snapshot": "ewq",
+      "started_at": "2026-03-05T03:45:43.355760Z",
+      "completed_at": "2026-03-05T03:45:43.355760Z",
+      "concept_color_choices": {
+        "concept_d3139c3821": "color_3fb8b10e37",
+        "concept_dd3cac486d": "color_e2952db658",
+        "concept_e29d38fd8f": "color_e2952db658",
+        "concept_652cde75f6": "color_e2952db658",
+        "concept_a46b187df5": "color_e2952db658",
+        "concept_6016185c27": "color_e2952db658"
+      },
+      "color_rank_order": [
+        "color_e2952db658",
+        "color_6066ac787a",
+        "color_92f341689a",
+        "color_3dfbb4237a",
+        "color_3fb8b10e37",
+        "color_49840a7173"
+      ],
+      "calculated_metrics": {
+        "base_metric": 0.1,
+        "metric_1772682291416": 0.0
+      }
+    },
+    {
+      "id": "run_324de044c4",
+      "project_id": "project_d4acb78937",
+      "project_name_snapshot": "qwert",
+      "user_id": "syn_7dd6fb7295",
+      "user_name_snapshot": "ewq",
+      "started_at": "2026-03-05T03:54:45.947381Z",
+      "completed_at": "2026-03-05T03:54:45.947381Z",
+      "concept_color_choices": {
+        "concept_d3139c3821": "color_e2952db658",
+        "concept_dd3cac486d": "color_e2952db658",
+        "concept_e29d38fd8f": "color_3fb8b10e37",
+        "concept_652cde75f6": "color_3fb8b10e37",
+        "concept_a46b187df5": "color_3fb8b10e37",
+        "concept_6016185c27": "color_3fb8b10e37"
+      },
+      "color_rank_order": [
+        "color_e2952db658",
+        "color_3dfbb4237a",
+        "color_92f341689a",
+        "color_3fb8b10e37",
+        "color_6066ac787a",
+        "color_49840a7173"
+      ],
+      "calculated_metrics": {
+        "base_metric": 0.2,
+        "metric_1772682291416": 0.0
+      }
+    }
+  ]
+}

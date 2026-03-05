@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: lite-color-test-backend
+    environment:
+      LITE_COLOR_TEST_STORAGE_PATH: /app/data/storage.json
+    volumes:
+      - lite_color_test_data:/app/data
+    expose:
+      - "18010"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:18010/api/health').read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: lite-color-test-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  lite_color_test_data:
