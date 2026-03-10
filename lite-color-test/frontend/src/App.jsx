@@ -974,7 +974,7 @@ function App() {
                   <MatrixEditor
                     title="attractiveness_rank_weights"
                     rowLabels={concepts.map((item) => item.label)}
-                    colLabels={palette.map((item) => item.label)}
+                    colLabels={palette.map((_, index) => String(index + 1))}
                     matrix={selectedMetric.attractiveness_rank_weights}
                     onChange={(row, col, value) =>
                       updateMetricCell('attractiveness_rank_weights', row, col, value)
