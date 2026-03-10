@@ -367,11 +367,32 @@ th {
 .matrix-table {
   width: max-content;
   min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .matrix-table th,
 .matrix-table td {
   white-space: nowrap;
+}
+
+.matrix-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: #f8fafc;
+}
+
+.matrix-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #ffffff;
+}
+
+.matrix-table thead th:first-child {
+  left: 0;
+  z-index: 4;
 }
 
 .survey-meta {
