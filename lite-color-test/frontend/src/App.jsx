@@ -623,6 +623,9 @@ function App() {
 
   function setConceptColor(conceptId, colorId) {
     setConceptChoices((prev) => ({ ...prev, [conceptId]: colorId }));
+    if (currentConceptIndex < activeConcepts.length - 1) {
+      goToNextConcept();
+    }
   }
 
   function ensureColorInRank(colorId, index = null) {
@@ -1121,15 +1124,6 @@ function App() {
                       <div className="row">
                         <button onClick={goToPreviousConcept} disabled={currentConceptIndex === 0}>
                           Назад
-                        </button>
-                        <button
-                          onClick={goToNextConcept}
-                          disabled={
-                            currentConceptIndex >= activeConcepts.length - 1 ||
-                            !conceptChoices[currentConcept.id]
-                          }
-                        >
-                          Далее
                         </button>
                         <button
                           onClick={() => setSurveyStage(2)}
