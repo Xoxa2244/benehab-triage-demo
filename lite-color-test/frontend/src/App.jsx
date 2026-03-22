@@ -875,7 +875,7 @@ function App() {
                     onDragEnd={() => setDragPaletteIndex(-1)}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => dropPalette(index)}
-                    className="list-item"
+                    className="list-item palette-item"
                   >
                     <span className="drag-handle">⋮⋮</span>
                     <span className="color-dot" style={{ backgroundColor: item.hex }} />

@@ -240,6 +240,24 @@ button:disabled {
   background: #fbfdff;
 }
 
+.palette-item {
+  flex-wrap: wrap;
+}
+
+.palette-item .color-dot {
+  flex: 0 0 16px;
+}
+
+.palette-item .grow {
+  flex: 1 1 180px;
+  min-width: 120px;
+}
+
+.palette-item input[type='text'] {
+  flex: 0 1 140px;
+  min-width: 120px;
+}
+
 .list-item.selected {
   border-color: #6ea8ff;
   box-shadow: 0 0 0 2px rgba(76, 126, 255, 0.15);
@@ -265,6 +283,7 @@ button:disabled {
   height: 16px;
   border-radius: 50%;
   border: 1px solid #d1d5db;
+  flex: 0 0 16px;
 }
 
 .badge {
