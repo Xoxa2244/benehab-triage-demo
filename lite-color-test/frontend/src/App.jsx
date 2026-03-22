@@ -103,6 +103,7 @@ function App() {
   const [userResults, setUserResults] = useState([]);
   const [surveyRuns, setSurveyRuns] = useState([]);
   const [resultsStatus, setResultsStatus] = useState('');
+  const [csvStatus, setCsvStatus] = useState('');
   const [runsFilter, setRunsFilter] = useState({
     project_id: '',
     user_id: '',
@@ -238,6 +239,40 @@ function App() {
       setResultsStatus('');
     } catch (error) {
       setResultsStatus(`Ошибка загрузки результатов: ${error.message}`);
+    }
+  }
+
+  function getFilenameFromContentDisposition(headerValue, fallback) {
+    const match = headerValue?.match(/filename="?([^"]+)"?/i);
+    return match?.[1] || fallback;
+  }
+
+  async function downloadUserResultsCsv() {
+    setCsvStatus('Подготовка CSV...');
+    try {
+      const response = await api.downloadUserResultsCsv();
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || `Request failed: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const fallbackName = 'user-results.csv';
+      const filename = getFilenameFromContentDisposition(
+        response.headers.get('content-disposition'),
+        fallbackName
+      );
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+      setCsvStatus(`CSV скачан: ${filename}`);
+    } catch (error) {
+      setCsvStatus(`Ошибка выгрузки CSV: ${error.message}`);
     }
   }
 
@@ -1229,10 +1264,14 @@ function App() {
           <section className="card">
             <div className="card-head">
               <h2>Результаты пользователя</h2>
-              <button onClick={loadResults}>Обновить</button>
+              <div className="row">
+                <button onClick={downloadUserResultsCsv}>Скачать CSV</button>
+                <button onClick={loadResults}>Обновить</button>
+              </div>
             </div>
 
             {resultsStatus && <div className="hint">{resultsStatus}</div>}
+            {csvStatus && <div className="hint">{csvStatus}</div>}
 
             <div className="table-wrap">
               <table>

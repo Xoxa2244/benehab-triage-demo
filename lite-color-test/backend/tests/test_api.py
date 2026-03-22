@@ -1,7 +1,10 @@
+import csv
 import importlib
+from io import StringIO
 
 import pytest
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture()
@@ -145,3 +148,61 @@ def test_metric_values_must_have_step_01(backend):
 
     assert exc.value.status_code == 400
     assert '0.1 step' in str(exc.value.detail)
+
+
+def test_user_results_csv_export(backend):
+    main, models = backend
+
+    project = main.create_project(
+        models.ProjectCreateRequest(name='CSV Project', description='', status='active')
+    )
+    metric = main.list_project_metrics(project.id)[0]
+    concepts = main.get_project_concepts(project.id)
+    palette = main.get_project_palette(project.id)
+
+    user = main.create_synthetic_user(
+        models.SyntheticUserCreateRequest(display_name='CSV Tester', note='')
+    )
+
+    active_concepts = [item for item in concepts if item.is_active]
+    active_palette = [item for item in palette if item.is_active]
+    concept_choices = {concept.id: active_palette[0].id for concept in active_concepts}
+    rank_order = [color.id for color in active_palette]
+
+    run = main.create_survey_run(
+        project.id,
+        models.SurveyRunCreateRequest(
+            user_id=user.id,
+            concept_color_choices=concept_choices,
+            color_rank_order=rank_order,
+        ),
+    )
+
+    client = TestClient(main.app)
+    response = client.get('/api/results/users.csv')
+
+    assert response.status_code == 200
+    assert response.headers['content-type'].startswith('text/csv')
+    assert 'attachment' in response.headers['content-disposition']
+
+    reader = csv.reader(StringIO(response.text))
+    header = next(reader)
+    row = next(reader)
+
+    assert header[:6] == [
+        'user_id',
+        'user_name',
+        'project_id',
+        'project_name',
+        'runs_count',
+        'last_completed_at',
+    ]
+    assert row[0] == user.id
+    assert row[1] == 'CSV Tester'
+    assert row[2] == project.id
+    assert row[3] == 'CSV Project'
+    assert row[4] == '1'
+    assert row[5] == run.completed_at
+    assert f'metric_{metric.name}' in header
+    metric_index = header.index(f'metric_{metric.name}')
+    assert row[metric_index] == str(run.calculated_metrics[metric.name])

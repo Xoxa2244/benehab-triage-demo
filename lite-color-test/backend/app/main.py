@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+from io import StringIO
 from datetime import datetime, timezone
 import os
 from pathlib import Path
@@ -115,6 +117,66 @@ def _seed_if_empty(snapshot: DataStoreSnapshot) -> DataStoreSnapshot:
 
 def _load() -> DataStoreSnapshot:
     return _seed_if_empty(store.load())
+
+
+def _build_user_results_rows(snapshot: DataStoreSnapshot) -> list[UserResultsRow]:
+    grouped: dict[tuple[str, str], list[SurveyRun]] = {}
+
+    for run in snapshot.survey_runs:
+        key = (run.user_id, run.project_id)
+        grouped.setdefault(key, []).append(run)
+
+    rows: list[UserResultsRow] = []
+    for (user_id, project_id), runs in grouped.items():
+        runs_sorted = sorted(runs, key=lambda item: item.completed_at, reverse=True)
+        latest = runs_sorted[0]
+        rows.append(
+            UserResultsRow(
+                user_id=user_id,
+                user_name=latest.user_name_snapshot,
+                project_id=project_id,
+                project_name=latest.project_name_snapshot,
+                runs_count=len(runs_sorted),
+                last_completed_at=latest.completed_at,
+                latest_metrics=latest.calculated_metrics,
+            )
+        )
+
+    return sorted(rows, key=lambda item: item.last_completed_at, reverse=True)
+
+
+def _build_user_results_csv(snapshot: DataStoreSnapshot) -> str:
+    rows = _build_user_results_rows(snapshot)
+    metric_names = sorted({name for row in rows for name in row.latest_metrics.keys()})
+
+    buffer = StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(
+        [
+            "user_id",
+            "user_name",
+            "project_id",
+            "project_name",
+            "runs_count",
+            "last_completed_at",
+            *[f"metric_{name}" for name in metric_names],
+        ]
+    )
+
+    for row in rows:
+        writer.writerow(
+            [
+                row.user_id,
+                row.user_name,
+                row.project_id,
+                row.project_name,
+                row.runs_count,
+                row.last_completed_at,
+                *[row.latest_metrics.get(name, "") for name in metric_names],
+            ]
+        )
+
+    return buffer.getvalue()
 
 
 app = FastAPI(title="Lite Color Test API", version="0.1.0")
@@ -588,26 +650,15 @@ def list_survey_runs(
 @app.get("/api/results/users", response_model=list[UserResultsRow])
 def user_results() -> list[UserResultsRow]:
     snapshot = _load()
-    grouped: dict[tuple[str, str], list[SurveyRun]] = {}
+    return _build_user_results_rows(snapshot)
 
-    for run in snapshot.survey_runs:
-        key = (run.user_id, run.project_id)
-        grouped.setdefault(key, []).append(run)
 
-    rows: list[UserResultsRow] = []
-    for (user_id, project_id), runs in grouped.items():
-        runs_sorted = sorted(runs, key=lambda item: item.completed_at, reverse=True)
-        latest = runs_sorted[0]
-        rows.append(
-            UserResultsRow(
-                user_id=user_id,
-                user_name=latest.user_name_snapshot,
-                project_id=project_id,
-                project_name=latest.project_name_snapshot,
-                runs_count=len(runs_sorted),
-                last_completed_at=latest.completed_at,
-                latest_metrics=latest.calculated_metrics,
-            )
-        )
-
-    return sorted(rows, key=lambda item: item.last_completed_at, reverse=True)
+@app.get("/api/results/users.csv")
+def user_results_csv() -> Response:
+    snapshot = _load()
+    csv_content = _build_user_results_csv(snapshot)
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="user-results.csv"'},
+    )
