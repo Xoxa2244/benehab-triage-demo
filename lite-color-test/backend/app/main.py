@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-import csv
-from io import StringIO
+from io import BytesIO
 from datetime import datetime, timezone
 import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
 from .models import (
     ConceptsUpdateRequest,
@@ -145,37 +148,80 @@ def _build_user_results_rows(snapshot: DataStoreSnapshot) -> list[UserResultsRow
     return sorted(rows, key=lambda item: item.last_completed_at, reverse=True)
 
 
-def _build_user_results_csv(snapshot: DataStoreSnapshot) -> str:
+def _build_user_results_xlsx(snapshot: DataStoreSnapshot) -> bytes:
     rows = _build_user_results_rows(snapshot)
     metric_names = sorted({name for row in rows for name in row.latest_metrics.keys()})
+    headers = [
+        "user_id",
+        "user_name",
+        "project_id",
+        "project_name",
+        "runs_count",
+        "last_completed_at",
+        *[f"metric_{name}" for name in metric_names],
+    ]
 
-    buffer = StringIO()
-    writer = csv.writer(buffer)
-    writer.writerow(
+    table_rows = [
         [
-            "user_id",
-            "user_name",
-            "project_id",
-            "project_name",
-            "runs_count",
-            "last_completed_at",
-            *[f"metric_{name}" for name in metric_names],
+            row.user_id,
+            row.user_name,
+            row.project_id,
+            row.project_name,
+            row.runs_count,
+            row.last_completed_at,
+            *[row.latest_metrics.get(name, "") for name in metric_names],
         ]
-    )
+        for row in rows
+    ]
 
-    for row in rows:
-        writer.writerow(
-            [
-                row.user_id,
-                row.user_name,
-                row.project_id,
-                row.project_name,
-                row.runs_count,
-                row.last_completed_at,
-                *[row.latest_metrics.get(name, "") for name in metric_names],
-            ]
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Results"
+    worksheet.freeze_panes = "A2"
+    worksheet.sheet_view.showGridLines = False
+
+    header_fill = PatternFill("solid", fgColor="1F6F78")
+    header_font = Font(color="FFFFFF", bold=True)
+    data_alignment = Alignment(vertical="top", wrap_text=True)
+
+    worksheet.append(headers)
+    for row_values in table_rows:
+        worksheet.append(row_values)
+
+    for cell in worksheet[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+    for row in worksheet.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = data_alignment
+
+    data_end_row = worksheet.max_row
+    data_end_col = worksheet.max_column
+
+    if data_end_row >= 1 and data_end_col >= 1:
+        table_ref = f"A1:{get_column_letter(data_end_col)}{data_end_row}"
+        table = Table(displayName="UserResults", ref=table_ref)
+        table.tableStyleInfo = TableStyleInfo(
+            name="TableStyleMedium2",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False,
         )
+        worksheet.add_table(table)
 
+    for index, header in enumerate(headers, start=1):
+        column_values = [header, *[str(row[index - 1]) for row in table_rows]] if table_rows else [header]
+        max_length = max(len(str(value)) for value in column_values)
+        worksheet.column_dimensions[get_column_letter(index)].width = min(max(max_length + 2, 12), 48)
+
+    if data_end_row == 1:
+        worksheet.row_dimensions[1].height = 24
+
+    buffer = BytesIO()
+    workbook.save(buffer)
     return buffer.getvalue()
 
 
@@ -653,12 +699,12 @@ def user_results() -> list[UserResultsRow]:
     return _build_user_results_rows(snapshot)
 
 
-@app.get("/api/results/users.csv")
-def user_results_csv() -> Response:
+@app.get("/api/results/users.xlsx")
+def user_results_xlsx() -> Response:
     snapshot = _load()
-    csv_content = _build_user_results_csv(snapshot)
+    xlsx_content = _build_user_results_xlsx(snapshot)
     return Response(
-        content=csv_content,
-        media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="user-results.csv"'},
+        content=xlsx_content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="user-results.xlsx"'},
     )

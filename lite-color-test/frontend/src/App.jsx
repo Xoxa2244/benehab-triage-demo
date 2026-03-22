@@ -103,7 +103,7 @@ function App() {
   const [userResults, setUserResults] = useState([]);
   const [surveyRuns, setSurveyRuns] = useState([]);
   const [resultsStatus, setResultsStatus] = useState('');
-  const [csvStatus, setCsvStatus] = useState('');
+  const [xlsxStatus, setXlsxStatus] = useState('');
   const [runsFilter, setRunsFilter] = useState({
     project_id: '',
     user_id: '',
@@ -247,17 +247,17 @@ function App() {
     return match?.[1] || fallback;
   }
 
-  async function downloadUserResultsCsv() {
-    setCsvStatus('Подготовка CSV...');
+  async function downloadUserResultsXlsx() {
+    setXlsxStatus('Подготовка XLSX...');
     try {
-      const response = await api.downloadUserResultsCsv();
+      const response = await api.downloadUserResultsXlsx();
       if (!response.ok) {
         const text = await response.text();
         throw new Error(text || `Request failed: ${response.status}`);
       }
 
       const blob = await response.blob();
-      const fallbackName = 'user-results.csv';
+      const fallbackName = 'user-results.xlsx';
       const filename = getFilenameFromContentDisposition(
         response.headers.get('content-disposition'),
         fallbackName
@@ -270,9 +270,9 @@ function App() {
       link.click();
       link.remove();
       window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-      setCsvStatus(`CSV скачан: ${filename}`);
+      setXlsxStatus(`XLSX скачан: ${filename}`);
     } catch (error) {
-      setCsvStatus(`Ошибка выгрузки CSV: ${error.message}`);
+      setXlsxStatus(`Ошибка выгрузки XLSX: ${error.message}`);
     }
   }
 
@@ -1265,13 +1265,13 @@ function App() {
             <div className="card-head">
               <h2>Результаты пользователя</h2>
               <div className="row">
-                <button onClick={downloadUserResultsCsv}>Скачать CSV</button>
+                <button onClick={downloadUserResultsXlsx}>Скачать XLSX</button>
                 <button onClick={loadResults}>Обновить</button>
               </div>
             </div>
 
             {resultsStatus && <div className="hint">{resultsStatus}</div>}
-            {csvStatus && <div className="hint">{csvStatus}</div>}
+            {xlsxStatus && <div className="hint">{xlsxStatus}</div>}
 
             <div className="table-wrap">
               <table>

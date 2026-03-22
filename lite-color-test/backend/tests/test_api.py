@@ -1,10 +1,10 @@
-import csv
 import importlib
-from io import StringIO
+from io import BytesIO
 
 import pytest
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
+from openpyxl import load_workbook
 
 
 @pytest.fixture()
@@ -150,18 +150,18 @@ def test_metric_values_must_have_step_01(backend):
     assert '0.1 step' in str(exc.value.detail)
 
 
-def test_user_results_csv_export(backend):
+def test_user_results_xlsx_export(backend):
     main, models = backend
 
     project = main.create_project(
-        models.ProjectCreateRequest(name='CSV Project', description='', status='active')
+        models.ProjectCreateRequest(name='XLSX Project', description='', status='active')
     )
     metric = main.list_project_metrics(project.id)[0]
     concepts = main.get_project_concepts(project.id)
     palette = main.get_project_palette(project.id)
 
     user = main.create_synthetic_user(
-        models.SyntheticUserCreateRequest(display_name='CSV Tester', note='')
+        models.SyntheticUserCreateRequest(display_name='XLSX Tester', note='')
     )
 
     active_concepts = [item for item in concepts if item.is_active]
@@ -179,15 +179,18 @@ def test_user_results_csv_export(backend):
     )
 
     client = TestClient(main.app)
-    response = client.get('/api/results/users.csv')
+    response = client.get('/api/results/users.xlsx')
 
     assert response.status_code == 200
-    assert response.headers['content-type'].startswith('text/csv')
+    assert response.headers['content-type'].startswith(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     assert 'attachment' in response.headers['content-disposition']
 
-    reader = csv.reader(StringIO(response.text))
-    header = next(reader)
-    row = next(reader)
+    workbook = load_workbook(BytesIO(response.content))
+    sheet = workbook['Results']
+    header = [cell.value for cell in sheet[1]]
+    row = [cell.value for cell in sheet[2]]
 
     assert header[:6] == [
         'user_id',
@@ -198,11 +201,15 @@ def test_user_results_csv_export(backend):
         'last_completed_at',
     ]
     assert row[0] == user.id
-    assert row[1] == 'CSV Tester'
+    assert row[1] == 'XLSX Tester'
     assert row[2] == project.id
-    assert row[3] == 'CSV Project'
+    assert row[3] == 'XLSX Project'
     assert row[4] == '1'
     assert row[5] == run.completed_at
     assert f'metric_{metric.name}' in header
     metric_index = header.index(f'metric_{metric.name}')
-    assert row[metric_index] == str(run.calculated_metrics[metric.name])
+    assert row[metric_index] == run.calculated_metrics[metric.name]
+    assert sheet.freeze_panes == 'A2'
+    assert sheet.sheet_view.showGridLines is False
+    assert sheet.column_dimensions['A'].width >= len('user_id') + 2
+    assert sheet.column_dimensions['B'].width >= len('user_name') + 2

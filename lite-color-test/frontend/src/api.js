@@ -91,5 +91,5 @@ export const api = {
     return request(`/survey-runs${query.toString() ? `?${query.toString()}` : ''}`);
   },
   listUserResults: () => request('/results/users'),
-  downloadUserResultsCsv: () => fetch(`${API_BASE}/results/users.csv`),
+  downloadUserResultsXlsx: () => fetch(`${API_BASE}/results/users.xlsx`),
 };
